@@ -723,3 +723,6 @@ private suspend fun infinityCancellableBlock(
         }
     }
 }
+
+/** Format MB sebagai GB, mis. 1536 -> "1,5 GB" */
+fun formatMbAsGb(mb: Double): String = String.format(java.util.Locale.getDefault(), "%.1f GB", mb / 1024.0)

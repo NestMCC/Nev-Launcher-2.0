@@ -225,10 +225,10 @@ fun GameSettingsScreen(
                                     .padding(start = 2.dp),
                                 preview = (AllSettings.ramAllocation.state ?: AllSettings.ramAllocation.min).toDouble(),
                                 usedText = { usedMemory, totalMemory ->
-                                    stringResource(R.string.settings_game_java_memory_used_text, usedMemory.toInt(), totalMemory.toInt())
+                                    stringResource(R.string.settings_game_java_memory_used_text, usedMemory.toInt(), totalMemory.toInt()) + " (${com.movtery.zalithlauncher.ui.screens.content.elements.formatMbAsGb(usedMemory)} / ${com.movtery.zalithlauncher.ui.screens.content.elements.formatMbAsGb(totalMemory)})"
                                 },
                                 previewText = { preview ->
-                                    stringResource(R.string.settings_game_java_memory_allocation_text, preview.toInt())
+                                    stringResource(R.string.settings_game_java_memory_allocation_text, preview.toInt()) + " (${com.movtery.zalithlauncher.ui.screens.content.elements.formatMbAsGb(preview)})"
                                 }
                             )
                         }
