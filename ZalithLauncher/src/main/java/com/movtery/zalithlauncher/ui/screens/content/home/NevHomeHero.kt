@@ -63,6 +63,7 @@ import com.movtery.zalithlauncher.ui.components.nevCardBorder
 @Composable
 fun NevHeroBanner(
     onPlay: () -> Unit,
+    versionSelector: @Composable () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val primary = MaterialTheme.colorScheme.primary
@@ -75,7 +76,7 @@ fun NevHeroBanner(
     Box(
         modifier = modifier
             .fillMaxWidth()
-            .height(132.dp)
+            .height(152.dp)
             .clip(shape)
             .background(base)
             .drawBehind {
@@ -94,8 +95,8 @@ fun NevHeroBanner(
             contentDescription = null,
             modifier = Modifier
                 .align(Alignment.CenterEnd)
-                .padding(end = 24.dp)
-                .size(104.dp)
+                .padding(end = 16.dp)
+                .size(84.dp)
                 .alpha(0.92f)
         )
 
@@ -124,25 +125,52 @@ fun NevHeroBanner(
                 maxLines = 1
             )
             Spacer(modifier = Modifier.height(6.dp))
-            ScalingActionButton(
-                onClick = onPlay,
-                shape = RoundedCornerShape(percent = 50),
-                colors = ButtonDefaults.buttonColors(
-                    containerColor = primary,
-                    contentColor = Color.White
-                ),
-                contentPadding = PaddingValues(horizontal = 18.dp, vertical = 6.dp)
+            Row(
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                Icon(
-                    modifier = Modifier.size(18.dp),
-                    painter = painterResource(R.drawable.ic_play_arrow_filled),
-                    contentDescription = null
-                )
-                Spacer(modifier = Modifier.width(6.dp))
-                Text(
-                    text = "Main Sekarang",
-                    style = MaterialTheme.typography.labelLarge
-                )
+                // Tombol Main Sekarang = tombol luncurkan (menggantikan tombol Luncurkan di panel kanan)
+                ScalingActionButton(
+                    onClick = onPlay,
+                    shape = RoundedCornerShape(percent = 50),
+                    colors = ButtonDefaults.buttonColors(
+                        containerColor = Color.Transparent,
+                        contentColor = Color.White
+                    ),
+                    contentPadding = PaddingValues(0.dp)
+                ) {
+                    Row(
+                        modifier = Modifier
+                            .background(
+                                Brush.horizontalGradient(
+                                    colors = listOf(primary, MaterialTheme.colorScheme.primaryContainer)
+                                )
+                            )
+                            .padding(horizontal = 16.dp, vertical = 9.dp),
+                        verticalAlignment = Alignment.CenterVertically
+                    ) {
+                        Icon(
+                            modifier = Modifier.size(18.dp),
+                            painter = painterResource(R.drawable.ic_play_arrow_filled),
+                            contentDescription = null
+                        )
+                        Spacer(modifier = Modifier.width(6.dp))
+                        Text(
+                            text = "Main Sekarang",
+                            style = MaterialTheme.typography.labelLarge
+                        )
+                    }
+                }
+
+                // Pemilih versi (dipindah dari menu Luncurkan)
+                Box(
+                    modifier = Modifier
+                        .width(200.dp)
+                        .clip(MaterialTheme.shapes.large)
+                        .background(Color.Black.copy(alpha = 0.28f))
+                ) {
+                    versionSelector()
+                }
             }
         }
     }

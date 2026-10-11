@@ -217,7 +217,9 @@ fun LauncherScreen(
                     },
                     onQuickPlayServer = onQuickPlayServer,
                     onOpenVersionSettings = navigateToVersions,
-                    onPlayCurrent = { onLaunchGame(null) }
+                    onPlayCurrent = { onLaunchGame(null) },
+                    toVersionManageScreen = toVersionManageScreen,
+                    toVersionSettingsScreen = toVersionSettingsScreen
                 )
                 }
 
@@ -267,6 +269,8 @@ private fun ContentMenu(
     onQuickPlayServer: (Version?, String) -> Unit,
     onOpenVersionSettings: (Version) -> Unit,
     onPlayCurrent: () -> Unit,
+    toVersionManageScreen: () -> Unit,
+    toVersionSettingsScreen: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val yOffset by swapAnimateDpAsState(
@@ -298,7 +302,14 @@ private fun ContentMenu(
             ) {
                 NevHeroBanner(
                     modifier = Modifier.padding(horizontal = 4.dp),
-                    onPlay = onPlayCurrent
+                    onPlay = onPlayCurrent,
+                    versionSelector = {
+                        VersionSelector(
+                            onLaunchGame = onLaunchGame,
+                            toVersionManageScreen = toVersionManageScreen,
+                            toVersionSettingsScreen = toVersionSettingsScreen
+                        )
+                    }
                 )
                 HomeGrid(
                     state = gridState,
@@ -406,9 +417,12 @@ private fun AccountAvatarRow(
     }
 }
 
+/**
+ * Nev Launcher: pemilih versi (dulu bagian dari menu Luncurkan di panel kanan, sekarang ada di banner)
+ */
 @Composable
-private fun VersionsContent(
-    onLaunchGame: (Version?) -> Unit,
+private fun VersionSelector(
+    onLaunchGame: (Version) -> Unit,
     toVersionManageScreen: () -> Unit,
     toVersionSettingsScreen: () -> Unit,
     modifier: Modifier = Modifier
@@ -507,44 +521,6 @@ private fun VersionsContent(
                 }
             }
         }
-
-        val launchBrush = Brush.horizontalGradient(
-            colors = listOf(
-                MaterialTheme.colorScheme.primary,
-                MaterialTheme.colorScheme.primaryContainer
-            )
-        )
-        ScalingActionButton(
-            modifier = Modifier
-                .fillMaxWidth()
-                .padding(PaddingValues(horizontal = 12.dp))
-                .padding(bottom = 8.dp),
-            shape = RoundedCornerShape(percent = 50),
-            colors = ButtonDefaults.buttonColors(
-                containerColor = Color.Transparent,
-                contentColor = Color.White
-            ),
-            contentPadding = PaddingValues(0.dp),
-            elevation = ButtonDefaults.buttonElevation(defaultElevation = 1.dp),
-            onClick = {
-                onLaunchGame(null)
-            },
-            content = {
-                // Nev Launcher: tombol Luncurkan bergradasi merah
-                Box(
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .heightIn(min = 52.dp)
-                        .background(launchBrush),
-                    contentAlignment = Alignment.Center
-                ) {
-                    MarqueeText(
-                        text = stringResource(R.string.main_launch_game),
-                        style = MaterialTheme.typography.titleMedium
-                    )
-                }
-            }
-        )
     }
 }
 
@@ -567,13 +543,13 @@ private fun ActionMenuCardContent(
         ConstraintLayout(
             modifier = Modifier.fillMaxSize()
         ) {
-            val (accountAvatar, versionManagerLayout) = createRefs()
+            val accountAvatar = createRef()
 
             AccountAvatarCenter(
                 modifier = Modifier
                     .constrainAs(accountAvatar) {
                         top.linkTo(parent.top)
-                        bottom.linkTo(versionManagerLayout.top)
+                        bottom.linkTo(parent.bottom)
                         start.linkTo(parent.start)
                         end.linkTo(parent.end)
                     }.guideNode(
@@ -582,17 +558,6 @@ private fun ActionMenuCardContent(
                     ),
                 account = account,
                 onClick = toAccountManageScreen
-            )
-
-            VersionsContent(
-                modifier = Modifier.constrainAs(versionManagerLayout) {
-                    start.linkTo(parent.start)
-                    end.linkTo(parent.end)
-                    bottom.linkTo(parent.bottom)
-                },
-                onLaunchGame = onLaunchGame,
-                toVersionManageScreen = toVersionManageScreen,
-                toVersionSettingsScreen = toVersionSettingsScreen,
             )
         }
     }
@@ -654,18 +619,6 @@ private fun ActionMenuTallerContent(
             AccountAvatarRow(
                 modifier = Modifier.fillMaxWidth(),
                 account = account,
-            )
-        }
-
-        BackgroundCard(
-            modifier = Modifier.fillMaxWidth(),
-            shape = MaterialTheme.shapes.extraLarge,
-        ) {
-            VersionsContent(
-                modifier = Modifier.fillMaxWidth(),
-                onLaunchGame = onLaunchGame,
-                toVersionManageScreen = toVersionManageScreen,
-                toVersionSettingsScreen = toVersionSettingsScreen,
             )
         }
     }

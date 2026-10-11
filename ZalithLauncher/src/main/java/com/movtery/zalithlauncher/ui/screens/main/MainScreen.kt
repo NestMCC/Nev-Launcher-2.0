@@ -18,6 +18,10 @@
 
 package com.movtery.zalithlauncher.ui.screens.main
 
+import androidx.compose.ui.text.style.TextOverflow
+import androidx.compose.foundation.verticalScroll
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.background
 import androidx.compose.ui.unit.sp
 import androidx.compose.ui.text.withStyle
 import androidx.compose.ui.text.font.FontWeight
@@ -247,10 +251,46 @@ fun MainScreen(
                 },
             )
 
-            Box(
+            Row(
                 modifier = Modifier
                     .fillMaxWidth()
                     .weight(1f)
+            ) {
+            // Nev Launcher: ikon menu dipindah dari bilah atas ke sidebar kiri (fungsi sama)
+            NevSideRail(
+                inLauncherScreen = inLauncherScreen,
+                inMultiplayerScreen = mainScreenKey is NormalNavKey.Multiplayer,
+                inDownloadScreen = mainScreenKey is NestedNavKey.Download,
+                inSettingsScreen = mainScreenKey is NestedNavKey.Settings,
+                toMainScreen = toMainScreen,
+                openFileManager = {
+                    eventViewModel.sendEvent(
+                        EventViewModel.Event.OpenFileManager(
+                            rootPath = PathManager.DIR_FILES_EXTERNAL.absolutePath
+                        )
+                    )
+                },
+                toMultiplayerScreen = {
+                    screenBackStackModel.mainScreen.removeAndNavigateTo(
+                        removes = screenBackStackModel.clearBeforeNavKeys,
+                        screenKey = NormalNavKey.Multiplayer
+                    )
+                },
+                toDownloadScreen = {
+                    screenBackStackModel.navigateToDownload()
+                },
+                toSettingsScreen = {
+                    screenBackStackModel.mainScreen.removeAndNavigateTo(
+                        removes = screenBackStackModel.clearBeforeNavKeys,
+                        screenKey = screenBackStackModel.settingsScreen
+                    )
+                }
+            )
+
+            Box(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight()
             ) {
                 NavigationUI(
                     modifier = Modifier.fillMaxSize(),
@@ -273,6 +313,7 @@ fun MainScreen(
                 ) {
                     changeTasksExpandedState()
                 }
+            }
             }
         }
     }
@@ -434,42 +475,6 @@ private fun <E: TitledNavKey> TopBar(
                         )
                     }
                 }
-
-                IconButton(
-                    onClick = openFileManager
-                ) {
-                    Icon(
-                        painter = painterResource(R.drawable.ic_folder_filled),
-                        contentDescription = null
-                    )
-                }
-
-                TopBarRailItem(
-                    selected = inMultiplayerScreen,
-                    painter = painterResource(R.drawable.ic_group_filled),
-                    text = stringResource(R.string.terracotta),
-                    onClick = {
-                        if (!inMultiplayerScreen) toMultiplayerScreen()
-                    },
-                )
-
-                TopBarRailItem(
-                    selected = inDownloadScreen,
-                    painter = painterResource(R.drawable.ic_download_2_filled),
-                    text = stringResource(R.string.generic_download),
-                    onClick = {
-                        if (!inDownloadScreen) toDownloadScreen()
-                    },
-                )
-
-                TopBarRailItem(
-                    selected = inSettingsScreen,
-                    painter = painterResource(R.drawable.ic_settings_filled),
-                    text = stringResource(R.string.generic_setting),
-                    onClick = {
-                        if (!inSettingsScreen) toSettingsScreen()
-                    },
-                )
             }
         }
     }
@@ -904,5 +909,103 @@ private fun NevBrandTitle() {
                 softWrap = false
             )
         }
+    }
+}
+
+/**
+ * Nev Launcher: sidebar kiri berisi menu (Beranda, File, Multiplayer, Unduh, Pengaturan)
+ */
+@Composable
+private fun NevSideRail(
+    inLauncherScreen: Boolean,
+    inMultiplayerScreen: Boolean,
+    inDownloadScreen: Boolean,
+    inSettingsScreen: Boolean,
+    toMainScreen: () -> Unit,
+    openFileManager: () -> Unit,
+    toMultiplayerScreen: () -> Unit,
+    toDownloadScreen: () -> Unit,
+    toSettingsScreen: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Column(
+        modifier = modifier
+            .width(76.dp)
+            .fillMaxHeight()
+            .verticalScroll(rememberScrollState())
+            .padding(horizontal = 6.dp, vertical = 4.dp),
+        verticalArrangement = Arrangement.spacedBy(6.dp),
+        horizontalAlignment = Alignment.CenterHorizontally
+    ) {
+        NevRailItem(
+            selected = inLauncherScreen,
+            painter = painterResource(R.drawable.ic_home_filled),
+            text = "Beranda",
+            onClick = { if (!inLauncherScreen) toMainScreen() }
+        )
+        NevRailItem(
+            selected = false,
+            painter = painterResource(R.drawable.ic_folder_filled),
+            text = "File",
+            onClick = openFileManager
+        )
+        NevRailItem(
+            selected = inMultiplayerScreen,
+            painter = painterResource(R.drawable.ic_group_filled),
+            text = stringResource(R.string.terracotta),
+            onClick = { if (!inMultiplayerScreen) toMultiplayerScreen() }
+        )
+        NevRailItem(
+            selected = inDownloadScreen,
+            painter = painterResource(R.drawable.ic_download_2_filled),
+            text = stringResource(R.string.generic_download),
+            onClick = { if (!inDownloadScreen) toDownloadScreen() }
+        )
+        NevRailItem(
+            selected = inSettingsScreen,
+            painter = painterResource(R.drawable.ic_settings_filled),
+            text = stringResource(R.string.generic_setting),
+            onClick = { if (!inSettingsScreen) toSettingsScreen() }
+        )
+    }
+}
+
+@Composable
+private fun NevRailItem(
+    selected: Boolean,
+    painter: Painter,
+    text: String,
+    onClick: () -> Unit
+) {
+    val selectedBrush = Brush.horizontalGradient(
+        colors = listOf(
+            MaterialTheme.colorScheme.primary,
+            MaterialTheme.colorScheme.primaryContainer
+        )
+    )
+    val tint = if (selected) Color.White else LocalContentColor.current
+    Column(
+        modifier = Modifier
+            .fillMaxWidth()
+            .clip(MaterialTheme.shapes.large)
+            .then(if (selected) Modifier.background(selectedBrush) else Modifier)
+            .clickable(onClick = onClick)
+            .padding(vertical = 8.dp),
+        horizontalAlignment = Alignment.CenterHorizontally,
+        verticalArrangement = Arrangement.spacedBy(2.dp)
+    ) {
+        Icon(
+            modifier = Modifier.size(22.dp),
+            painter = painter,
+            contentDescription = text,
+            tint = tint
+        )
+        Text(
+            text = text,
+            style = MaterialTheme.typography.labelSmall,
+            color = tint,
+            maxLines = 1,
+            overflow = TextOverflow.Ellipsis
+        )
     }
 }
