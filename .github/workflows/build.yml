@@ -21,9 +21,12 @@ jobs:
   build:
     if: github.event_name != 'pull_request'
     runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      actions: write
     strategy:
       matrix:
-        arch: ["all", "arm", "arm64", "x86", "x86_64"]
+        arch: ["arm64"]
       fail-fast: false
 
     env:
@@ -53,6 +56,20 @@ jobs:
         run: |
           chmod +x gradlew
           ./gradlew ZalithLauncher:assemble${{ inputs.variant }} -Darch=${{ matrix.arch }}
+
+      - name: Hapus APK dan riwayat build lama
+        continue-on-error: true
+        env:
+          GH_TOKEN: ${{ github.token }}
+          REPO: ${{ github.repository }}
+          CURRENT_RUN: ${{ github.run_id }}
+        run: |
+          for id in $(gh api --paginate "repos/$REPO/actions/artifacts?per_page=100" -q '.artifacts[].id'); do
+            gh api -X DELETE "repos/$REPO/actions/artifacts/$id" || true
+          done
+          for id in $(gh api --paginate "repos/$REPO/actions/runs?per_page=100" -q ".workflow_runs[] | select(.id != $CURRENT_RUN and .status == \"completed\") | .id"); do
+            gh api -X DELETE "repos/$REPO/actions/runs/$id" || true
+          done
 
       - name: Upload Release APK for ${{ matrix.arch }}
         if: inputs.variant == 'Release'
