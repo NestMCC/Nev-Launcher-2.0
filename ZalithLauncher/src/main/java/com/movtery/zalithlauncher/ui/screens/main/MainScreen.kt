@@ -18,6 +18,12 @@
 
 package com.movtery.zalithlauncher.ui.screens.main
 
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.text.withStyle
+import androidx.compose.ui.text.font.FontWeight
+import androidx.compose.ui.text.buildAnnotatedString
+import androidx.compose.ui.text.SpanStyle
+import androidx.compose.foundation.Image
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
@@ -368,12 +374,7 @@ private fun <E: TitledNavKey> TopBar(
 
                 if (parent == null) {
                     if (festivals.isEmpty()) {
-                        Text(
-                            text = BuildKeys.LAUNCHER_NAME,
-                            style = style,
-                            softWrap = softWarp,
-                            maxLines = maxLines
-                        )
+                        NevBrandTitle()
                     } else {
                         FestivalTitleText(
                             festivals = festivals,
@@ -859,6 +860,49 @@ private fun TaskItem(
                     }
                 }
             }
+        }
+    }
+}
+
+/**
+ * Nev Launcher: judul bermerek di bilah atas (logo N, nama, dan tagline)
+ */
+@Composable
+private fun NevBrandTitle() {
+    Row(
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        Image(
+            painter = painterResource(R.drawable.img_launcher),
+            contentDescription = null,
+            modifier = Modifier.size(30.dp)
+        )
+        Column(verticalArrangement = Arrangement.Center) {
+            Text(
+                text = buildAnnotatedString {
+                    withStyle(SpanStyle(color = MaterialTheme.colorScheme.primary)) { append("NEV ") }
+                    withStyle(SpanStyle(color = MaterialTheme.colorScheme.onSurface)) {
+                        append(BuildKeys.LAUNCHER_NAME.removePrefix("Nev ").uppercase())
+                    }
+                },
+                style = MaterialTheme.typography.titleSmall.copy(
+                    fontWeight = FontWeight.ExtraBold,
+                    letterSpacing = 1.2.sp
+                ),
+                maxLines = 1,
+                softWrap = false
+            )
+            Text(
+                text = "PLAY · EXPLORE · TOGETHER",
+                style = MaterialTheme.typography.labelSmall.copy(
+                    fontSize = 8.sp,
+                    letterSpacing = 1.6.sp
+                ),
+                color = MaterialTheme.colorScheme.onSurfaceVariant.copy(alpha = 0.75f),
+                maxLines = 1,
+                softWrap = false
+            )
         }
     }
 }

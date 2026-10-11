@@ -18,6 +18,7 @@
 
 package com.movtery.zalithlauncher.ui.screens.content
 
+import com.movtery.zalithlauncher.ui.screens.content.home.NevHeroBanner
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.draw.alpha
@@ -215,7 +216,8 @@ fun LauncherScreen(
                         onLaunchGame(version)
                     },
                     onQuickPlayServer = onQuickPlayServer,
-                    onOpenVersionSettings = navigateToVersions
+                    onOpenVersionSettings = navigateToVersions,
+                    onPlayCurrent = { onLaunchGame(null) }
                 )
                 }
 
@@ -264,6 +266,7 @@ private fun ContentMenu(
     onLaunchGame: (Version) -> Unit,
     onQuickPlayServer: (Version?, String) -> Unit,
     onOpenVersionSettings: (Version) -> Unit,
+    onPlayCurrent: () -> Unit,
     modifier: Modifier = Modifier,
 ) {
     val yOffset by swapAnimateDpAsState(
@@ -287,13 +290,24 @@ private fun ContentMenu(
                     .size(240.dp)
                     .alpha(0.10f)
             )
-            HomeGrid(
-                state = gridState,
-                isVisible = isVisible,
+            Column(
                 modifier = Modifier
                     .fillMaxSize()
-                    .offset { IntOffset(x = 0, y = yOffset.roundToPx()) }
-            )
+                    .offset { IntOffset(x = 0, y = yOffset.roundToPx()) },
+                verticalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                NevHeroBanner(
+                    modifier = Modifier.padding(horizontal = 4.dp),
+                    onPlay = onPlayCurrent
+                )
+                HomeGrid(
+                    state = gridState,
+                    isVisible = isVisible,
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .weight(1f)
+                )
+            }
         }
     }
 }
