@@ -59,6 +59,9 @@ import androidx.compose.runtime.remember
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.geometry.Offset
+import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
@@ -165,6 +168,9 @@ fun MainScreen(
         backgroundColor().copy(alpha = launcherBackgroundOpacity)
     } else backgroundColor()
 
+    val glowPrimary = MaterialTheme.colorScheme.primary
+    val glowSecondary = MaterialTheme.colorScheme.secondary
+
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = backgroundColor,
@@ -173,6 +179,27 @@ fun MainScreen(
         Column(
             modifier = Modifier
                 .fillMaxSize()
+                .then(
+                    if (!isBackgroundValid) {
+                        // Nev Launcher: cahaya merah (kiri atas) dan emas (kanan bawah) yang halus
+                        Modifier.drawBehind {
+                            drawRect(
+                                brush = Brush.radialGradient(
+                                    colors = listOf(glowPrimary.copy(alpha = 0.24f), Color.Transparent),
+                                    center = Offset.Zero,
+                                    radius = size.maxDimension * 0.8f
+                                )
+                            )
+                            drawRect(
+                                brush = Brush.radialGradient(
+                                    colors = listOf(glowSecondary.copy(alpha = 0.10f), Color.Transparent),
+                                    center = Offset(size.width, size.height),
+                                    radius = size.maxDimension * 0.6f
+                                )
+                            )
+                        }
+                    } else Modifier
+                )
         ) {
             TopBar(
                 modifier = Modifier

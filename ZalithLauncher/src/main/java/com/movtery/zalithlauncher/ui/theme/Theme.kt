@@ -18,6 +18,9 @@
 
 package com.movtery.zalithlauncher.ui.theme
 
+import androidx.compose.ui.unit.dp
+import androidx.compose.material3.Shapes
+import androidx.compose.foundation.shape.RoundedCornerShape
 import android.os.Build
 import androidx.compose.material3.ColorScheme
 import androidx.compose.material3.MaterialExpressiveTheme
@@ -81,6 +84,13 @@ private val embermireLight = lightColorScheme(
     surfaceContainer = surfaceContainerLight.embermire,
     surfaceContainerHigh = surfaceContainerHighLight.embermire,
     surfaceContainerHighest = surfaceContainerHighestLight.embermire,
+)
+
+// Nev Launcher: sudut lebih membulat untuk kesan modern
+private val NevShapes = Shapes(
+    medium = RoundedCornerShape(18.dp),
+    large = RoundedCornerShape(24.dp),
+    extraLarge = RoundedCornerShape(32.dp)
 )
 
 // Nev Launcher: skema gelap merah (menggantikan Embermire gelap bawaan)
@@ -681,6 +691,7 @@ fun ZalithLauncherTheme(
         MaterialExpressiveTheme(
             colorScheme = currentDisplayScheme,
             motionScheme = MotionScheme.expressive(),
+            shapes = NevShapes,
             typography = AppTypography,
             content = content
         )

@@ -18,6 +18,15 @@
 
 package com.movtery.zalithlauncher.ui.theme
 
+import androidx.compose.ui.text.font.FontWeight
 import androidx.compose.material3.Typography
 
-val AppTypography = Typography()
+private val baseTypography = Typography()
+
+// Nev Launcher: judul dan label lebih tebal supaya terlihat tegas
+val AppTypography = baseTypography.copy(
+    titleLarge = baseTypography.titleLarge.copy(fontWeight = FontWeight.Bold),
+    titleMedium = baseTypography.titleMedium.copy(fontWeight = FontWeight.Bold),
+    titleSmall = baseTypography.titleSmall.copy(fontWeight = FontWeight.SemiBold),
+    labelLarge = baseTypography.labelLarge.copy(fontWeight = FontWeight.SemiBold)
+)

@@ -18,6 +18,13 @@
 
 package com.movtery.zalithlauncher.ui.screens.content
 
+import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.ui.draw.alpha
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.background
+import androidx.compose.foundation.Image
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.combinedClickable
@@ -270,13 +277,24 @@ private fun ContentMenu(
         LocalHomeCardVersionSettings provides onOpenVersionSettings,
         LocalServerCardQuickPlay provides onQuickPlayServer
     ) {
-        HomeGrid(
-            state = gridState,
-            isVisible = isVisible,
-            modifier = modifier
-                .fillMaxSize()
-                .offset { IntOffset(x = 0, y = yOffset.roundToPx()) }
-        )
+        Box(modifier = modifier.fillMaxSize()) {
+            // Nev Launcher: logo N pudar sebagai hiasan latar layar utama
+            Image(
+                painter = painterResource(R.drawable.img_launcher),
+                contentDescription = null,
+                modifier = Modifier
+                    .align(Alignment.Center)
+                    .size(240.dp)
+                    .alpha(0.10f)
+            )
+            HomeGrid(
+                state = gridState,
+                isVisible = isVisible,
+                modifier = Modifier
+                    .fillMaxSize()
+                    .offset { IntOffset(x = 0, y = yOffset.roundToPx()) }
+            )
+        }
     }
 }
 
@@ -476,17 +494,41 @@ private fun VersionsContent(
             }
         }
 
+        val launchBrush = Brush.horizontalGradient(
+            colors = listOf(
+                MaterialTheme.colorScheme.primary,
+                MaterialTheme.colorScheme.primaryContainer
+            )
+        )
         ScalingActionButton(
             modifier = Modifier
                 .fillMaxWidth()
                 .padding(PaddingValues(horizontal = 12.dp))
                 .padding(bottom = 8.dp),
+            shape = RoundedCornerShape(percent = 50),
+            colors = ButtonDefaults.buttonColors(
+                containerColor = Color.Transparent,
+                contentColor = Color.White
+            ),
+            contentPadding = PaddingValues(0.dp),
             elevation = ButtonDefaults.buttonElevation(defaultElevation = 1.dp),
             onClick = {
                 onLaunchGame(null)
             },
             content = {
-                MarqueeText(text = stringResource(R.string.main_launch_game))
+                // Nev Launcher: tombol Luncurkan bergradasi merah
+                Box(
+                    modifier = Modifier
+                        .fillMaxWidth()
+                        .heightIn(min = 52.dp)
+                        .background(launchBrush),
+                    contentAlignment = Alignment.Center
+                ) {
+                    MarqueeText(
+                        text = stringResource(R.string.main_launch_game),
+                        style = MaterialTheme.typography.titleMedium
+                    )
+                }
             }
         )
     }

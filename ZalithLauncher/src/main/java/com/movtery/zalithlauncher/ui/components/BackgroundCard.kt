@@ -31,6 +31,9 @@ import androidx.compose.material3.Surface
 import androidx.compose.runtime.Composable
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.UiComposable
+import androidx.compose.ui.unit.dp
+import androidx.compose.ui.graphics.Brush
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import com.movtery.zalithlauncher.setting.AllSettings
@@ -38,6 +41,21 @@ import com.movtery.zalithlauncher.ui.screens.content.elements.backgroundGlass
 import com.movtery.zalithlauncher.ui.theme.cardColor
 import com.movtery.zalithlauncher.ui.theme.cardTitleColor
 import com.movtery.zalithlauncher.ui.theme.onCardColor
+
+/**
+ * Nev Launcher: garis tepi kartu bergradasi merah ke emas yang tipis
+ */
+@Composable
+fun nevCardBorder(): BorderStroke = BorderStroke(
+    width = 1.dp,
+    brush = Brush.linearGradient(
+        colors = listOf(
+            MaterialTheme.colorScheme.primary.copy(alpha = 0.60f),
+            MaterialTheme.colorScheme.outlineVariant.copy(alpha = 0.35f),
+            MaterialTheme.colorScheme.secondary.copy(alpha = 0.40f)
+        )
+    )
+)
 
 /**
  * 背景卡片组件，
@@ -54,7 +72,7 @@ fun BackgroundCard(
     ),
     elevation: CardElevation = CardDefaults.cardElevation(),
     blur: Int = AllSettings.backgroundBlur.state,
-    border: BorderStroke? = null,
+    border: BorderStroke? = nevCardBorder(),
     content: @Composable ColumnScope.() -> Unit
 ) {
     Card(
@@ -87,7 +105,7 @@ fun BackgroundCard(
     ),
     elevation: CardElevation = CardDefaults.cardElevation(),
     blur: Int = AllSettings.backgroundBlur.state,
-    border: BorderStroke? = null,
+    border: BorderStroke? = nevCardBorder(),
     onClick: () -> Unit,
     enabled: Boolean = true,
     content: @Composable @UiComposable ColumnScope.() -> Unit
