@@ -18,6 +18,7 @@
 
 package com.movtery.zalithlauncher.ui.screens.content.home
 
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -64,6 +65,7 @@ import com.movtery.zalithlauncher.ui.components.nevCardBorder
 fun NevHeroBanner(
     onPlay: () -> Unit,
     versionSelector: @Composable () -> Unit,
+    accountChip: @Composable () -> Unit,
     modifier: Modifier = Modifier
 ) {
     val primary = MaterialTheme.colorScheme.primary
@@ -103,7 +105,7 @@ fun NevHeroBanner(
         Column(
             modifier = Modifier
                 .align(Alignment.CenterStart)
-                .padding(horizontal = 22.dp),
+                .padding(start = 22.dp, end = 110.dp),
             verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             Text(
@@ -165,11 +167,17 @@ fun NevHeroBanner(
                 // Pemilih versi (dipindah dari menu Luncurkan)
                 Box(
                     modifier = Modifier
-                        .width(200.dp)
+                        .weight(1f, fill = false)
+                        .widthIn(max = 200.dp)
                         .clip(MaterialTheme.shapes.large)
                         .background(Color.Black.copy(alpha = 0.28f))
                 ) {
                     versionSelector()
+                }
+
+                // Menu akun (Tambahkan Akun / akun aktif) di samping pemilih versi
+                Box(modifier = Modifier.widthIn(max = 170.dp)) {
+                    accountChip()
                 }
             }
         }

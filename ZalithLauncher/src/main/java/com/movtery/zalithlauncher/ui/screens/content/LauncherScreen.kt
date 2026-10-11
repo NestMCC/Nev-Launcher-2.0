@@ -18,6 +18,7 @@
 
 package com.movtery.zalithlauncher.ui.screens.content
 
+import androidx.compose.ui.text.style.TextOverflow
 import com.movtery.zalithlauncher.ui.screens.content.home.NevHeroBanner
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Brush
@@ -189,10 +190,13 @@ fun LauncherScreen(
                 }
             }
 
+            // Nev Launcher: di layar pendek, panel kanan tidak dipakai lagi (akun pindah ke banner)
+            val isActionMenuTaller = maxHeight >= 600.dp
+
             // 内容区域
             Row(modifier = Modifier.fillMaxSize()) {
                 // ActionMenu 对接到了 Start，留出空位
-                if (dockedSide == ActionMenuSide.START) {
+                if (isActionMenuTaller && dockedSide == ActionMenuSide.START) {
                     Spacer(modifier = Modifier.weight(ActionMenuWeight))
                 }
 
@@ -218,18 +222,18 @@ fun LauncherScreen(
                     onQuickPlayServer = onQuickPlayServer,
                     onOpenVersionSettings = navigateToVersions,
                     onPlayCurrent = { onLaunchGame(null) },
+                    toAccountManageScreen = toAccountManageScreen,
                     toVersionManageScreen = toVersionManageScreen,
                     toVersionSettingsScreen = toVersionSettingsScreen
                 )
                 }
 
                 // ActionMenu 对接到了 End，留出空位
-                if (dockedSide == ActionMenuSide.END) {
+                if (isActionMenuTaller && dockedSide == ActionMenuSide.END) {
                     Spacer(modifier = Modifier.weight(ActionMenuWeight))
                 }
             }
 
-            val isActionMenuTaller = maxHeight >= 600.dp
             CompositionLocalProvider(LocalActionMenuDrag provides dragState) {
                 Box(
                     modifier = Modifier
@@ -269,6 +273,7 @@ private fun ContentMenu(
     onQuickPlayServer: (Version?, String) -> Unit,
     onOpenVersionSettings: (Version) -> Unit,
     onPlayCurrent: () -> Unit,
+    toAccountManageScreen: () -> Unit,
     toVersionManageScreen: () -> Unit,
     toVersionSettingsScreen: () -> Unit,
     modifier: Modifier = Modifier,
@@ -308,6 +313,17 @@ private fun ContentMenu(
                             onLaunchGame = onLaunchGame,
                             toVersionManageScreen = toVersionManageScreen,
                             toVersionSettingsScreen = toVersionSettingsScreen
+                        )
+                    },
+                    accountChip = {
+                        val account by AccountsManager.currentAccountFlow.collectAsStateWithLifecycle()
+                        AccountChip(
+                            account = account,
+                            onClick = toAccountManageScreen,
+                            modifier = Modifier.guideNode(
+                                key = GuideKeys.Main.Step.Account,
+                                preferSide = GuideSide.Below
+                            )
                         )
                     }
                 )
@@ -367,6 +383,56 @@ private fun AccountAvatarCenter(
                         style = MaterialTheme.typography.labelSmall
                     )
                 }
+            }
+        }
+    }
+}
+
+/**
+ * Nev Launcher: menu akun kecil di samping pemilih versi (avatar/ikon tambah + nama akun)
+ */
+@Composable
+private fun AccountChip(
+    account: Account?,
+    onClick: () -> Unit,
+    modifier: Modifier = Modifier
+) {
+    Row(
+        modifier = modifier
+            .clip(MaterialTheme.shapes.large)
+            .background(Color.Black.copy(alpha = 0.28f))
+            .clickable(onClick = onClick)
+            .padding(horizontal = 10.dp, vertical = 8.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        if (account != null) {
+            PlayerFace(
+                account = account,
+                avatarSize = 32.dp
+            )
+        } else {
+            Icon(
+                modifier = Modifier.size(24.dp),
+                painter = painterResource(R.drawable.ic_add),
+                contentDescription = null
+            )
+        }
+
+        Column {
+            Text(
+                text = account?.username ?: stringResource(R.string.account_add_new_account),
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis,
+                style = MaterialTheme.typography.titleSmall
+            )
+            if (account != null) {
+                Text(
+                    text = getAccountTypeName(account),
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis,
+                    style = MaterialTheme.typography.labelSmall
+                )
             }
         }
     }
@@ -656,15 +722,6 @@ private fun ActionMenu(
             modifier = contentModifier,
             account = account,
             dockedSide = dockedSide,
-            onLaunchGame = onLaunchGame,
-            toAccountManageScreen = toAccountManageScreen,
-            toVersionManageScreen = toVersionManageScreen,
-            toVersionSettingsScreen = toVersionSettingsScreen,
-        )
-    } else {
-        ActionMenuCardContent(
-            modifier = contentModifier,
-            account = account,
             onLaunchGame = onLaunchGame,
             toAccountManageScreen = toAccountManageScreen,
             toVersionManageScreen = toVersionManageScreen,
