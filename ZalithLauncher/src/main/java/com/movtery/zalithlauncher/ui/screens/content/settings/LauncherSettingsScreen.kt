@@ -43,6 +43,9 @@ import androidx.compose.foundation.lazy.items
 import androidx.compose.foundation.lazy.rememberLazyListState
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.Button
+import androidx.compose.material3.AlertDialog
+import androidx.compose.material3.OutlinedTextField
+import androidx.compose.material3.TextButton
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.FilledTonalButton
 import androidx.compose.material3.Icon
@@ -728,6 +731,8 @@ private fun CustomBackground(
 ) {
     val context = LocalContext.current
     var operation by remember { mutableStateOf<BackgroundOperation>(BackgroundOperation.None) }
+    var showUrlDialog by remember { mutableStateOf(false) }
+    var backgroundUrl by remember { mutableStateOf("") }
 
     BackgroundOperation(
         operation = operation,
@@ -765,6 +770,54 @@ private fun CustomBackground(
         }
     }
 
+    if (showUrlDialog) {
+        AlertDialog(
+            onDismissRequest = { showUrlDialog = false },
+            title = { Text("Gunakan banner dari URL") },
+            text = {
+                Column(verticalArrangement = Arrangement.spacedBy(8.dp)) {
+                    Text("Masukkan URL langsung ke file gambar atau video (HTTP/HTTPS, maksimal 100 MB).")
+                    OutlinedTextField(
+                        value = backgroundUrl,
+                        onValueChange = { backgroundUrl = it },
+                        label = { Text("URL gambar/video") },
+                        placeholder = { Text("https://contoh.com/banner.mp4") },
+                        singleLine = true,
+                        modifier = Modifier.fillMaxWidth()
+                    )
+                }
+            },
+            confirmButton = {
+                TextButton(onClick = {
+                    val url = backgroundUrl.trim()
+                    showUrlDialog = false
+                    if (url.isNotBlank()) {
+                        TaskSystem.submitTask(
+                            Task.runTask(
+                                dispatcher = Dispatchers.IO,
+                                task = { task ->
+                                    task.updateMessage(androidText(R.string.settings_launcher_background_importing))
+                                    backgroundViewModel.importFromUrl(url)
+                                },
+                                onError = { th ->
+                                    submitError(
+                                        ErrorViewModel.ThrowableMessage(
+                                            title = androidText("Gagal memuat banner dari URL"),
+                                            message = androidText(th.getMessageOrToString())
+                                        )
+                                    )
+                                }
+                            )
+                        )
+                    }
+                }) { Text("Terapkan") }
+            },
+            dismissButton = {
+                TextButton(onClick = { showUrlDialog = false }) { Text("Batal") }
+            }
+        )
+    }
+
     Row(
         modifier = modifier,
         verticalAlignment = Alignment.CenterVertically,
@@ -780,6 +833,10 @@ private fun CustomBackground(
                 title = stringResource(R.string.settings_launcher_background_title),
                 summary = stringResource(R.string.settings_launcher_background_summary),
             )
+        }
+
+        Button(onClick = { showUrlDialog = true }) {
+            Text("URL")
         }
 
         AnimatedVisibility(
