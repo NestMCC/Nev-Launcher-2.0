@@ -183,6 +183,55 @@ class BackgroundViewModel: ViewModel() {
             updateState()
         }
     }
+    /** Import an image/video background from a direct HTTP(S) URL. */
+    suspend fun importFromUrl(rawUrl: String) {
+        withContext(Dispatchers.IO) {
+            val parsed = java.net.URL(rawUrl.trim())
+            require(parsed.protocol.equals("https", ignoreCase = true) || parsed.protocol.equals("http", ignoreCase = true)) {
+                "URL harus menggunakan HTTP atau HTTPS."
+            }
+            val tempFile = File(backgroundFile.parentFile, "background_download.tmp")
+            try {
+                val connection = (parsed.openConnection() as java.net.HttpURLConnection).apply {
+                    connectTimeout = 15_000
+                    readTimeout = 20_000
+                    instanceFollowRedirects = true
+                    requestMethod = "GET"
+                }
+                try {
+                    connection.connect()
+                    require(connection.responseCode in 200..299) { "Server gagal mengirim media (HTTP " + connection.responseCode + ")." }
+                    val declaredLength = connection.contentLengthLong
+                    require(declaredLength <= 100L * 1024L * 1024L || declaredLength < 0) {
+                        "Ukuran media maksimal 100 MB."
+                    }
+                    connection.inputStream.use { input ->
+                        tempFile.outputStream().buffered().use { output ->
+                            val buffer = ByteArray(16 * 1024)
+                            var total = 0L
+                            while (true) {
+                                val count = input.read(buffer)
+                                if (count < 0) break
+                                total += count
+                                require(total <= 100L * 1024L * 1024L) { "Ukuran media maksimal 100 MB." }
+                                output.write(buffer, 0, count)
+                            }
+                        }
+                    }
+                } finally {
+                    connection.disconnect()
+                }
+                require(tempFile.isImageFile() || tempFile.isVideoFile()) {
+                    "URL tidak mengarah ke gambar atau video yang didukung. Gunakan URL langsung ke file media."
+                }
+                tempFile.copyTo(backgroundFile, overwrite = true)
+                updateState()
+            } finally {
+                FileUtils.deleteQuietly(tempFile)
+            }
+        }
+    }
+
 }
 
 /**
