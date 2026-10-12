@@ -1538,4 +1538,6 @@
     <string name="settings_game_auto_ram_title">Automatic RAM allocation</string>
     <string name="settings_game_auto_ram_summary">Adjusts game RAM to your device performance and the RAM that is free at launch</string>
     <string name="settings_game_auto_ram_current">Automatic: about %1$dMB (%2$s)</string>
+    <string name="versions_manage_instance_title">INSTANCE (%1$d)</string>
+    <string name="versions_manage_add_instance">+ ADD</string>
 </resources>

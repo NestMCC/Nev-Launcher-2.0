@@ -1428,4 +1428,6 @@
     <string name="settings_game_auto_ram_title">Alokasi RAM otomatis</string>
     <string name="settings_game_auto_ram_summary">Menyesuaikan RAM game dengan performa perangkat dan RAM yang sedang bebas saat peluncuran</string>
     <string name="settings_game_auto_ram_current">Otomatis: sekitar %1$dMB (%2$s)</string>
+    <string name="versions_manage_instance_title">INSTANCE (%1$d)</string>
+    <string name="versions_manage_add_instance">+ TAMBAH</string>
 </resources>

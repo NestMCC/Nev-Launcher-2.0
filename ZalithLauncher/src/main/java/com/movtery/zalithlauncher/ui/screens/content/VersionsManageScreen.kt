@@ -40,6 +40,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.ExperimentalMaterial3ExpressiveApi
 import androidx.compose.material3.LoadingIndicator
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.ui.draw.clip
+import androidx.compose.material3.Text
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.TopAppBarDefaults
@@ -469,7 +473,16 @@ private fun VersionsLayout(
     )
 
     Box(
-        modifier = modifier.offset { IntOffset(x = 0, y = surfaceYOffset.roundToPx()) }
+        modifier = modifier
+            .offset { IntOffset(x = 0, y = surfaceYOffset.roundToPx()) }
+            .padding(top = 8.dp, end = 12.dp, bottom = 8.dp)
+            .clip(androidx.compose.foundation.shape.RoundedCornerShape(24.dp))
+            .background(MaterialTheme.colorScheme.surfaceContainerLow)
+            .border(
+                width = 1.dp,
+                color = MaterialTheme.colorScheme.outlineVariant,
+                shape = androidx.compose.foundation.shape.RoundedCornerShape(24.dp)
+            )
     ) {
         if (isRefreshing) { //版本正在刷新中
             Box(
@@ -609,17 +622,28 @@ private fun VersionsLayout(
                                 horizontalArrangement = Arrangement.spacedBy(8.dp),
                                 verticalAlignment = Alignment.CenterVertically
                             ) {
+                                Text(
+                                    modifier = Modifier.padding(start = 6.dp),
+                                    text = stringResource(R.string.versions_manage_instance_title, allVersionsCount),
+                                    style = MaterialTheme.typography.titleMedium,
+                                    fontWeight = androidx.compose.ui.text.font.FontWeight.ExtraBold
+                                )
+                                androidx.compose.material3.OutlinedButton(
+                                    onClick = onInstall,
+                                    shape = MaterialTheme.shapes.medium,
+                                    border = androidx.compose.foundation.BorderStroke(1.5.dp, MaterialTheme.colorScheme.primary),
+                                    contentPadding = PaddingValues(horizontal = 14.dp, vertical = 4.dp)
+                                ) {
+                                    Text(
+                                        text = stringResource(R.string.versions_manage_add_instance),
+                                        fontWeight = androidx.compose.ui.text.font.FontWeight.Bold
+                                    )
+                                }
                                 IconTextButton(
                                     onClick = onRefresh,
                                     painter = painterResource(R.drawable.ic_refresh),
                                     contentDescription = stringResource(R.string.generic_refresh),
                                     text = stringResource(R.string.generic_refresh)
-                                )
-                                IconTextButton(
-                                    onClick = onInstall,
-                                    painter = painterResource(R.drawable.ic_download),
-                                    contentDescription = stringResource(R.string.versions_manage_install_new),
-                                    text = stringResource(R.string.versions_manage_install_new),
                                 )
                             }
                         }

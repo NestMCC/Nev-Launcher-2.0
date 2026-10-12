@@ -39,6 +39,8 @@ import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
 import androidx.compose.material3.DropdownMenu
 import androidx.compose.material3.DropdownMenuItem
+import androidx.compose.foundation.background
+import androidx.compose.foundation.layout.Box
 import androidx.compose.material3.Icon
 import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
@@ -703,11 +705,17 @@ fun VersionItemLayout(
     LaunchedEffect(Unit) {
         scale.animateTo(targetValue = 1f, animationSpec = getAnimateTween())
     }
+    val scheme = MaterialTheme.colorScheme
+    val itemColor = if (selected) androidx.compose.ui.graphics.lerp(color, scheme.primary, 0.18f) else color
     Surface(
         modifier = modifier.graphicsLayer(scaleY = scale.value, scaleX = scale.value),
-        color = color,
+        color = itemColor,
         contentColor = contentColor,
         shape = MaterialTheme.shapes.large,
+        border = androidx.compose.foundation.BorderStroke(
+            width = if (selected) 1.5.dp else 1.dp,
+            color = if (selected) scheme.primary else scheme.outlineVariant
+        ),
         onClick = {
             if (selected) return@Surface
             onSelected()
@@ -721,17 +729,28 @@ fun VersionItemLayout(
                 .padding(all = 4.dp),
             verticalAlignment = Alignment.CenterVertically
         ) {
-            RadioButton(
-                selected = selected,
-                onClick = {
-                    if (selected) return@RadioButton
-                    onSelected()
-                }
-            )
+            Spacer(modifier = Modifier.width(10.dp))
             CommonVersionInfoLayout(
                 modifier = Modifier.weight(1f),
                 version = version
             )
+
+            if (selected) {
+                Box(
+                    modifier = Modifier
+                        .size(28.dp)
+                        .clip(androidx.compose.foundation.shape.CircleShape)
+                        .background(scheme.primary),
+                    contentAlignment = Alignment.Center
+                ) {
+                    Icon(
+                        modifier = Modifier.size(18.dp),
+                        painter = painterResource(R.drawable.ic_check),
+                        tint = scheme.onPrimary,
+                        contentDescription = null
+                    )
+                }
+            }
 
             IconButton(
                 onClick = {
@@ -776,6 +795,14 @@ fun VersionItemLayout(
                     modifier = Modifier.size(24.dp),
                     painter = painterResource(R.drawable.ic_settings_filled),
                     contentDescription = stringResource(R.string.versions_manage_settings)
+                )
+            }
+
+            IconButton(onClick = onDeleteClick) {
+                Icon(
+                    modifier = Modifier.size(22.dp),
+                    painter = painterResource(R.drawable.ic_delete_outlined),
+                    contentDescription = stringResource(R.string.generic_delete)
                 )
             }
 
