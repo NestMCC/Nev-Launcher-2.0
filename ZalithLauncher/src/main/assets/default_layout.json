@@ -765,6 +765,76 @@
           "isSwipple": false,
           "isPenetrable": false,
           "isToggleable": false
+        },
+        {
+          "text": {
+            "default": "C",
+            "matchQueue": []
+          },
+          "uuid": "b30f0059514f4059af",
+          "position": {
+            "x": 4524,
+            "y": 185
+          },
+          "buttonSize": {
+            "type": "percentage",
+            "widthDp": 50.0,
+            "heightDp": 50.0,
+            "widthPercentage": 1222,
+            "heightPercentage": 1000,
+            "widthReference": "screen_height",
+            "heightReference": "screen_height"
+          },
+          "buttonStyle": "684b801fd397",
+          "visibilityType": "always",
+          "clickEvents": [
+            {
+              "type": "key",
+              "key": "GLFW_KEY_C"
+            }
+          ],
+          "isSwipple": false,
+          "isPenetrable": false,
+          "isToggleable": false
+        }
+      ]
+    },
+    {
+      "name": "gui",
+      "uuid": "572a810aceb5",
+      "hide": false,
+      "visibilityType": "always",
+      "normalButtons": [
+        {
+          "text": {
+            "default": "GUI",
+            "matchQueue": []
+          },
+          "uuid": "a5ff64e0cac74a3fa1",
+          "position": {
+            "x": 106,
+            "y": 6730
+          },
+          "buttonSize": {
+            "type": "percentage",
+            "widthDp": 50.0,
+            "heightDp": 50.0,
+            "widthPercentage": 1222,
+            "heightPercentage": 1000,
+            "widthReference": "screen_height",
+            "heightReference": "screen_height"
+          },
+          "buttonStyle": "684b801fd397",
+          "visibilityType": "always",
+          "clickEvents": [
+            {
+              "type": "switch_layer",
+              "key": "ea90871c91cc"
+            }
+          ],
+          "isSwipple": false,
+          "isPenetrable": false,
+          "isToggleable": false
         }
       ]
     }
