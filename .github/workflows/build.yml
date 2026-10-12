@@ -57,40 +57,31 @@ jobs:
           chmod +x gradlew
           ./gradlew ZalithLauncher:assemble${{ inputs.variant }} -Darch=${{ matrix.arch }}
 
-      - name: Hapus APK dan riwayat build lama
-        continue-on-error: true
+      - name: Delete previous debug APK artifacts
         env:
           GH_TOKEN: ${{ github.token }}
           REPO: ${{ github.repository }}
           CURRENT_RUN: ${{ github.run_id }}
         run: |
-          for id in $(gh api --paginate "repos/$REPO/actions/artifacts?per_page=100" -q '.artifacts[].id'); do
-            gh api -X DELETE "repos/$REPO/actions/artifacts/$id" || true
-          done
-          for id in $(gh api --paginate "repos/$REPO/actions/runs?per_page=100" -q ".workflow_runs[] | select(.id != $CURRENT_RUN and .status == \"completed\") | .id"); do
-            gh api -X DELETE "repos/$REPO/actions/runs/$id" || true
+          # Remove only older debug APK artifacts, leaving unrelated workflow artifacts alone.
+          gh api --paginate "repos/$REPO/actions/artifacts?per_page=100" \
+            -q '.artifacts[] | select(.name == "debug apk (arm64)") | .id' |
+          while read -r id; do
+            [ -n "$id" ] && gh api -X DELETE "repos/$REPO/actions/artifacts/$id" || true
           done
 
-      - name: Upload Release APK for ${{ matrix.arch }}
-        if: inputs.variant == 'Release'
-        continue-on-error: true
-        uses: actions/upload-artifact@v7
-        with:
-          name: release apk (${{ matrix.arch }})
-          path: ZalithLauncher/build/outputs/apk/release/*.apk
-
-      - name: Upload Release Mapping for ${{ matrix.arch }}
-        if: inputs.variant == 'Release'
-        continue-on-error: true
-        uses: actions/upload-artifact@v7
-        with:
-          name: mapping (${{ matrix.arch }})
-          path: ZalithLauncher/build/outputs/mapping/release/mapping.txt
+          # Remove completed runs belonging to this push-build workflow only.
+          gh api --paginate "repos/$REPO/actions/runs?per_page=100" \
+            -q ".workflow_runs[] | select(.id != ($CURRENT_RUN | tonumber) and .status == \"completed\" and .path == \".github/workflows/push_ci.yml\") | .id" |
+          while read -r id; do
+            [ -n "$id" ] && gh api -X DELETE "repos/$REPO/actions/runs/$id" || true
+          done
 
       - name: Upload Debug APK for ${{ matrix.arch }}
         if: inputs.variant == 'Debug'
-        continue-on-error: true
         uses: actions/upload-artifact@v7
         with:
           name: debug apk (${{ matrix.arch }})
           path: ZalithLauncher/build/outputs/apk/debug/*.apk
+          if-no-files-found: error
+          retention-days: 90
