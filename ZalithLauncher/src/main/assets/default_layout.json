@@ -703,6 +703,68 @@
           "isSwipple": false,
           "isPenetrable": false,
           "isToggleable": false
+        },
+        {
+          "text": {
+            "default": "KB",
+            "matchQueue": []
+          },
+          "uuid": "3ed9b0a8dbb8484180",
+          "position": {
+            "x": 3254,
+            "y": 185
+          },
+          "buttonSize": {
+            "type": "percentage",
+            "widthDp": 50.0,
+            "heightDp": 50.0,
+            "widthPercentage": 1222,
+            "heightPercentage": 1000,
+            "widthReference": "screen_height",
+            "heightReference": "screen_height"
+          },
+          "buttonStyle": "684b801fd397",
+          "visibilityType": "always",
+          "clickEvents": [
+            {
+              "type": "launcher_event",
+              "key": "launcher.event.switch_ime"
+            }
+          ],
+          "isSwipple": false,
+          "isPenetrable": false,
+          "isToggleable": false
+        },
+        {
+          "text": {
+            "default": "Menu",
+            "matchQueue": []
+          },
+          "uuid": "1e71dc106d9d4f2fad",
+          "position": {
+            "x": 3889,
+            "y": 185
+          },
+          "buttonSize": {
+            "type": "percentage",
+            "widthDp": 50.0,
+            "heightDp": 50.0,
+            "widthPercentage": 1222,
+            "heightPercentage": 1000,
+            "widthReference": "screen_height",
+            "heightReference": "screen_height"
+          },
+          "buttonStyle": "684b801fd397",
+          "visibilityType": "always",
+          "clickEvents": [
+            {
+              "type": "launcher_event",
+              "key": "launcher.event.switch_menu"
+            }
+          ],
+          "isSwipple": false,
+          "isPenetrable": false,
+          "isToggleable": false
         }
       ]
     }
