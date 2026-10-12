@@ -23,6 +23,11 @@ import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.offset
 import androidx.compose.foundation.lazy.LazyListScope
+import androidx.compose.foundation.background
+import androidx.compose.foundation.border
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.layout.padding
+import androidx.compose.material3.MaterialTheme
 import androidx.compose.runtime.Composable
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateListOf
@@ -295,13 +300,22 @@ fun SearchAssetsScreen(
         Triple(parentScreenKey, parentCurrentKey, false),
         Triple(screenKey, currentKey, false)
     ) { isVisible ->
-        Row {
+        Row(
+            modifier = Modifier.padding(start = 12.dp, end = 12.dp, bottom = 12.dp, top = 4.dp),
+            horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(12.dp)
+        ) {
+            val panelShape = androidx.compose.foundation.shape.RoundedCornerShape(24.dp)
+            val panelModifier = Modifier
+                .clip(panelShape)
+                .background(MaterialTheme.colorScheme.surfaceContainerLow.copy(alpha = 0.92f))
+                .border(1.dp, MaterialTheme.colorScheme.outlineVariant, panelShape)
             val yOffset by swapAnimateDpAsState(targetValue = (-40).dp, swapIn = isVisible)
             ResultListLayout(
                 modifier = Modifier
                     .fillMaxHeight()
                     .weight(7f)
-                    .offset { IntOffset(x = 0, y = yOffset.roundToPx()) },
+                    .offset { IntOffset(x = 0, y = yOffset.roundToPx()) }
+                    .then(panelModifier),
                 classes = platformClasses,
                 searchState = viewModel.searchResult,
                 onReload = {
@@ -367,8 +381,9 @@ fun SearchAssetsScreen(
                 modifier = Modifier
                     .fillMaxHeight()
                     .weight(3f)
-                    .offset { IntOffset(x = xOffset.roundToPx(), y = 0) },
-                contentPadding = PaddingValues(top = 12.dp, bottom = 12.dp, end = 12.dp),
+                    .offset { IntOffset(x = xOffset.roundToPx(), y = 0) }
+                    .then(panelModifier),
+                contentPadding = PaddingValues(12.dp),
                 enablePlatform = enablePlatform,
                 searchPlatform = viewModel.searchPlatform,
                 onPlatformChange = {
