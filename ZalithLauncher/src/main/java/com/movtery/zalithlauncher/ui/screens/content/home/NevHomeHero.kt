@@ -89,58 +89,36 @@ fun NevHeroBanner(
         colors = listOf(Color(0xFF14050A), Color(0xFF3A0A10), Color(0xFF7A0C14))
     )
 
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val bannerVersion = NevBannerStore.version.intValue
+    val hasMedia = remember(bannerVersion) { NevBannerStore.exists(context) }
+
     Box(
         modifier = modifier
             .fillMaxWidth()
             .height(152.dp)
             .clip(shape)
-            .background(base)
-            .drawBehind {
-                drawRect(
-                    brush = Brush.radialGradient(
-                        colors = listOf(primary.copy(alpha = 0.45f), Color.Transparent),
-                        center = Offset(size.width * 0.85f, size.height * 0.5f),
-                        radius = size.height * 1.6f
-                    )
-                )
-            }
-            .border(nevCardBorder(), shape)
-    ) {
-        val context = androidx.compose.ui.platform.LocalContext.current
-        val bannerVersion = NevBannerStore.version.intValue
-        val hasMedia = remember(bannerVersion) { NevBannerStore.exists(context) }
-        if (hasMedia) {
-            val file = remember(bannerVersion) { NevBannerStore.file(context) }
-            if (AllSettings.bannerIsVideo.state) {
-                VideoPlayer(
-                    videoUri = Uri.fromFile(file),
-                    modifier = Modifier.matchParentSize(),
-                    refreshTrigger = bannerVersion,
-                    volume = 0f
-                )
-            } else {
-                val loader = remember(bannerVersion) {
-                    ImageLoader.Builder(context).components { add(GifDecoder.Factory()) }.build()
+            .then(
+                if (hasMedia) {
+                    // Banner kustom tampil penuh di belakang seluruh layar utama
+                    Modifier
+                } else {
+                    Modifier
+                        .background(base)
+                        .drawBehind {
+                            drawRect(
+                                brush = Brush.radialGradient(
+                                    colors = listOf(primary.copy(alpha = 0.45f), Color.Transparent),
+                                    center = Offset(size.width * 0.85f, size.height * 0.5f),
+                                    radius = size.height * 1.6f
+                                )
+                            )
+                        }
+                        .border(nevCardBorder(), shape)
                 }
-                AsyncImage(
-                    model = ImageRequest.Builder(context).data(file).memoryCacheKey("banner-$bannerVersion").diskCacheKey("banner-$bannerVersion").build(),
-                    imageLoader = loader,
-                    contentDescription = null,
-                    modifier = Modifier.matchParentSize(),
-                    contentScale = ContentScale.Crop
-                )
-            }
-            // Lapisan gelap agar teks tetap terbaca
-            Box(
-                modifier = Modifier
-                    .matchParentSize()
-                    .background(
-                        Brush.horizontalGradient(
-                            colors = listOf(Color.Black.copy(alpha = 0.72f), Color.Black.copy(alpha = 0.25f))
-                        )
-                    )
             )
-        } else {
+    ) {
+        if (!hasMedia) {
             Image(
                 painter = painterResource(R.drawable.img_launcher),
                 contentDescription = null,
@@ -271,5 +249,57 @@ fun NevHeroBanner(
                 }
             }
         }
+    }
+}
+
+
+/**
+ * Nev Launcher: banner kustom (gambar / GIF / video) memenuhi seluruh area layar utama sampai bawah.
+ * Tidak menampilkan apa pun jika pengguna belum memilih banner.
+ */
+@Composable
+fun NevBannerMedia(modifier: Modifier = Modifier) {
+    val context = androidx.compose.ui.platform.LocalContext.current
+    val bannerVersion = NevBannerStore.version.intValue
+    val hasMedia = remember(bannerVersion) { NevBannerStore.exists(context) }
+    if (!hasMedia) return
+
+    val file = remember(bannerVersion) { NevBannerStore.file(context) }
+    Box(modifier = modifier) {
+        if (AllSettings.bannerIsVideo.state) {
+            VideoPlayer(
+                videoUri = Uri.fromFile(file),
+                modifier = Modifier.matchParentSize(),
+                refreshTrigger = bannerVersion,
+                volume = 0f
+            )
+        } else {
+            val loader = remember(bannerVersion) {
+                ImageLoader.Builder(context).components { add(GifDecoder.Factory()) }.build()
+            }
+            AsyncImage(
+                model = ImageRequest.Builder(context).data(file)
+                    .memoryCacheKey("banner-$bannerVersion").diskCacheKey("banner-$bannerVersion").build(),
+                imageLoader = loader,
+                contentDescription = null,
+                modifier = Modifier.matchParentSize(),
+                contentScale = ContentScale.Crop
+            )
+        }
+        // Lapisan gelap: kiri untuk teks banner, bawah agar kartu tetap terbaca
+        Box(
+            modifier = Modifier.matchParentSize().background(
+                Brush.horizontalGradient(listOf(Color.Black.copy(alpha = 0.55f), Color.Black.copy(alpha = 0.10f)))
+            )
+        )
+        Box(
+            modifier = Modifier.matchParentSize().background(
+                Brush.verticalGradient(
+                    0.0f to Color.Transparent,
+                    0.35f to Color.Black.copy(alpha = 0.20f),
+                    1.0f to Color.Black.copy(alpha = 0.72f)
+                )
+            )
+        )
     }
 }

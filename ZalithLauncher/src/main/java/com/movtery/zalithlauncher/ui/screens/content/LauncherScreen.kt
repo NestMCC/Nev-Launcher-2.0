@@ -290,6 +290,12 @@ private fun ContentMenu(
         LocalServerCardQuickPlay provides onQuickPlayServer
     ) {
         Box(modifier = modifier.fillMaxSize()) {
+            // Nev Launcher: banner kustom memenuhi seluruh area sampai bawah
+            com.movtery.zalithlauncher.ui.screens.content.home.NevBannerMedia(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .clip(MaterialTheme.shapes.extraLarge)
+            )
             // Nev Launcher: logo N pudar sebagai hiasan latar layar utama
             Image(
                 painter = painterResource(R.drawable.img_launcher),
