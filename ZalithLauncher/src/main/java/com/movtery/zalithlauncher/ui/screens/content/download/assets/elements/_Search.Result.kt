@@ -25,6 +25,7 @@ import androidx.compose.animation.expandHorizontally
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkHorizontally
+import androidx.compose.foundation.background
 import androidx.compose.foundation.basicMarquee
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
@@ -445,18 +446,19 @@ fun ResultProjectLayout(
         shape = shape,
         color = color,
         contentColor = contentColor,
+        border = androidx.compose.foundation.BorderStroke(1.dp, MaterialTheme.colorScheme.outlineVariant),
         onClick = onClick
     ) {
         Row(
             modifier = Modifier
                 .backgroundGlass(blur, color, influencedByBackground)
-                .padding(all = 8.dp)
+                .padding(all = 10.dp)
                 .height(IntrinsicSize.Min),
             horizontalArrangement = Arrangement.spacedBy(12.dp)
         ) {
             AssetsIcon(
                 modifier = Modifier
-                    .clip(shape = RoundedCornerShape(10.dp))
+                    .clip(shape = RoundedCornerShape(14.dp))
                     .align(Alignment.CenterVertically),
                 size = 72.dp,
                 iconUrl = iconUrl
@@ -518,18 +520,12 @@ fun ResultProjectLayout(
                     ) {
                         modloaders?.let {
                             it.forEach { modloader ->
-                                Text(
-                                    text = modloader.getDisplayName(),
-                                    style = MaterialTheme.typography.labelSmall
-                                )
+                                NevTagChip(text = modloader.getDisplayName(), highlight = true)
                             }
                         }
                         categories?.let {
                             it.forEach { category ->
-                                Text(
-                                    text = stringResource(category.getDisplayName()),
-                                    style = MaterialTheme.typography.labelSmall
-                                )
+                                NevTagChip(text = stringResource(category.getDisplayName()))
                             }
                         }
                     }
@@ -618,4 +614,20 @@ fun ProjectTitleHead(
         //平台标签
         PlatformIdentifier(platform = platform)
     }
+}
+
+/** Nev Launcher: label kecil berbentuk pil untuk loader dan kategori */
+@Composable
+private fun NevTagChip(text: String, highlight: Boolean = false) {
+    val color = if (highlight) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.onSurface
+    Text(
+        modifier = Modifier
+            .clip(RoundedCornerShape(50))
+            .background(color.copy(alpha = 0.14f))
+            .padding(horizontal = 8.dp, vertical = 2.dp),
+        text = text,
+        color = color,
+        style = MaterialTheme.typography.labelSmall,
+        maxLines = 1
+    )
 }
