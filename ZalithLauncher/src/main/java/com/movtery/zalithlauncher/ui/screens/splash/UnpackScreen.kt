@@ -107,7 +107,8 @@ private fun ActionMenu(
     modifier: Modifier = Modifier,
     onAgreeClick: () -> Unit = {}
 ) {
-    var installing by remember { mutableStateOf(false) }
+    // Nev: pemasangan berjalan otomatis, tanpa menunggu tombol "Pasang"
+    androidx.compose.runtime.LaunchedEffect(Unit) { onAgreeClick() }
 
     val xOffset by swapAnimateDpAsState(
         targetValue = 40.dp,
@@ -125,25 +126,11 @@ private fun ActionMenu(
         ) {
             Text(
                 modifier = Modifier.fillMaxWidth(),
-                text = if (installing) {
-                    stringResource(R.string.splash_screen_installing)
-                } else {
-                    stringResource(R.string.splash_screen_unpack_desc)
-                },
+                text = stringResource(R.string.splash_screen_installing),
                 style = MaterialTheme.typography.bodyMedium
             )
         }
 
-        ScalingActionButton(
-            enabled = !installing,
-            modifier = Modifier.fillMaxWidth(),
-            onClick = {
-                installing = true
-                onAgreeClick()
-            }
-        ) {
-            MarqueeText(text = stringResource(R.string.splash_screen_agree))
-        }
     }
 }
 

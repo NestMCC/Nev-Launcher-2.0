@@ -35,6 +35,10 @@ import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.HorizontalDivider
 import androidx.compose.material3.MaterialTheme
+import androidx.compose.foundation.horizontalScroll
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.material3.NavigationRailItem
 import androidx.compose.material3.Text
 import androidx.compose.runtime.Composable
@@ -137,9 +141,9 @@ fun DownloadScreen(
         currentKey = backScreenViewModel.mainScreen.currentKey,
         useClassEquality = true
     ) { isVisible: Boolean ->
-        Row(modifier = Modifier.fillMaxSize()) {
+        Column(modifier = Modifier.fillMaxSize()) {
             TabMenu(
-                modifier = Modifier.fillMaxHeight(),
+                modifier = Modifier.fillMaxWidth(),
                 isVisible = isVisible,
                 backStack = key.backStack,
                 backScreenViewModel = backScreenViewModel,
@@ -151,7 +155,7 @@ fun DownloadScreen(
                 eventViewModel = eventViewModel,
                 modpackImportViewModel = modpackImportViewModel,
                 submitError = submitError,
-                modifier = Modifier.fillMaxHeight()
+                modifier = Modifier.fillMaxWidth().weight(1f)
             )
         }
     }
@@ -175,53 +179,56 @@ private fun TabMenu(
         CategoryItem(backScreenViewModel.downloadFavoritesScreen, { CategoryIcon(R.drawable.ic_favorite_outlined, R.string.download_category_favorites) }, R.string.download_category_favorites),
     )
 
-    val xOffset by swapAnimateDpAsState(
+    val yOffset by swapAnimateDpAsState(
         targetValue = (-40).dp,
         swapIn = isVisible,
-        isHorizontal = true
+        isHorizontal = false
     )
 
     val scrollState = rememberScrollState()
-    Column(
+    androidx.compose.foundation.layout.Row(
         modifier = modifier
-            .fadeEdge(scrollState)
-            .width(IntrinsicSize.Min)
-            .padding(start = 8.dp)
-            .offset { IntOffset(x = xOffset.roundToPx(), y = 0) }
-            .verticalScroll(scrollState),
-        horizontalAlignment = Alignment.CenterHorizontally
+            .offset { IntOffset(x = 0, y = yOffset.roundToPx()) }
+            .horizontalScroll(scrollState)
+            .padding(horizontal = 12.dp, vertical = 6.dp),
+        verticalAlignment = Alignment.CenterVertically,
+        horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp)
     ) {
-        Spacer(modifier = Modifier.height(12.dp))
         downloadsList.forEach { item ->
             if (item.division) {
-                HorizontalDivider(
+                androidx.compose.material3.VerticalDivider(
                     modifier = Modifier
-                        .padding(vertical = 12.dp)
-                        .fillMaxWidth(0.4f)
+                        .height(24.dp)
                         .alpha(0.4f),
                     color = MaterialTheme.colorScheme.onSurface
                 )
             }
 
-            NavigationRailItem(
-                selected = backScreenViewModel.downloadScreen.currentKey == item.key,
-                onClick = {
-                    backStack.navigateOnce(item.key)
-                },
-                icon = {
+            val selected = backScreenViewModel.downloadScreen.currentKey == item.key
+            val scheme = MaterialTheme.colorScheme
+            val bg = if (selected) scheme.primary else scheme.surfaceBright
+            val fg = if (selected) scheme.onPrimary else scheme.onSurface
+            androidx.compose.foundation.layout.Row(
+                modifier = Modifier
+                    .clip(androidx.compose.foundation.shape.RoundedCornerShape(50))
+                    .background(bg)
+                    .clickable { backStack.navigateOnce(item.key) }
+                    .padding(horizontal = 14.dp, vertical = 8.dp),
+                verticalAlignment = Alignment.CenterVertically,
+                horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(6.dp)
+            ) {
+                androidx.compose.runtime.CompositionLocalProvider(
+                    androidx.compose.material3.LocalContentColor provides fg
+                ) {
                     item.icon()
-                },
-                label = {
                     Text(
-                        modifier = Modifier.basicMarquee(iterations = Int.MAX_VALUE),
                         text = stringResource(item.textRes),
                         maxLines = 1,
-                        style = MaterialTheme.typography.labelMedium
+                        color = fg,
+                        style = MaterialTheme.typography.labelLarge
                     )
                 }
-            )
-
-            Spacer(modifier = Modifier.height(8.dp))
+            }
         }
     }
 }
