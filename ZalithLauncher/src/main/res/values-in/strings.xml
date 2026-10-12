@@ -1430,4 +1430,7 @@
     <string name="settings_game_auto_ram_current">Otomatis: sekitar %1$dMB (%2$s)</string>
     <string name="versions_manage_instance_title">INSTANCE (%1$d)</string>
     <string name="versions_manage_add_instance">+ TAMBAH</string>
+    <string name="nev_banner_edit">Ubah banner</string>
+    <string name="nev_banner_choose">Pilih banner gambar / video</string>
+    <string name="nev_banner_reset">Kembalikan banner default</string>
 </resources>

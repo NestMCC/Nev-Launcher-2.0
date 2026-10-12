@@ -1540,4 +1540,7 @@
     <string name="settings_game_auto_ram_current">Automatic: about %1$dMB (%2$s)</string>
     <string name="versions_manage_instance_title">INSTANCE (%1$d)</string>
     <string name="versions_manage_add_instance">+ ADD</string>
+    <string name="nev_banner_edit">Customize banner</string>
+    <string name="nev_banner_choose">Choose image / video banner</string>
+    <string name="nev_banner_reset">Restore default banner</string>
 </resources>

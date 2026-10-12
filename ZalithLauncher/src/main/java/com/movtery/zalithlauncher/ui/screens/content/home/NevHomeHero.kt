@@ -19,6 +19,20 @@
 package com.movtery.zalithlauncher.ui.screens.content.home
 
 import androidx.compose.foundation.layout.widthIn
+import android.net.Uri
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableStateOf
+import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
+import androidx.compose.ui.layout.ContentScale
+import androidx.compose.ui.res.stringResource
+import coil3.ImageLoader
+import coil3.compose.AsyncImage
+import coil3.gif.GifDecoder
+import coil3.request.ImageRequest
+import com.movtery.zalithlauncher.setting.AllSettings
+import com.movtery.zalithlauncher.ui.components.VideoPlayer
+import kotlinx.coroutines.launch
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
 import androidx.compose.foundation.border
@@ -92,15 +106,91 @@ fun NevHeroBanner(
             }
             .border(nevCardBorder(), shape)
     ) {
-        Image(
-            painter = painterResource(R.drawable.img_launcher),
-            contentDescription = null,
-            modifier = Modifier
-                .align(Alignment.CenterEnd)
-                .padding(end = 16.dp)
-                .size(84.dp)
-                .alpha(0.92f)
-        )
+        val context = androidx.compose.ui.platform.LocalContext.current
+        val bannerVersion = NevBannerStore.version.intValue
+        val hasMedia = remember(bannerVersion) { NevBannerStore.exists(context) }
+        if (hasMedia) {
+            val file = remember(bannerVersion) { NevBannerStore.file(context) }
+            if (AllSettings.bannerIsVideo.state) {
+                VideoPlayer(
+                    videoUri = Uri.fromFile(file),
+                    modifier = Modifier.matchParentSize(),
+                    refreshTrigger = bannerVersion,
+                    volume = 0f
+                )
+            } else {
+                val loader = remember(bannerVersion) {
+                    ImageLoader.Builder(context).components { add(GifDecoder.Factory()) }.build()
+                }
+                AsyncImage(
+                    model = ImageRequest.Builder(context).data(file).memoryCacheKey("banner-$bannerVersion").diskCacheKey("banner-$bannerVersion").build(),
+                    imageLoader = loader,
+                    contentDescription = null,
+                    modifier = Modifier.matchParentSize(),
+                    contentScale = ContentScale.Crop
+                )
+            }
+            // Lapisan gelap agar teks tetap terbaca
+            Box(
+                modifier = Modifier
+                    .matchParentSize()
+                    .background(
+                        Brush.horizontalGradient(
+                            colors = listOf(Color.Black.copy(alpha = 0.72f), Color.Black.copy(alpha = 0.25f))
+                        )
+                    )
+            )
+        } else {
+            Image(
+                painter = painterResource(R.drawable.img_launcher),
+                contentDescription = null,
+                modifier = Modifier
+                    .align(Alignment.CenterEnd)
+                    .padding(end = 16.dp)
+                    .size(84.dp)
+                    .alpha(0.92f)
+            )
+        }
+
+        // Tombol ganti / hapus banner kustom
+        val scope = androidx.compose.runtime.rememberCoroutineScope()
+        var menuOpen by remember { mutableStateOf(false) }
+        val picker = androidx.activity.compose.rememberLauncherForActivityResult(
+            androidx.activity.result.contract.ActivityResultContracts.OpenDocument()
+        ) { uri ->
+            if (uri != null) scope.launch { NevBannerStore.import(context, uri) }
+        }
+        Box(modifier = Modifier.align(Alignment.TopEnd).padding(8.dp)) {
+            androidx.compose.material3.IconButton(
+                onClick = { menuOpen = true },
+                modifier = Modifier.size(34.dp).clip(androidx.compose.foundation.shape.CircleShape).background(Color.Black.copy(alpha = 0.4f))
+            ) {
+                Icon(
+                    modifier = Modifier.size(18.dp),
+                    painter = painterResource(R.drawable.ic_edit_filled),
+                    tint = Color.White,
+                    contentDescription = stringResource(R.string.nev_banner_edit)
+                )
+            }
+            androidx.compose.material3.DropdownMenu(expanded = menuOpen, onDismissRequest = { menuOpen = false }) {
+                androidx.compose.material3.DropdownMenuItem(
+                    text = { Text(stringResource(R.string.nev_banner_choose)) },
+                    onClick = {
+                        menuOpen = false
+                        picker.launch(arrayOf("image/*", "video/*"))
+                    }
+                )
+                if (hasMedia) {
+                    androidx.compose.material3.DropdownMenuItem(
+                        text = { Text(stringResource(R.string.nev_banner_reset)) },
+                        onClick = {
+                            menuOpen = false
+                            scope.launch { NevBannerStore.reset(context) }
+                        }
+                    )
+                }
+            }
+        }
 
         Column(
             modifier = Modifier
