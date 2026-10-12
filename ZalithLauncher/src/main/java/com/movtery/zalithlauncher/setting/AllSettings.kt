@@ -146,6 +146,7 @@ object AllSettings : SettingsRegistry() {
     /**
      * 游戏内存分配大小
      */
+    val autoRamAllocation = boolSetting("autoRamAllocation", true)
     val ramAllocation = intSetting("ramAllocation", null, min = 256)
 
     /**

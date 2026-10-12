@@ -1425,4 +1425,7 @@
     <string name="cape_name_twisted">Twisted</string>
     <string name="cape_name_hero">Hero</string>
     <string name="cape_name_aurora">Aurora</string>
+    <string name="settings_game_auto_ram_title">Alokasi RAM otomatis</string>
+    <string name="settings_game_auto_ram_summary">Menyesuaikan RAM game dengan performa perangkat dan RAM yang sedang bebas saat peluncuran</string>
+    <string name="settings_game_auto_ram_current">Otomatis: sekitar %1$dMB (%2$s)</string>
 </resources>

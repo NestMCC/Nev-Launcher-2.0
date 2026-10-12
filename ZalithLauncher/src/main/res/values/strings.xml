@@ -1535,4 +1535,7 @@
     <string name="guide_tip_blank">Tap any blank area to continue to the next step</string>
     <!-- Next-step hint shown near a screen corner during the final guide step; tapping any blank area finishes the whole guide -->
     <string name="guide_tip_finish">Tap any blank area to finish the guide</string>
+    <string name="settings_game_auto_ram_title">Automatic RAM allocation</string>
+    <string name="settings_game_auto_ram_summary">Adjusts game RAM to your device performance and the RAM that is free at launch</string>
+    <string name="settings_game_auto_ram_current">Automatic: about %1$dMB (%2$s)</string>
 </resources>

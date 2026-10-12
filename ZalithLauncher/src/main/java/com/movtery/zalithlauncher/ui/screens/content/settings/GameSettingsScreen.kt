@@ -209,30 +209,51 @@ fun GameSettingsScreen(
                         )
                     }
 
-                    IntSliderSettingsCard(
+                    SwitchSettingsCard(
                         modifier = Modifier.fillMaxWidth(),
                         position = CardPosition.Middle,
-                        unit = AllSettings.ramAllocation,
-                        title = stringResource(R.string.settings_game_java_memory_title),
-                        summary = stringResource(R.string.settings_game_java_memory_summary),
-                        valueRange = AllSettings.ramAllocation.floatRange.start..getMaxMemoryForSettings(LocalContext.current).toFloat(),
-                        suffix = "MB",
-                        fineTuningControl = true,
-                        previewContent = {
-                            MemoryPreview(
-                                modifier = Modifier
-                                    .fillMaxWidth()
-                                    .padding(start = 2.dp),
-                                preview = (AllSettings.ramAllocation.state ?: AllSettings.ramAllocation.min).toDouble(),
-                                usedText = { usedMemory, totalMemory ->
-                                    stringResource(R.string.settings_game_java_memory_used_text, usedMemory.toInt(), totalMemory.toInt()) + " (${com.movtery.zalithlauncher.ui.screens.content.elements.formatMbAsGb(usedMemory)} / ${com.movtery.zalithlauncher.ui.screens.content.elements.formatMbAsGb(totalMemory)})"
-                                },
-                                previewText = { preview ->
-                                    stringResource(R.string.settings_game_java_memory_allocation_text, preview.toInt()) + " (${com.movtery.zalithlauncher.ui.screens.content.elements.formatMbAsGb(preview)})"
-                                }
-                            )
-                        }
+                        unit = AllSettings.autoRamAllocation,
+                        title = stringResource(R.string.settings_game_auto_ram_title),
+                        summary = stringResource(R.string.settings_game_auto_ram_summary)
                     )
+
+                    if (AllSettings.autoRamAllocation.state) {
+                        val context = LocalContext.current
+                        val autoRam = remember { com.movtery.zalithlauncher.setting.findAutoRAMAllocation(context) }
+                        SettingsCard(
+                            modifier = Modifier.fillMaxWidth(),
+                            position = CardPosition.Middle,
+                            title = stringResource(R.string.settings_game_java_memory_title),
+                            summary = stringResource(R.string.settings_game_auto_ram_current, autoRam, com.movtery.zalithlauncher.ui.screens.content.elements.formatMbAsGb(autoRam.toDouble())),
+                            onClick = {}
+                        )
+                    } else {
+                        IntSliderSettingsCard(
+                            modifier = Modifier.fillMaxWidth(),
+                            position = CardPosition.Middle,
+                            unit = AllSettings.ramAllocation,
+                            title = stringResource(R.string.settings_game_java_memory_title),
+                            summary = stringResource(R.string.settings_game_java_memory_summary),
+                            valueRange = AllSettings.ramAllocation.floatRange.start..getMaxMemoryForSettings(LocalContext.current).toFloat(),
+                            suffix = "MB",
+                            fineTuningControl = true,
+                            previewContent = {
+                                MemoryPreview(
+                                    modifier = Modifier
+                                        .fillMaxWidth()
+                                        .padding(start = 2.dp),
+                                    preview = (AllSettings.ramAllocation.state ?: AllSettings.ramAllocation.min).toDouble(),
+                                    usedText = { usedMemory, totalMemory ->
+                                        stringResource(R.string.settings_game_java_memory_used_text, usedMemory.toInt(), totalMemory.toInt()) + " (${com.movtery.zalithlauncher.ui.screens.content.elements.formatMbAsGb(usedMemory)} / ${com.movtery.zalithlauncher.ui.screens.content.elements.formatMbAsGb(totalMemory)})"
+                                    },
+                                    previewText = { preview ->
+                                        stringResource(R.string.settings_game_java_memory_allocation_text, preview.toInt()) + " (${com.movtery.zalithlauncher.ui.screens.content.elements.formatMbAsGb(preview)})"
+                                    }
+                                )
+                            }
+                        )
+
+                    }
 
                     TextInputSettingsCard(
                         modifier = Modifier.fillMaxWidth(),

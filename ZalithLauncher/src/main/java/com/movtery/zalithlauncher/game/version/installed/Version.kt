@@ -227,7 +227,11 @@ class Version(
 
     fun getRamAllocation(context: Context = GlobalContext): Int = versionConfig.ramAllocation.takeIf { it >= 256 }?.let {
         min(it, getMaxMemoryForSettings(context))
-    } ?: AllSettings.ramAllocation.getOrMin()
+    } ?: if (AllSettings.autoRamAllocation.getValue()) {
+        com.movtery.zalithlauncher.setting.findAutoRAMAllocation(context)
+    } else {
+        AllSettings.ramAllocation.getOrMin()
+    }
 
     fun getTouchVibrateDuration(): Int? = versionConfig.touchVibrateDuration.takeIf { it >= 80 }
 

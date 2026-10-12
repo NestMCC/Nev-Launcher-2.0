@@ -22,6 +22,8 @@ import android.content.Context
 import com.movtery.zalithlauncher.utils.device.Architecture
 import com.movtery.zalithlauncher.utils.platform.bytesToMB
 import com.movtery.zalithlauncher.utils.platform.getTotalMemory
+import com.movtery.zalithlauncher.utils.platform.getFreeMemory
+import com.movtery.zalithlauncher.utils.platform.getMaxMemoryForSettings
 import com.movtery.zalithlauncher.utils.string.splitPreservingQuotes
 
 private const val LWJGL_LIB_NAME_ARG = "-Dorg.lwjgl.opengl.libname="
@@ -65,4 +67,24 @@ fun findBestRAMAllocation(context: Context): Int {
         deviceRam < 6144 -> 1536
         else -> 2048 //Default RAM allocation for 64 bits
     }
+}
+
+/**
+ * Alokasi RAM otomatis: menyesuaikan dengan total RAM perangkat (kelas performa)
+ * dan RAM yang sedang bebas saat ini, dengan menyisakan ruang untuk sistem Android.
+ */
+fun findAutoRAMAllocation(context: Context): Int {
+    val deviceRam = getTotalMemory(context).bytesToMB()
+    val freeRam = getFreeMemory(context).bytesToMB()
+    val tier = when {
+        Architecture.is32BitsDevice -> 696
+        deviceRam < 2048 -> 768
+        deviceRam < 3072 -> 1024
+        deviceRam < 4096 -> 1536
+        deviceRam < 6144 -> 2048
+        deviceRam < 8192 -> 3072
+        else -> 4096
+    }
+    val byFree = (freeRam - 512).toInt().coerceAtLeast(512)
+    return minOf(tier, byFree, getMaxMemoryForSettings(context)).coerceAtLeast(256)
 }
