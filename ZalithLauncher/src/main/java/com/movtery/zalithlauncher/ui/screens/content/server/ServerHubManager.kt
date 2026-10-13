@@ -21,7 +21,13 @@ import kotlinx.coroutines.sync.Semaphore
 import kotlinx.coroutines.sync.withPermit
 import kotlinx.coroutines.withTimeout
 import kotlinx.serialization.Serializable
+import kotlinx.coroutines.withContext
+import java.net.DatagramPacket
+import java.net.DatagramSocket
+import java.net.InetAddress
+import java.nio.ByteBuffer
 import java.util.concurrent.ConcurrentHashMap
+import kotlin.random.Random
 
 /**
  * Satu server di halaman Jelajah (Server Discovery).
@@ -30,15 +36,20 @@ import java.util.concurrent.ConcurrentHashMap
 @Serializable
 data class HubServer(
     val name: String,
+    /** Alamat Java (host atau host:port) */
     val address: String,
+    /** Alamat Bedrock (host atau host:port, port bawaan 19132); null jika tidak ada */
+    val bedrockAddress: String? = null,
     val description: String = "",
     val banner: String? = null,
     val categories: List<String> = emptyList(),
+    /** Contoh: "Java", "Bedrock", "Java & Bedrock" */
     val edition: String = "Java",
     val version: String? = null,
-    val bedrockAddress: String? = null,
-    val bedrockPort: Int = 19132,
-    val accountSupport: String = "Tidak diketahui",
+    /** "both" (premium & non-premium), "premium", "nonpremium", atau null jika belum diketahui */
+    val account: String? = null,
+    val accountNote: String? = null,
+    val location: String? = null,
     val featured: Boolean = false
 )
 
@@ -47,11 +58,19 @@ private data class HubServerList(
     val servers: List<HubServer> = emptyList()
 )
 
-/** Kategori filter di halaman Jelajah; null berarti semua */
-val HubCategories: List<String> = listOf(
-    "Survival", "SMP", "OneBlock", "SkyBlock", "PvP", "Faction",
-    "Creative", "Vanilla", "Parkour", "Minigames", "Indonesia"
-)
+/** Port Bedrock bawaan */
+const val BEDROCK_DEFAULT_PORT = 19132
+
+/** Pisahkan "host" atau "host:port" Bedrock */
+fun parseBedrockAddress(address: String): Pair<String, Int> {
+    val trimmed = address.trim()
+    val idx = trimmed.lastIndexOf(':')
+    if (idx > 0) {
+        val port = trimmed.substring(idx + 1).toIntOrNull()
+        if (port != null && port in 1..65535) return trimmed.substring(0, idx) to port
+    }
+    return trimmed to BEDROCK_DEFAULT_PORT
+}
 
 /** Status ping satu server */
 sealed interface HubPing {
@@ -83,23 +102,44 @@ object ServerHubManager {
 
     private val bundled = listOf(
         HubServer(
-            name = "Hypixel",
-            address = "mc.hypixel.net",
-            description = "Salah satu server minigames terbesar di dunia dengan banyak mode permainan.",
-            categories = listOf("Minigames", "PvP", "SkyBlock"),
+            name = "AlwiNation",
+            address = "alwination.id",
+            bedrockAddress = "alwination.id:19132",
+            description = "Server Indonesia dengan banyak mode: Vanilla, Tycoon, Skyblock, Arena PvP, dan lainnya.",
+            categories = listOf("Survival", "Vanilla", "Tycoon", "SkyBlock", "PvP"),
+            edition = "Java & Bedrock",
+            location = "Indonesia",
             featured = true
         ),
         HubServer(
-            name = "CubeCraft",
-            address = "play.cubecraft.net",
-            description = "Server minigames dan PvP dengan komunitas besar.",
-            categories = listOf("Minigames", "PvP")
+            name = "Minesive",
+            address = "minesive.com",
+            bedrockAddress = "be.minesive.com:19132",
+            description = "Server fokus ekonomi, PvP, dan survival, juga untuk latihan dan minigame.",
+            categories = listOf("Economy", "PvP", "Lifesteal", "Survival"),
+            edition = "Java & Bedrock",
+            location = "Singapura"
         ),
         HubServer(
-            name = "The Hive",
-            address = "play.hivemc.com",
-            description = "Server minigames klasik: BedWars, SkyWars, dan lainnya.",
-            categories = listOf("Minigames", "PvP", "Parkour")
+            name = "RelxMC",
+            address = "play.relxmc.com",
+            bedrockAddress = "play.relxmc.com:19132",
+            description = "Server crossplay Java dan Bedrock dari Indonesia.",
+            categories = listOf("Survival", "Economy", "PvP", "Ranks", "Crossplay"),
+            edition = "Java & Bedrock",
+            location = "Indonesia"
+        ),
+        HubServer(
+            name = "KaizenMC",
+            address = "play.kaizenmc.id",
+            bedrockAddress = "play.kaizenmc.id:19132",
+            description = "Server Indonesia sejak 2022 dengan fokus gameplay unik, anti-cheat, dan crossplay Java-Bedrock.",
+            categories = listOf("Survival", "SkyBlock", "Tycoon", "Creative", "Crossplay"),
+            edition = "Java & Bedrock",
+            version = "1.21.6+",
+            account = "both",
+            accountNote = "Premium masuk otomatis. Non-premium daftar dengan /register lalu /login. Akun alt tidak diizinkan.",
+            location = "Indonesia"
         )
     )
 
@@ -112,6 +152,11 @@ object ServerHubManager {
 
     /** Status ping, kunci = alamat server */
     val pings: StateFlow<Map<String, HubPing>> = _pings.asStateFlow()
+
+    private val _bedrockPings = MutableStateFlow<Map<String, HubPing>>(emptyMap())
+
+    /** Status ping Bedrock, kunci = alamat Bedrock sesuai data server */
+    val bedrockPings: StateFlow<Map<String, HubPing>> = _bedrockPings.asStateFlow()
 
     private val _loading = MutableStateFlow(false)
 
@@ -179,6 +224,82 @@ object ServerHubManager {
             }
         }
     }
+
+    /**
+     * Ping Bedrock (RakNet Unconnected Ping lewat UDP).
+     * @param address host atau host:port
+     */
+    fun pingBedrock(address: String, force: Boolean = false) {
+        val key = "bedrock:$address"
+        val now = System.currentTimeMillis()
+        val last = lastPingAt[key]
+        if (!force && last != null && now - last < PING_COOLDOWN_MS) return
+        lastPingAt[key] = now
+
+        _bedrockPings.update { map ->
+            if (map[address] is HubPing.Online) map else map + (address to HubPing.Loading)
+        }
+
+        scope.launch {
+            pingPermits.withPermit {
+                val result = runCatching {
+                    val (host, port) = parseBedrockAddress(address)
+                    pingBedrockRaw(host, port)
+                }.onFailure {
+                    Logger.warning(TAG, "Unable to ping bedrock server: $address", it)
+                }.getOrNull()
+
+                _bedrockPings.update { it + (address to (result ?: HubPing.Offline)) }
+            }
+        }
+    }
+
+    private suspend fun pingBedrockRaw(host: String, port: Int, timeoutMs: Int = 5_000): HubPing.Online? =
+        withContext(Dispatchers.IO) {
+            DatagramSocket().use { socket ->
+                socket.soTimeout = timeoutMs
+                val magic = byteArrayOf(
+                    0x00, 0xff.toByte(), 0xff.toByte(), 0x00,
+                    0xfe.toByte(), 0xfe.toByte(), 0xfe.toByte(), 0xfe.toByte(),
+                    0xfd.toByte(), 0xfd.toByte(), 0xfd.toByte(), 0xfd.toByte(),
+                    0x12, 0x34, 0x56, 0x78
+                )
+                val start = System.currentTimeMillis()
+                val request = ByteBuffer.allocate(1 + 8 + 16 + 8)
+                    .put(0x01.toByte())
+                    .putLong(start)
+                    .put(magic)
+                    .putLong(Random.nextLong())
+                    .array()
+
+                val target = InetAddress.getByName(host)
+                socket.send(DatagramPacket(request, request.size, target, port))
+
+                val buffer = ByteArray(2048)
+                val packet = DatagramPacket(buffer, buffer.size)
+                socket.receive(packet)
+                val ping = System.currentTimeMillis() - start
+
+                val data = ByteBuffer.wrap(packet.data, 0, packet.length)
+                //0x1C = Unconnected Pong
+                if (data.get().toInt() != 0x1C) return@use null
+                data.position(1 + 8 + 8 + 16)
+                val length = data.short.toInt() and 0xFFFF
+                val bytes = ByteArray(minOf(length, data.remaining()))
+                data.get(bytes)
+
+                //MCPE;MOTD;protokol;versi;online;maks;...
+                val parts = String(bytes, Charsets.UTF_8).split(";")
+                if (parts.size < 6) return@use null
+                HubPing.Online(
+                    online = parts[4].toIntOrNull() ?: 0,
+                    max = parts[5].toIntOrNull() ?: 0,
+                    pingMs = ping,
+                    versionName = parts[3],
+                    icon = null
+                )
+            }
+        }
 
     private fun loadCached(): List<HubServer>? {
         return runCatching {
