@@ -34,6 +34,7 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.LazyListScope
 import androidx.compose.foundation.pager.HorizontalPager
@@ -67,6 +68,7 @@ import com.movtery.layer_controller.data.ButtonShape
 import com.movtery.layer_controller.data.DEFAULT_FONT_SIZE
 import com.movtery.layer_controller.data.FONT_SIZE_RANGE
 import com.movtery.layer_controller.data.SHAPE_RANGE
+import com.movtery.layer_controller.data.toAndroidShape
 import com.movtery.layer_controller.layout.RendererStyleBox
 import com.movtery.layer_controller.observable.ObservableButtonStyle
 import com.movtery.layer_controller.observable.ObservableStyleConfig
@@ -524,6 +526,46 @@ private fun LazyListScope.commonStyleConfig(
             modifier = Modifier.animateItem(),
             text = stringResource(R.string.control_editor_edit_style_config_widget_radius)
         )
+    }
+
+    // Bentuk cepat: preset ini mengubah keempat sudut sekaligus.
+    item(key = "shape_presets_$tag") {
+        val shapePresets = listOf(
+            "Kotak" to ButtonShape(0f),
+            "Membulat" to ButtonShape(12f),
+            "Kapsul" to ButtonShape(50f),
+            "Sudut miring" to ButtonShape(4f, 20f, 4f, 20f)
+        )
+        Column(
+            modifier = Modifier
+                .fillMaxWidth()
+                .animateItem(),
+            verticalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Text(text = "Preset bentuk tombol")
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalAlignment = Alignment.CenterVertically
+            ) {
+                shapePresets.forEach { (label, presetShape) ->
+                    Box(
+                        modifier = Modifier
+                            .border(
+                                width = 1.dp,
+                                color = MaterialTheme.colorScheme.outline,
+                                shape = presetShape.toAndroidShape()
+                            )
+                            .clickable { onBorderRadiusChange(presetShape) }
+                            .padding(horizontal = 12.dp, vertical = 8.dp)
+                    ) {
+                        Text(text = label, style = MaterialTheme.typography.labelMedium)
+                    }
+                }
+            }
+        }
     }
 
     //控件圆角
