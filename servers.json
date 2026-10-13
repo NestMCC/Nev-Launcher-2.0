@@ -3,62 +3,48 @@
     {
       "name": "AlwiNation",
       "address": "alwination.id",
-      "description": "Server Indonesia; mode Survival dan SkyBlock.",
-      "categories": [
-        "Indonesia",
-        "Survival",
-        "SkyBlock"
-      ],
-      "edition": "Java & Bedrock",
       "bedrockAddress": "alwination.id",
       "bedrockPort": 19132,
-      "accountSupport": "Tidak diketahui",
+      "description": "Server Indonesia; mode Survival dan SkyBlock.",
+      "categories": ["Survival", "SkyBlock"],
+      "edition": "Java & Bedrock",
+      "location": "Indonesia",
       "featured": true
     },
     {
       "name": "Minesive",
       "address": "minesive.com",
-      "description": "Minesive NEW ERA; Survival dan Economy.",
-      "categories": [
-        "Indonesia",
-        "Survival",
-        "Economy"
-      ],
-      "edition": "Java & Bedrock",
-      "bedrockAddress": "minesive.com",
+      "bedrockAddress": "be.minesive.com",
       "bedrockPort": 19132,
-      "accountSupport": "Tidak diketahui",
+      "description": "Server fokus ekonomi, PvP, dan survival.",
+      "categories": ["Economy", "PvP", "Lifesteal", "Survival"],
+      "edition": "Java & Bedrock",
+      "location": "Singapura",
       "featured": true
     },
     {
-      "name": "RELXMC",
+      "name": "RelxMC",
       "address": "play.relxmc.com",
-      "description": "Server Survival Economy.",
-      "categories": [
-        "Indonesia",
-        "Survival",
-        "Economy"
-      ],
-      "edition": "Java & Bedrock",
       "bedrockAddress": "play.relxmc.com",
       "bedrockPort": 19132,
-      "accountSupport": "Tidak diketahui",
+      "description": "Server crossplay Java dan Bedrock.",
+      "categories": ["Survival", "Economy", "Crossplay"],
+      "edition": "Java & Bedrock",
+      "location": "Indonesia",
       "featured": true
     },
     {
       "name": "Kaizen Network",
       "address": "play.kaizenmc.id",
-      "description": "Survival Mix (TERRA), SkyBlock Tycoon (ASTRA), Creative (ILLUSTRA).",
-      "categories": [
-        "Indonesia",
-        "Survival",
-        "SkyBlock",
-        "Creative"
-      ],
-      "edition": "Java & Bedrock",
       "bedrockAddress": "play.kaizenmc.id",
       "bedrockPort": 19132,
-      "accountSupport": "Offline/Cracked diperbolehkan; akun alt dilarang",
+      "description": "Survival Mix (TERRA), SkyBlock Tycoon (ASTRA), dan Creative (ILLUSTRA). Crossplay Java-Bedrock.",
+      "categories": ["Survival", "SkyBlock", "Tycoon", "Creative", "Crossplay"],
+      "edition": "Java & Bedrock",
+      "version": "1.21.6+",
+      "account": "both",
+      "accountNote": "Premium masuk otomatis. Non-premium: /register <sandi> <sandi>, lalu /login <sandi> tiap masuk. Akun alt dilarang.",
+      "location": "Indonesia",
       "featured": true
     }
   ]

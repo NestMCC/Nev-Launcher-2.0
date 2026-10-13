@@ -95,9 +95,10 @@ private data class ServerEntry(
     val version: String?,
     val icon: ByteArray?,
     val saved: Boolean,
-    val bedrockAddress: String? = null,
-    val bedrockPort: Int = 19132,
-    val accountSupport: String = "Tidak diketahui"
+    val bedrock: String? = null,
+    val account: String? = null,
+    val accountNote: String? = null,
+    val location: String? = null
 )
 
 /**
@@ -137,6 +138,7 @@ private fun ServerHubContent(
 
     val servers by ServerHubManager.servers.collectAsState()
     val pings by ServerHubManager.pings.collectAsState()
+    val bedrockPings by ServerHubManager.bedrockPings.collectAsState()
     val loading by ServerHubManager.loading.collectAsState()
     val savedCards by ServerCardManager.cards.collectAsState()
 
@@ -162,11 +164,15 @@ private fun ServerHubContent(
                     version = server.version,
                     icon = null,
                     saved = server.address in savedAddresses,
-                    bedrockAddress = server.bedrockAddress,
-                    bedrockPort = server.bedrockPort,
-                    accountSupport = server.accountSupport
+                    bedrock = server.bedrockTarget(),
+                    account = server.account,
+                    accountNote = server.accountNote,
+                    location = server.location
                 )
             }
+    }
+    val categories = remember(servers) {
+        servers.flatMap { it.categories }.distinctBy { it.lowercase() }.sorted()
     }
     val savedEntries = remember(savedCards) {
         savedCards.map { card ->
@@ -186,8 +192,11 @@ private fun ServerHubContent(
     val entries = if (tab == 0) discoverEntries else savedEntries
 
     //ping semua server yang sedang tampil
-    LaunchedEffect(entries.map { it.address }) {
-        entries.forEach { ServerHubManager.ping(it.address) }
+    LaunchedEffect(entries.map { it.address to it.bedrock }) {
+        entries.forEach { entry ->
+            ServerHubManager.ping(entry.address)
+            entry.bedrock?.let { ServerHubManager.pingBedrock(it) }
+        }
     }
 
     val detail = detailAddress?.let { address ->
@@ -196,8 +205,8 @@ private fun ServerHubContent(
                 ServerEntry(
                     server.name, server.address, server.description, server.banner,
                     server.categories, server.edition, server.version, null,
-                    server.address in savedAddresses, server.bedrockAddress,
-                    server.bedrockPort, server.accountSupport
+                    server.address in savedAddresses,
+                    server.bedrockTarget(), server.account, server.accountNote, server.location
                 )
             }
     }
@@ -227,7 +236,10 @@ private fun ServerHubContent(
             IconButton(
                 onClick = {
                     ServerHubManager.refreshList()
-                    entries.forEach { ServerHubManager.ping(it.address, force = true) }
+                    entries.forEach { entry ->
+                        ServerHubManager.ping(entry.address, force = true)
+                        entry.bedrock?.let { ServerHubManager.pingBedrock(it, force = true) }
+                    }
                 }
             ) {
                 Icon(
@@ -259,7 +271,7 @@ private fun ServerHubContent(
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
                 HubChip(selected = category == null, label = "Semua", onClick = { category = null })
-                HubCategories.forEach { name ->
+                categories.forEach { name ->
                     HubChip(
                         selected = category == name,
                         label = name,
@@ -300,6 +312,7 @@ private fun ServerHubContent(
                 ServerCard(
                     entry = entry,
                     ping = pings[entry.address],
+                    bedrockPing = entry.bedrock?.let { bedrockPings[it] },
                     onClick = { detailAddress = entry.address }
                 )
             }
@@ -311,6 +324,7 @@ private fun ServerHubContent(
         ServerDetailDialog(
             entry = detail,
             ping = pings[detail.address],
+            bedrockPing = detail.bedrock?.let { bedrockPings[it] },
             onDismiss = { detailAddress = null },
             onPlay = {
                 detailAddress = null
@@ -425,6 +439,7 @@ private fun AddServerCard(onClick: () -> Unit) {
 private fun ServerCard(
     entry: ServerEntry,
     ping: HubPing?,
+    bedrockPing: HubPing?,
     onClick: () -> Unit
 ) {
     val primary = MaterialTheme.colorScheme.primary
@@ -455,11 +470,15 @@ private fun ServerCard(
                     maxLines = 1,
                     overflow = TextOverflow.Ellipsis
                 )
-                StatusLine(ping = ping)
+                StatusLine(ping = ping, label = "Java")
+                if (entry.bedrock != null) {
+                    StatusLine(ping = bedrockPing, label = "Bedrock")
+                }
                 val versionText = (ping as? HubPing.Online)?.versionName ?: entry.version
                 val meta = listOfNotNull(
                     versionText,
-                    entry.categories.take(2).takeIf { it.isNotEmpty() }?.joinToString(" • ")
+                    entry.categories.take(3).takeIf { it.isNotEmpty() }?.joinToString(" • "),
+                    accountShort(entry.account)
                 ).joinToString("  |  ")
                 if (meta.isNotEmpty()) {
                     Text(
@@ -476,11 +495,12 @@ private fun ServerCard(
 }
 
 @Composable
-private fun StatusLine(ping: HubPing?) {
+private fun StatusLine(ping: HubPing?, label: String? = null) {
+    val prefix = if (label != null) "$label  " else ""
     val (color, text) = when (ping) {
-        is HubPing.Online -> OnlineColor to "${ping.online}/${ping.max} pemain  •  ${ping.pingMs} ms"
-        HubPing.Offline -> OfflineColor to "Offline"
-        else -> LoadingColor to "Memeriksa…"
+        is HubPing.Online -> OnlineColor to "${prefix}Online  ${ping.online}/${ping.max}  •  ${ping.pingMs} ms"
+        HubPing.Offline -> OfflineColor to "${prefix}Offline"
+        else -> LoadingColor to "${prefix}Memeriksa…"
     }
     Row(
         verticalAlignment = Alignment.CenterVertically,
@@ -538,6 +558,7 @@ private fun ServerLogo(icon: ByteArray?, size: Dp) {
 private fun ServerDetailDialog(
     entry: ServerEntry,
     ping: HubPing?,
+    bedrockPing: HubPing?,
     onDismiss: () -> Unit,
     onPlay: () -> Unit,
     onSave: (() -> Unit)?,
@@ -604,74 +625,40 @@ private fun ServerDetailDialog(
                     modifier = Modifier.padding(16.dp),
                     verticalArrangement = Arrangement.spacedBy(10.dp)
                 ) {
-                    StatusLine(ping = ping)
+                    StatusLine(ping = ping, label = "Java")
+                    if (entry.bedrock != null) {
+                        StatusLine(ping = bedrockPing, label = "Bedrock")
+                    }
 
                     if (entry.description.isNotBlank()) {
                         Text(text = entry.description, style = MaterialTheme.typography.bodyMedium)
                     }
 
-                    // IP Java + tombol salin
-                    Surface(
-                        shape = RoundedCornerShape(12.dp),
-                        color = primary.copy(alpha = 0.12f)
-                    ) {
-                        Row(
-                            modifier = Modifier.padding(start = 12.dp),
-                            verticalAlignment = Alignment.CenterVertically
-                        ) {
-                            Column(modifier = Modifier.weight(1f).padding(vertical = 10.dp)) {
-                                Text("Java", style = MaterialTheme.typography.labelSmall,
-                                    color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                Text(
-                                    text = entry.address,
-                                    style = MaterialTheme.typography.bodyMedium,
-                                    fontWeight = FontWeight.SemiBold,
-                                    maxLines = 2,
-                                    overflow = TextOverflow.Ellipsis
-                                )
-                            }
-                            IconButton(onClick = {
-                                context.getSystemService(ClipboardManager::class.java)
-                                    ?.setPrimaryClip(ClipData.newPlainText("Java IP", entry.address))
-                                Toast.makeText(context, "IP Java disalin", Toast.LENGTH_SHORT).show()
-                            }) {
-                                Icon(painter = painterResource(R.drawable.ic_content_copy_filled),
-                                    contentDescription = "Salin IP Java", tint = primary)
-                            }
-                        }
-                    }
-                    if (entry.edition.contains("Bedrock", ignoreCase = true) && entry.bedrockAddress != null) {
-                        Surface(shape = RoundedCornerShape(12.dp), color = primary.copy(alpha = 0.08f)) {
-                            Row(modifier = Modifier.padding(start = 12.dp),
-                                verticalAlignment = Alignment.CenterVertically) {
-                                Column(modifier = Modifier.weight(1f).padding(vertical = 10.dp)) {
-                                    Text("Bedrock • Port ${entry.bedrockPort}",
-                                        style = MaterialTheme.typography.labelSmall,
-                                        color = MaterialTheme.colorScheme.onSurfaceVariant)
-                                    Text(entry.bedrockAddress, style = MaterialTheme.typography.bodyMedium,
-                                        fontWeight = FontWeight.SemiBold, maxLines = 2,
-                                        overflow = TextOverflow.Ellipsis)
-                                }
-                                IconButton(onClick = {
-                                    val bedrockIp = "${entry.bedrockAddress}:${entry.bedrockPort}"
-                                    context.getSystemService(ClipboardManager::class.java)
-                                        ?.setPrimaryClip(ClipData.newPlainText("Bedrock IP", bedrockIp))
-                                    Toast.makeText(context, "IP Bedrock disalin", Toast.LENGTH_SHORT).show()
-                                }) {
-                                    Icon(painter = painterResource(R.drawable.ic_content_copy_filled),
-                                        contentDescription = "Salin IP Bedrock", tint = primary)
-                                }
-                            }
-                        }
+                    //Alamat server: Java dan Bedrock
+                    AddressRow(label = "IP Java", value = entry.address)
+                    if (entry.bedrock != null) {
+                        val (bedrockHost, bedrockPort) = parseBedrockAddress(entry.bedrock)
+                        AddressRow(label = "IP Bedrock", value = bedrockHost)
+                        AddressRow(label = "Port Bedrock", value = bedrockPort.toString())
                     }
 
                     val versionText = (ping as? HubPing.Online)?.versionName ?: entry.version
                     InfoRow("Edisi", entry.edition)
-                    if (versionText != null) InfoRow("Versi", versionText)
+                    val bedrockVersion = (bedrockPing as? HubPing.Online)?.versionName
+                    if (versionText != null) InfoRow("Versi Java", versionText)
+                    if (bedrockVersion != null) InfoRow("Versi Bedrock", bedrockVersion)
                     if (entry.categories.isNotEmpty()) {
                         InfoRow("Mode", entry.categories.joinToString(", "))
                     }
-                    InfoRow("Akun", entry.accountSupport)
+                    InfoRow("Akun", accountLong(entry.account))
+                    if (!entry.accountNote.isNullOrBlank()) {
+                        Text(
+                            text = entry.accountNote,
+                            style = MaterialTheme.typography.bodySmall,
+                            color = MaterialTheme.colorScheme.onSurfaceVariant
+                        )
+                    }
+                    if (!entry.location.isNullOrBlank()) InfoRow("Lokasi", entry.location)
 
                     Spacer(Modifier.height(4.dp))
 
@@ -707,11 +694,69 @@ private fun ServerDetailDialog(
     }
 }
 
+private fun accountShort(account: String?): String? = when (account) {
+    "both" -> "Premium & Non-premium"
+    "premium" -> "Premium"
+    "nonpremium" -> "Non-premium"
+    else -> null
+}
+
+private fun accountLong(account: String?): String = when (account) {
+    "both" -> "Premium & Non-premium (cracked)"
+    "premium" -> "Premium saja (online-mode)"
+    "nonpremium" -> "Non-premium (offline-mode)"
+    else -> "Belum diketahui"
+}
+
+/** Baris alamat dengan tombol salin */
+@Composable
+private fun AddressRow(label: String, value: String) {
+    val context = LocalContext.current
+    val primary = MaterialTheme.colorScheme.primary
+    Surface(
+        shape = RoundedCornerShape(12.dp),
+        color = primary.copy(alpha = 0.12f)
+    ) {
+        Row(
+            modifier = Modifier.padding(start = 12.dp),
+            verticalAlignment = Alignment.CenterVertically
+        ) {
+            Text(
+                modifier = Modifier.width(96.dp),
+                text = label,
+                style = MaterialTheme.typography.bodySmall,
+                color = MaterialTheme.colorScheme.onSurfaceVariant
+            )
+            Text(
+                modifier = Modifier.weight(1f),
+                text = value,
+                style = MaterialTheme.typography.bodyMedium,
+                fontWeight = FontWeight.SemiBold,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+            IconButton(
+                onClick = {
+                    context.getSystemService(ClipboardManager::class.java)
+                        ?.setPrimaryClip(ClipData.newPlainText(label, value))
+                    Toast.makeText(context, "$label disalin", Toast.LENGTH_SHORT).show()
+                }
+            ) {
+                Icon(
+                    painter = painterResource(R.drawable.ic_content_copy_filled),
+                    contentDescription = "Salin $label",
+                    tint = primary
+                )
+            }
+        }
+    }
+}
+
 @Composable
 private fun InfoRow(label: String, value: String) {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(
-            modifier = Modifier.width(56.dp),
+            modifier = Modifier.width(96.dp),
             text = label,
             style = MaterialTheme.typography.bodySmall,
             color = MaterialTheme.colorScheme.onSurfaceVariant
