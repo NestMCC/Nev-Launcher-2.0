@@ -23,6 +23,7 @@ Launcher komunitas yang dikembangkan dengan identitas NEV Launcher, dengan fokus
 - [Unduhan](#unduhan)
 - [Pelaporan masalah](#pelaporan-masalah)
 - [Lisensi dan kepatuhan](#lisensi-dan-kepatuhan)
+- [Inventaris lisensi pihak ketiga](#inventaris-lisensi-pihak-ketiga)
 - [Kredit dan proyek hulu](#kredit-dan-proyek-hulu)
 - [Penafian](#penafian)
 
@@ -82,7 +83,15 @@ Hal penting untuk distribusi versi modifikasi:
 5. **Jangan menyatakan kepemilikan atas kode pihak lain.** Perubahan yang dibuat untuk NEV Launcher tidak menghapus hak cipta maupun lisensi yang dimiliki para kontributor sebelumnya.
 6. **Nama dan merek tetap terpisah.** Gunakan nama serta identitas NEV Launcher yang berbeda dan jangan membuat pengguna mengira aplikasi ini adalah rilis resmi dari proyek hulu atau Minecraft.
 
-README ini merupakan ringkasan praktis, bukan pengganti teks lisensi. Jika ada perbedaan, teks lisensi yang berlaku pada komponen terkait dan ketentuan hukum yang berlaku harus diperiksa secara langsung.
+README ini merupakan ringkasan praktis, bukan pengganti teks lisensi. Lihat juga [inventaris lisensi pihak ketiga](./THIRD_PARTY_LICENSES.md), yang saat ini masih berstatus audit awal dan belum memverifikasi lisensi setiap artefak. Jika ada perbedaan, teks lisensi yang berlaku pada komponen terkait dan ketentuan hukum yang berlaku harus diperiksa secara langsung.
+
+### Inventaris lisensi pihak ketiga
+
+Berkas [THIRD_PARTY_LICENSES.md](./THIRD_PARTY_LICENSES.md) mencatat proyek hulu, kelompok dependensi yang terlihat pada konfigurasi build, dan daftar pemeriksaan sebelum rilis. **Dokumen tersebut belum merupakan inventaris lisensi lengkap**: dependensi transitif, aset runtime, serta seluruh JAR/AAR dan pustaka native masih perlu diperiksa untuk varian APK yang benar-benar dirilis.
+
+### Catatan identitas teknis
+
+Pada konfigurasi yang diperiksa, modul Android masih menggunakan namespace dan application ID dasar `com.movtery.zalithlauncher`, serta nama proyek Gradle `ZalithLauncher`. Ini merupakan temuan yang perlu ditangani sebagai pekerjaan branding/teknis terpisah. Jangan mengganti application ID secara serampangan karena dapat memengaruhi data aplikasi, autentikasi, tautan, dan kompatibilitas. Apa pun nama aplikasi yang ditampilkan, pertahankan atribusi dan pemberitahuan lisensi proyek hulu.
 
 ## Kredit dan proyek hulu
 
