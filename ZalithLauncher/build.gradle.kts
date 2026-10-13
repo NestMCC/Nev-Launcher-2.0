@@ -83,6 +83,18 @@ android {
                 "proguard-rules.pro"
             )
         }
+        // Nev Launcher: build ringan & cepat untuk pengujian (R8 aktif, bukan debuggable),
+        // ditandatangani kunci debug agar bisa dipasang tanpa rahasia keystore rilis.
+        create("fast") {
+            initWith(getByName("release"))
+            isDebuggable = false
+            isMinifyEnabled = true
+            isShrinkResources = true
+            applicationIdSuffix = ".debug"
+            versionNameSuffix = "-fast"
+            signingConfig = signingConfigs.getByName("debugBuild")
+            matchingFallbacks += listOf("release")
+        }
         debug {
             isMinifyEnabled = false
             applicationIdSuffix = ".debug"

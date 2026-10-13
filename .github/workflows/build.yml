@@ -78,10 +78,12 @@ jobs:
           done
 
       - name: Upload Debug APK for ${{ matrix.arch }}
-        if: inputs.variant == 'Debug'
+        if: inputs.variant == 'Debug' || inputs.variant == 'Fast'
         uses: actions/upload-artifact@v7
         with:
           name: debug apk (${{ matrix.arch }})
-          path: ZalithLauncher/build/outputs/apk/debug/*.apk
+          path: |
+            ZalithLauncher/build/outputs/apk/debug/*.apk
+            ZalithLauncher/build/outputs/apk/fast/*.apk
           if-no-files-found: error
           retention-days: 90

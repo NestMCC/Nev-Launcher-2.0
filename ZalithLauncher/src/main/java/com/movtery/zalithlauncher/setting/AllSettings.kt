@@ -404,17 +404,17 @@ object AllSettings : SettingsRegistry() {
     /**
      * 动画倍速
      */
-    val launcherAnimateSpeed = intSetting("launcherAnimateSpeed", 5, 0..10)
+    val launcherAnimateSpeed = intSetting("launcherAnimateSpeed", 8, 0..10)
 
     /**
      * 动画幅度
      */
-    val launcherAnimateExtent = intSetting("launcherAnimateExtent", 5, 0..10)
+    val launcherAnimateExtent = intSetting("launcherAnimateExtent", 2, 0..10)
 
     /**
      * 启动器页面切换动画类型
      */
-    val launcherSwapAnimateType = enumSetting("launcherSwapAnimateType", TransitionAnimationType.JELLY_BOUNCE)
+    val launcherSwapAnimateType = enumSetting("launcherSwapAnimateType", TransitionAnimationType.SLICE_IN)
 
     /**
      * 主界面操作菜单的停泊侧
