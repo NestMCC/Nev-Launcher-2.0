@@ -35,7 +35,6 @@ import com.movtery.zalithlauncher.game.input.LWJGLCharSender
 import com.movtery.zalithlauncher.game.launch.GameLauncher
 import com.movtery.zalithlauncher.game.launch.LaunchConfig
 import com.movtery.zalithlauncher.game.launch.MCOptions
-import com.movtery.zalithlauncher.game.launch.applyOptimization
 import com.movtery.zalithlauncher.game.launch.loadLanguage
 import com.movtery.zalithlauncher.game.sdl.SdlBridge
 import com.movtery.zalithlauncher.game.sdl.handleGamepadKeyEvent
@@ -128,9 +127,6 @@ class GameHandler(
             }
 
             loadLanguage(version.getVersionInfo()!!.minecraftVersion)
-            if (AllSettings.gameOptimization.getValue()) {
-                applyOptimization(com.movtery.zalithlauncher.game.launch.GameOptimizer.tier(activity))
-            }
             save()
         }
 

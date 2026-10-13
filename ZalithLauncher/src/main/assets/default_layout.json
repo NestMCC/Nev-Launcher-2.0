@@ -427,7 +427,7 @@
         },
         {
           "text": {
-            "default": "F3+F4",
+            "default": "GM",
             "matchQueue": []
           },
           "uuid": "6c797cc304714e0caa",
@@ -745,7 +745,7 @@
           ],
           "isSwipple": false,
           "isPenetrable": false,
-          "isToggleable": false
+          "isToggleable": true
         },
         {
           "text": {
@@ -931,7 +931,7 @@
           ],
           "isSwipple": false,
           "isPenetrable": false,
-          "isToggleable": false
+          "isToggleable": true
         }
       ]
     },

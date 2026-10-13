@@ -255,14 +255,6 @@ fun GameSettingsScreen(
 
                     }
 
-                    SwitchSettingsCard(
-                        modifier = Modifier.fillMaxWidth(),
-                        position = CardPosition.Middle,
-                        unit = AllSettings.gameOptimization,
-                        title = stringResource(R.string.settings_game_optimization_title),
-                        summary = stringResource(R.string.settings_game_optimization_summary)
-                    )
-
                     TextInputSettingsCard(
                         modifier = Modifier.fillMaxWidth(),
                         position = CardPosition.Bottom,

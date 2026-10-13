@@ -22,6 +22,11 @@ import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.ui.unit.sp
+import androidx.compose.ui.draw.clip
+import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.border
+import androidx.compose.foundation.background
 import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
@@ -905,58 +910,71 @@ private fun GameInfoBox(
         exit = fadeOut(),
         modifier = modifier
     ) {
-        BackgroundCard(
-            modifier = modifier,
-            influencedByBackground = false,
-            shape = MaterialTheme.shapes.extraLarge
+        val accent = androidx.compose.ui.graphics.Color(0xFFFF5A36)
+        val shape = androidx.compose.foundation.shape.RoundedCornerShape(24.dp)
+        Box(
+            modifier = Modifier
+                .widthIn(max = 360.dp)
+                .clip(shape)
+                .background(androidx.compose.ui.graphics.Color(0xE6120808))
+                .border(1.5.dp, accent.copy(alpha = 0.85f), shape)
         ) {
-            Row {
-                Row(
-                    modifier = Modifier
-                        .weight(1f, fill = false)
-                        .padding(vertical = 16.dp)
-                        .padding(start = 16.dp),
-                    horizontalArrangement = Arrangement.spacedBy(16.dp)
-                ) {
-                    LoadingIndicator(
-                        modifier = Modifier.align(Alignment.CenterVertically)
-                    )
-
-                    //提示信息
-                    Column(
-                        modifier = Modifier.weight(1f, fill = false),
-                        verticalArrangement = Arrangement.spacedBy(2.dp)
-                    ) {
-                        Text(
-                            text = stringResource(R.string.game_loading),
-                            style = MaterialTheme.typography.bodyLarge
-                        )
-                        Text(
-                            text = stringResource(R.string.game_loading_version_name, versionName),
-                            style = MaterialTheme.typography.labelLarge
-                        )
-                        versionInfo?.let { info ->
-                            Text(
-                                text = stringResource(R.string.game_loading_version_info, info),
-                                style = MaterialTheme.typography.labelLarge
-                            )
-                        }
-                    }
+            Column(
+                modifier = Modifier.padding(horizontal = 24.dp, vertical = 20.dp),
+                horizontalAlignment = Alignment.CenterHorizontally,
+                verticalArrangement = Arrangement.spacedBy(10.dp)
+            ) {
+                LoadingIndicator(
+                    modifier = Modifier.size(56.dp),
+                    color = accent
+                )
+                Text(
+                    text = "NEV LAUNCHER",
+                    style = MaterialTheme.typography.labelLarge,
+                    color = accent,
+                    letterSpacing = 3.sp
+                )
+                Text(
+                    text = stringResource(R.string.game_loading),
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = androidx.compose.ui.graphics.Color.White,
+                    textAlign = androidx.compose.ui.text.style.TextAlign.Center
+                )
+                Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
+                    InfoChip(versionName, accent)
+                    versionInfo?.let { InfoChip(it, accent) }
                 }
-
-                IconButton(
-                    modifier = Modifier.padding(top = 4.dp, end = 4.dp),
-                    onClick = onClose
-                ) {
-                    Icon(
-                        modifier = Modifier.size(18.dp),
-                        painter = painterResource(R.drawable.ic_close),
-                        contentDescription = stringResource(R.string.generic_close)
-                    )
-                }
+            }
+            IconButton(
+                modifier = Modifier
+                    .align(Alignment.TopEnd)
+                    .padding(top = 2.dp, end = 2.dp),
+                onClick = onClose
+            ) {
+                Icon(
+                    modifier = Modifier.size(18.dp),
+                    painter = painterResource(R.drawable.ic_close),
+                    tint = androidx.compose.ui.graphics.Color.White.copy(alpha = 0.8f),
+                    contentDescription = stringResource(R.string.generic_close)
+                )
             }
         }
     }
+}
+
+@Composable
+private fun InfoChip(text: String, accent: androidx.compose.ui.graphics.Color) {
+    val shape = androidx.compose.foundation.shape.RoundedCornerShape(50)
+    Text(
+        modifier = Modifier
+            .clip(shape)
+            .background(accent.copy(alpha = 0.18f))
+            .padding(horizontal = 12.dp, vertical = 4.dp),
+        text = text,
+        style = MaterialTheme.typography.labelMedium,
+        color = androidx.compose.ui.graphics.Color.White,
+        maxLines = 1
+    )
 }
 
 @Preview(showBackground = false)

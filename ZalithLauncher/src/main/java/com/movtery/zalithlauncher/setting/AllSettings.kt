@@ -147,7 +147,6 @@ object AllSettings : SettingsRegistry() {
      * 游戏内存分配大小
      */
     val bannerIsVideo = boolSetting("bannerIsVideo", false)
-    val gameOptimization = boolSetting("gameOptimization", true)
     val autoRamAllocation = boolSetting("autoRamAllocation", true)
     val ramAllocation = intSetting("ramAllocation", null, min = 256)
 
