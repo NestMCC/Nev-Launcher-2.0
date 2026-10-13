@@ -1,0 +1,26 @@
+{
+  "servers": [
+    {
+      "name": "Hypixel",
+      "address": "mc.hypixel.net",
+      "description": "Salah satu server minigames terbesar di dunia dengan banyak mode permainan.",
+      "categories": ["Minigames", "PvP", "SkyBlock"],
+      "edition": "Java",
+      "featured": true
+    },
+    {
+      "name": "CubeCraft",
+      "address": "play.cubecraft.net",
+      "description": "Server minigames dan PvP dengan komunitas besar.",
+      "categories": ["Minigames", "PvP"],
+      "edition": "Java"
+    },
+    {
+      "name": "The Hive",
+      "address": "play.hivemc.com",
+      "description": "Server minigames klasik: BedWars, SkyWars, dan lainnya.",
+      "categories": ["Minigames", "PvP", "Parkour"],
+      "edition": "Java"
+    }
+  ]
+}

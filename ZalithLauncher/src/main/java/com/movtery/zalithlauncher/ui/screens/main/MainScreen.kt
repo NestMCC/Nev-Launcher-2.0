@@ -110,6 +110,7 @@ import com.movtery.zalithlauncher.ui.screens.content.LauncherScreen
 import com.movtery.zalithlauncher.ui.screens.content.LicenseScreen
 import com.movtery.zalithlauncher.ui.screens.content.LogViewScreen
 import com.movtery.zalithlauncher.ui.screens.content.MultiplayerScreen
+import com.movtery.zalithlauncher.ui.screens.content.server.ServerHubScreen
 import com.movtery.zalithlauncher.ui.screens.content.SettingsScreen
 import com.movtery.zalithlauncher.ui.screens.content.VersionExportScreen
 import com.movtery.zalithlauncher.ui.screens.content.VersionSettingsScreen
@@ -259,10 +260,17 @@ fun MainScreen(
             // Nev Launcher: ikon menu dipindah dari bilah atas ke sidebar kiri (fungsi sama)
             NevSideRail(
                 inLauncherScreen = inLauncherScreen,
+                inServerScreen = mainScreenKey is NormalNavKey.ServerHub,
                 inMultiplayerScreen = mainScreenKey is NormalNavKey.Multiplayer,
                 inDownloadScreen = mainScreenKey is NestedNavKey.Download,
                 inSettingsScreen = mainScreenKey is NestedNavKey.Settings,
                 toMainScreen = toMainScreen,
+                toServerScreen = {
+                    screenBackStackModel.mainScreen.removeAndNavigateTo(
+                        removes = screenBackStackModel.clearBeforeNavKeys,
+                        screenKey = NormalNavKey.ServerHub
+                    )
+                },
                 openFileManager = {
                     eventViewModel.sendEvent(
                         EventViewModel.Event.OpenFileManager(
@@ -684,6 +692,22 @@ private fun NavigationUI(
                         eventViewModel = eventViewModel
                     )
                 }
+                entry<NormalNavKey.ServerHub> {
+                    ServerHubScreen(
+                        backScreenViewModel = screenBackStackModel,
+                        onPlayServer = { address ->
+                            val target = VersionsManager.currentVersion.value?.takeIf { it.isValid() }
+                            if (target != null) {
+                                eventViewModel.sendEvent(
+                                    EventViewModel.Event.Launch.PlayServer(target, address)
+                                )
+                            } else {
+                                eventViewModel.sendToast(androidText(R.string.game_launch_no_version))
+                                screenBackStackModel.mainScreen.navigateTo(NormalNavKey.VersionsManager)
+                            }
+                        }
+                    )
+                }
                 entry<NormalNavKey.LogView> { key ->
                     LogViewScreen(
                         key = key,
@@ -918,11 +942,13 @@ private fun NevBrandTitle() {
 @Composable
 private fun NevSideRail(
     inLauncherScreen: Boolean,
+    inServerScreen: Boolean,
     inMultiplayerScreen: Boolean,
     inDownloadScreen: Boolean,
     inSettingsScreen: Boolean,
     toMainScreen: () -> Unit,
     openFileManager: () -> Unit,
+    toServerScreen: () -> Unit,
     toMultiplayerScreen: () -> Unit,
     toDownloadScreen: () -> Unit,
     toSettingsScreen: () -> Unit,
@@ -942,6 +968,12 @@ private fun NevSideRail(
             painter = painterResource(R.drawable.ic_home_filled),
             text = "Beranda",
             onClick = { if (!inLauncherScreen) toMainScreen() }
+        )
+        NevRailItem(
+            selected = inServerScreen,
+            painter = painterResource(R.drawable.ic_dns_outlined),
+            text = "Server",
+            onClick = { if (!inServerScreen) toServerScreen() }
         )
         NevRailItem(
             selected = false,

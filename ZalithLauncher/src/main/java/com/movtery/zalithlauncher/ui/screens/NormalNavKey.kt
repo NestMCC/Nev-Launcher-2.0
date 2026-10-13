@@ -64,6 +64,11 @@ sealed interface NormalNavKey : TitledNavKey {
         @Contextual override val title: AndroidStringText = androidText(R.string.terracotta_terracotta)
     }
 
+    /** Nev Server Hub */
+    @Serializable data object ServerHub : NormalNavKey {
+        @Contextual override val title: AndroidStringText = androidText("Server")
+    }
+
     /** 查看日志屏幕 */
     @Serializable data class LogView(
         val logPath: String
