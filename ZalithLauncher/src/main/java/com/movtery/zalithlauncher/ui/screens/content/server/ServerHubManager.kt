@@ -36,6 +36,9 @@ data class HubServer(
     val categories: List<String> = emptyList(),
     val edition: String = "Java",
     val version: String? = null,
+    val bedrockAddress: String? = null,
+    val bedrockPort: Int = 19132,
+    val accountSupport: String = "Tidak diketahui",
     val featured: Boolean = false
 )
 
