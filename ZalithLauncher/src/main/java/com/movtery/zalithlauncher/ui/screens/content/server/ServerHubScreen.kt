@@ -94,7 +94,10 @@ private data class ServerEntry(
     val edition: String,
     val version: String?,
     val icon: ByteArray?,
-    val saved: Boolean
+    val saved: Boolean,
+    val bedrockAddress: String? = null,
+    val bedrockPort: Int = 19132,
+    val accountSupport: String = "Tidak diketahui"
 )
 
 /**
@@ -158,7 +161,10 @@ private fun ServerHubContent(
                     edition = server.edition,
                     version = server.version,
                     icon = null,
-                    saved = server.address in savedAddresses
+                    saved = server.address in savedAddresses,
+                    bedrockAddress = server.bedrockAddress,
+                    bedrockPort = server.bedrockPort,
+                    accountSupport = server.accountSupport
                 )
             }
     }
@@ -190,7 +196,8 @@ private fun ServerHubContent(
                 ServerEntry(
                     server.name, server.address, server.description, server.banner,
                     server.categories, server.edition, server.version, null,
-                    server.address in savedAddresses
+                    server.address in savedAddresses, server.bedrockAddress,
+                    server.bedrockPort, server.accountSupport
                 )
             }
     }
@@ -603,7 +610,7 @@ private fun ServerDetailDialog(
                         Text(text = entry.description, style = MaterialTheme.typography.bodyMedium)
                     }
 
-                    //IP + salin
+                    // IP Java + tombol salin
                     Surface(
                         shape = RoundedCornerShape(12.dp),
                         color = primary.copy(alpha = 0.12f)
@@ -612,26 +619,48 @@ private fun ServerDetailDialog(
                             modifier = Modifier.padding(start = 12.dp),
                             verticalAlignment = Alignment.CenterVertically
                         ) {
-                            Text(
-                                modifier = Modifier.weight(1f),
-                                text = entry.address,
-                                style = MaterialTheme.typography.bodyMedium,
-                                fontWeight = FontWeight.SemiBold,
-                                maxLines = 1,
-                                overflow = TextOverflow.Ellipsis
-                            )
-                            IconButton(
-                                onClick = {
-                                    context.getSystemService(ClipboardManager::class.java)
-                                        ?.setPrimaryClip(ClipData.newPlainText("server", entry.address))
-                                    Toast.makeText(context, "IP disalin", Toast.LENGTH_SHORT).show()
-                                }
-                            ) {
-                                Icon(
-                                    painter = painterResource(R.drawable.ic_content_copy_filled),
-                                    contentDescription = "Salin IP",
-                                    tint = primary
+                            Column(modifier = Modifier.weight(1f).padding(vertical = 10.dp)) {
+                                Text("Java", style = MaterialTheme.typography.labelSmall,
+                                    color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                Text(
+                                    text = entry.address,
+                                    style = MaterialTheme.typography.bodyMedium,
+                                    fontWeight = FontWeight.SemiBold,
+                                    maxLines = 2,
+                                    overflow = TextOverflow.Ellipsis
                                 )
+                            }
+                            IconButton(onClick = {
+                                context.getSystemService(ClipboardManager::class.java)
+                                    ?.setPrimaryClip(ClipData.newPlainText("Java IP", entry.address))
+                                Toast.makeText(context, "IP Java disalin", Toast.LENGTH_SHORT).show()
+                            }) {
+                                Icon(painter = painterResource(R.drawable.ic_content_copy_filled),
+                                    contentDescription = "Salin IP Java", tint = primary)
+                            }
+                        }
+                    }
+                    if (entry.edition.contains("Bedrock", ignoreCase = true) && entry.bedrockAddress != null) {
+                        Surface(shape = RoundedCornerShape(12.dp), color = primary.copy(alpha = 0.08f)) {
+                            Row(modifier = Modifier.padding(start = 12.dp),
+                                verticalAlignment = Alignment.CenterVertically) {
+                                Column(modifier = Modifier.weight(1f).padding(vertical = 10.dp)) {
+                                    Text("Bedrock • Port ${entry.bedrockPort}",
+                                        style = MaterialTheme.typography.labelSmall,
+                                        color = MaterialTheme.colorScheme.onSurfaceVariant)
+                                    Text(entry.bedrockAddress, style = MaterialTheme.typography.bodyMedium,
+                                        fontWeight = FontWeight.SemiBold, maxLines = 2,
+                                        overflow = TextOverflow.Ellipsis)
+                                }
+                                IconButton(onClick = {
+                                    val bedrockIp = "${entry.bedrockAddress}:${entry.bedrockPort}"
+                                    context.getSystemService(ClipboardManager::class.java)
+                                        ?.setPrimaryClip(ClipData.newPlainText("Bedrock IP", bedrockIp))
+                                    Toast.makeText(context, "IP Bedrock disalin", Toast.LENGTH_SHORT).show()
+                                }) {
+                                    Icon(painter = painterResource(R.drawable.ic_content_copy_filled),
+                                        contentDescription = "Salin IP Bedrock", tint = primary)
+                                }
                             }
                         }
                     }
@@ -642,6 +671,7 @@ private fun ServerDetailDialog(
                     if (entry.categories.isNotEmpty()) {
                         InfoRow("Mode", entry.categories.joinToString(", "))
                     }
+                    InfoRow("Akun", entry.accountSupport)
 
                     Spacer(Modifier.height(4.dp))
 
