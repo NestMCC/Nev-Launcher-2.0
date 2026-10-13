@@ -1,26 +1,320 @@
 {
   "servers": [
     {
-      "name": "Hypixel",
-      "address": "mc.hypixel.net",
-      "description": "Salah satu server minigames terbesar di dunia dengan banyak mode permainan.",
-      "categories": ["Minigames", "PvP", "SkyBlock"],
-      "edition": "Java",
+      "name": "AlwiNation",
+      "address": "alwination.id",
+      "description": "Server Indonesia; mode Survival dan SkyBlock.",
+      "categories": [
+        "Indonesia",
+        "Survival",
+        "SkyBlock"
+      ],
+      "edition": "Java & Bedrock",
+      "bedrockAddress": "alwination.id",
+      "bedrockPort": 19132,
+      "accountSupport": "Tidak diketahui",
       "featured": true
     },
     {
-      "name": "CubeCraft",
-      "address": "play.cubecraft.net",
-      "description": "Server minigames dan PvP dengan komunitas besar.",
-      "categories": ["Minigames", "PvP"],
-      "edition": "Java"
+      "name": "Minesive",
+      "address": "minesive.com",
+      "description": "Minesive NEW ERA; Survival dan Economy.",
+      "categories": [
+        "Indonesia",
+        "Survival",
+        "Economy"
+      ],
+      "edition": "Java & Bedrock",
+      "bedrockAddress": "minesive.com",
+      "bedrockPort": 19132,
+      "accountSupport": "Tidak diketahui",
+      "featured": true
     },
     {
-      "name": "The Hive",
-      "address": "play.hivemc.com",
-      "description": "Server minigames klasik: BedWars, SkyWars, dan lainnya.",
-      "categories": ["Minigames", "PvP", "Parkour"],
-      "edition": "Java"
+      "name": "RELXMC",
+      "address": "play.relxmc.com",
+      "description": "Server Survival Economy.",
+      "categories": [
+        "Indonesia",
+        "Survival",
+        "Economy"
+      ],
+      "edition": "Java & Bedrock",
+      "bedrockAddress": "play.relxmc.com",
+      "bedrockPort": 19132,
+      "accountSupport": "Tidak diketahui",
+      "featured": true
+    },
+    {
+      "name": "Kaizen Network",
+      "address": "play.kaizenmc.id",
+      "description": "Survival Mix (TERRA), SkyBlock Tycoon (ASTRA), Creative (ILLUSTRA).",
+      "categories": [
+        "Indonesia",
+        "Survival",
+        "SkyBlock",
+        "Creative"
+      ],
+      "edition": "Java & Bedrock",
+      "bedrockAddress": "play.kaizenmc.id",
+      "bedrockPort": 19132,
+      "accountSupport": "Offline/Cracked diperbolehkan; akun alt dilarang",
+      "featured": true
+    },
+    {
+      "name": "Terangin SMP",
+      "address": "teranginsmp.my.id:25641",
+      "description": "Server Survival SMP Indonesia.",
+      "categories": [
+        "Indonesia",
+        "Survival",
+        "SMP"
+      ],
+      "edition": "Java & Bedrock",
+      "bedrockAddress": "teranginsmp.my.id",
+      "bedrockPort": 19132,
+      "accountSupport": "Tidak diketahui"
+    },
+    {
+      "name": "Rest area",
+      "address": "play.handerd.online:45418",
+      "description": "Server Survival SMP santai.",
+      "categories": [
+        "Indonesia",
+        "Survival",
+        "SMP"
+      ],
+      "edition": "Java & Bedrock",
+      "bedrockAddress": "play.handerd.online",
+      "bedrockPort": 45418,
+      "accountSupport": "Tidak diketahui"
+    },
+    {
+      "name": "Nusantarabatu",
+      "address": "nusantarabatu.id",
+      "description": "Survival, Economy dan PvP.",
+      "categories": [
+        "Indonesia",
+        "Survival",
+        "Economy",
+        "PvP"
+      ],
+      "edition": "Java & Bedrock",
+      "bedrockAddress": "nusantarabatu.id",
+      "bedrockPort": 19132,
+      "accountSupport": "Tidak diketahui"
+    },
+    {
+      "name": "ESP NETWORK",
+      "address": "play.espnet.xyz:19246",
+      "description": "Server Survival SMP; direktori pernah melaporkan offline, status diperiksa langsung di launcher.",
+      "categories": [
+        "Indonesia",
+        "Survival",
+        "SMP"
+      ],
+      "edition": "Java & Bedrock",
+      "bedrockAddress": "play.espnet.xyz",
+      "bedrockPort": 19246,
+      "accountSupport": "Tidak diketahui"
+    },
+    {
+      "name": "Project Seria",
+      "address": "mc.seria.id",
+      "description": "Mode Economy dan Factions.",
+      "categories": [
+        "Indonesia",
+        "Economy",
+        "Faction"
+      ],
+      "edition": "Java & Bedrock",
+      "bedrockAddress": "mc.seria.id",
+      "bedrockPort": 19132,
+      "accountSupport": "Tidak diketahui"
+    },
+    {
+      "name": "VolteraMC",
+      "address": "play.volteramc.net",
+      "description": "Vanilla SMP.",
+      "categories": [
+        "Indonesia",
+        "Vanilla",
+        "SMP"
+      ],
+      "edition": "Java & Bedrock",
+      "bedrockAddress": "play.volteramc.net",
+      "bedrockPort": 19132,
+      "accountSupport": "Tidak diketahui"
+    },
+    {
+      "name": "Trinity Indonesia",
+      "address": "trinityindonesia.cc",
+      "description": "Adventure dan Anarchy RPG.",
+      "categories": [
+        "Indonesia",
+        "Adventure"
+      ],
+      "edition": "Java & Bedrock",
+      "bedrockAddress": "trinityindonesia.cc",
+      "bedrockPort": 19132,
+      "accountSupport": "Tidak diketahui"
+    },
+    {
+      "name": "Voltraz MC",
+      "address": "voltraz.xyz",
+      "description": "Server semi-RPG dengan Economy dan KitPvP.",
+      "categories": [
+        "Indonesia",
+        "Economy",
+        "PvP"
+      ],
+      "edition": "Java & Bedrock",
+      "bedrockAddress": "voltraz.xyz",
+      "bedrockPort": 19132,
+      "accountSupport": "Tidak diketahui"
+    },
+    {
+      "name": "Visantara",
+      "address": "play.visantara.com",
+      "description": "Server Survival bertema Nusantara.",
+      "categories": [
+        "Indonesia",
+        "Survival"
+      ],
+      "edition": "Java & Bedrock",
+      "bedrockAddress": "play.visantara.com",
+      "bedrockPort": 19132,
+      "accountSupport": "Tidak diketahui"
+    },
+    {
+      "name": "KandangAlwi",
+      "address": "kalwi.id",
+      "description": "Survival dan SkyBlock.",
+      "categories": [
+        "Indonesia",
+        "Survival",
+        "SkyBlock"
+      ],
+      "edition": "Java & Bedrock",
+      "bedrockAddress": "kalwi.id",
+      "bedrockPort": 19132,
+      "accountSupport": "Tidak diketahui"
+    },
+    {
+      "name": "MineGens",
+      "address": "minegens.id",
+      "description": "Server Gens Tycoon, Survival dan SkyBlock.",
+      "categories": [
+        "Indonesia",
+        "Survival",
+        "SkyBlock"
+      ],
+      "edition": "Java & Bedrock",
+      "bedrockAddress": "minegens.id",
+      "bedrockPort": 19132,
+      "accountSupport": "Tidak diketahui"
+    },
+    {
+      "name": "Zeetex Legends",
+      "address": "zeetex.my.id",
+      "description": "Mode Anarchy dan Adventure.",
+      "categories": [
+        "Indonesia",
+        "Adventure"
+      ],
+      "edition": "Java & Bedrock",
+      "bedrockAddress": "zeetex.my.id",
+      "bedrockPort": 19132,
+      "accountSupport": "Tidak diketahui"
+    },
+    {
+      "name": "NIGHTFALL SMP",
+      "address": "play.nightfallsmp.my.id",
+      "description": "Survival Economy semi-RPG.",
+      "categories": [
+        "Indonesia",
+        "Survival",
+        "Economy",
+        "SMP"
+      ],
+      "edition": "Java & Bedrock",
+      "bedrockAddress": "play.nightfallsmp.my.id",
+      "bedrockPort": 19132,
+      "accountSupport": "Tidak diketahui"
+    },
+    {
+      "name": "Cala SMP",
+      "address": "calasmp.xyz:19165",
+      "description": "Survival Economy; deskripsi direktori menyebut akses untuk akun non-premium.",
+      "categories": [
+        "Indonesia",
+        "Survival",
+        "Economy",
+        "SMP"
+      ],
+      "edition": "Java & Bedrock",
+      "bedrockAddress": "calasmp.xyz",
+      "bedrockPort": 19165,
+      "accountSupport": "Non-premium disebut diperbolehkan"
+    },
+    {
+      "name": "Kampung Eles",
+      "address": "play.kampungeles.id",
+      "description": "Server cross-play dengan mode SMP, Parkour dan Practice PvP.",
+      "categories": [
+        "Indonesia",
+        "SMP",
+        "Parkour",
+        "PvP"
+      ],
+      "edition": "Java & Bedrock",
+      "bedrockAddress": "bedrock.kampungeles.id",
+      "bedrockPort": 19132,
+      "accountSupport": "Tidak diketahui"
+    },
+    {
+      "name": "ProwNetwork",
+      "address": "be.prownetwork.net",
+      "description": "Mode AcidIsland, OneBlock, Survival dan Economy; alamat Java belum terverifikasi.",
+      "categories": [
+        "Indonesia",
+        "Survival",
+        "OneBlock",
+        "SkyBlock",
+        "Economy"
+      ],
+      "edition": "Bedrock",
+      "bedrockAddress": "be.prownetwork.net",
+      "bedrockPort": 19132,
+      "accountSupport": "Tidak diketahui"
+    },
+    {
+      "name": "Venity Network",
+      "address": "play.venitymc.com",
+      "description": "Server Bedrock dengan BedWars, SkyWars, TheBridge dan CrystalPvP.",
+      "categories": [
+        "Indonesia",
+        "Minigames",
+        "PvP"
+      ],
+      "edition": "Bedrock",
+      "bedrockAddress": "play.venitymc.com",
+      "bedrockPort": 19132,
+      "accountSupport": "Akun Microsoft/Xbox diperlukan"
+    },
+    {
+      "name": "Jukut Goreng SMP",
+      "address": "be.jukutgoreng.my.id:26016",
+      "description": "Server Bedrock semi-vanilla; Java IP belum terverifikasi.",
+      "categories": [
+        "Indonesia",
+        "Vanilla",
+        "SMP"
+      ],
+      "edition": "Bedrock",
+      "bedrockAddress": "be.jukutgoreng.my.id",
+      "bedrockPort": 26016,
+      "accountSupport": "Akun Microsoft/Xbox diperlukan"
     }
   ]
 }
