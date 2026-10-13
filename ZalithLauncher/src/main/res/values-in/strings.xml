@@ -1433,4 +1433,6 @@
     <string name="nev_banner_edit">Ubah banner</string>
     <string name="nev_banner_choose">Pilih banner gambar / video</string>
     <string name="nev_banner_reset">Kembalikan banner default</string>
+    <string name="settings_game_optimization_title">Optimasi spek rendah</string>
+    <string name="settings_game_optimization_summary">Otomatis menurunkan jarak render, batas FPS, partikel, dan grafis pada perangkat lemah, serta memakai pengelola memori yang lebih ringan, agar tidak lag</string>
 </resources>

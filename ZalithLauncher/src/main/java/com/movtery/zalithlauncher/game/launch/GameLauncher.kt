@@ -225,6 +225,13 @@ class GameLauncher(
 
     override fun progressFinalUserArgs(args: MutableList<String>, ramAllocation: Int) {
         super.progressFinalUserArgs(args, version.getRamAllocation(activity))
+        // Nev: perangkat spek rendah memakai GC serial (lebih hemat memori dan CPU), kecuali pengguna menentukan GC sendiri
+        if (AllSettings.gameOptimization.getValue() &&
+            GameOptimizer.tier(activity) == GameOptimizer.Tier.LOW &&
+            args.none { it.startsWith("-XX:+Use") && it.endsWith("GC") }
+        ) {
+            args.add("-XX:+UseSerialGC")
+        }
         if (Renderers.isCurrentRendererValid()) {
             args.add("-Dorg.lwjgl.opengl.libname=${getRendererLibrary()}")
         }

@@ -1543,4 +1543,6 @@
     <string name="nev_banner_edit">Customize banner</string>
     <string name="nev_banner_choose">Choose image / video banner</string>
     <string name="nev_banner_reset">Restore default banner</string>
+    <string name="settings_game_optimization_title">Low-spec optimization</string>
+    <string name="settings_game_optimization_summary">Automatically lowers render distance, FPS cap, particles and graphics on weak devices, and uses a lighter garbage collector, to reduce lag</string>
 </resources>
