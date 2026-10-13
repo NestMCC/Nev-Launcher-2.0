@@ -1543,4 +1543,13 @@
     <string name="nev_banner_edit">Customize banner</string>
     <string name="nev_banner_choose">Choose image / video banner</string>
     <string name="nev_banner_reset">Restore default banner</string>
+    <string name="game_menu_category_general">General</string>
+    <string name="game_menu_category_input">Input</string>
+    <string name="game_menu_category_layout">Controls</string>
+    <string name="game_menu_category_mouse">Mouse</string>
+    <string name="game_menu_category_gamepad">Gamepad</string>
+    <string name="game_menu_category_gesture">Gestures</string>
+    <string name="game_menu_category_gyroscope">Gyroscope</string>
+    <string name="game_menu_category_display">Display</string>
+    <string name="game_menu_category_resolution">Resolution</string>
 </resources>

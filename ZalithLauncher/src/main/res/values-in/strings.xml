@@ -1433,4 +1433,13 @@
     <string name="nev_banner_edit">Ubah banner</string>
     <string name="nev_banner_choose">Pilih banner gambar / video</string>
     <string name="nev_banner_reset">Kembalikan banner default</string>
+    <string name="game_menu_category_general">Umum</string>
+    <string name="game_menu_category_input">Input</string>
+    <string name="game_menu_category_layout">Kontrol</string>
+    <string name="game_menu_category_mouse">Mouse</string>
+    <string name="game_menu_category_gamepad">Gamepad</string>
+    <string name="game_menu_category_gesture">Gestur</string>
+    <string name="game_menu_category_gyroscope">Giroskop</string>
+    <string name="game_menu_category_display">Tampilan</string>
+    <string name="game_menu_category_resolution">Resolusi</string>
 </resources>

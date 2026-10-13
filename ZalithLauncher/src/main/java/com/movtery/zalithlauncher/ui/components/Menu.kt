@@ -24,6 +24,8 @@ import androidx.compose.animation.core.animateFloatAsState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
+import androidx.compose.animation.scaleIn
+import androidx.compose.animation.scaleOut
 import androidx.compose.animation.shrinkVertically
 import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
@@ -44,6 +46,7 @@ import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.heightIn
 import androidx.compose.foundation.layout.padding
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
@@ -282,6 +285,83 @@ fun DualMenuSubscreen(
                             MenuTitleLayout(titleLayout, titleHeight)
                         }
                         rightMenuContent()
+                    }
+                )
+            }
+        }
+    }
+}
+
+/**
+ * 居中的单个菜单面板（带遮罩层，点击遮罩关闭）
+ */
+@Composable
+fun CenterMenuSubscreen(
+    state: MenuState,
+    closeScreen: () -> Unit,
+    shape: Shape = RoundedCornerShape(21.0.dp),
+    backgroundColor: Color = Color.Black.copy(alpha = 0.25f),
+    widthFraction: Float = 0.62f,
+    maxWidth: Dp = 680.dp,
+    titleHeight: Dp = 48.dp,
+    title: (@Composable BoxScope.() -> Unit)? = null,
+    content: @Composable ColumnScope.() -> Unit = {}
+) {
+    val visible = state == MenuState.SHOW
+
+    Box(modifier = Modifier.fillMaxSize()) {
+        AnimatedVisibility(
+            visible = visible,
+            enter = fadeIn(),
+            exit = fadeOut()
+        ) {
+            //背景阴影层
+            Box(
+                modifier = Modifier
+                    .fillMaxSize()
+                    .background(color = backgroundColor)
+                    .clickable(
+                        indication = null,
+                        interactionSource = remember { MutableInteractionSource() },
+                        onClick = closeScreen
+                    )
+            )
+        }
+
+        //居中菜单
+        Box(
+            modifier = Modifier
+                .align(Alignment.Center)
+                .fillMaxWidth(fraction = widthFraction)
+                .widthIn(max = maxWidth)
+                .fillMaxHeight()
+                .padding(vertical = 12.dp)
+        ) {
+            AnimatedVisibility(
+                visible = visible,
+                enter = fadeIn() + scaleIn(initialScale = 0.92f),
+                exit = fadeOut() + scaleOut(targetScale = 0.92f)
+            ) {
+                BackgroundCard(
+                    shape = shape,
+                    influencedByBackground = false,
+                    //拦截面板内的点击，避免穿透到遮罩层导致菜单被关闭
+                    modifier = Modifier
+                        .fillMaxSize()
+                        .clickable(
+                            indication = null,
+                            interactionSource = remember { MutableInteractionSource() },
+                            onClick = {}
+                        ),
+                    colors = CardDefaults.cardColors(
+                        containerColor = backgroundColor(),
+                        contentColor = onBackgroundColor()
+                    ),
+                    content = {
+                        title?.let { titleLayout ->
+                            MenuTitleLayout(titleLayout, titleHeight)
+                        }
+                        content()
                     }
                 )
             }

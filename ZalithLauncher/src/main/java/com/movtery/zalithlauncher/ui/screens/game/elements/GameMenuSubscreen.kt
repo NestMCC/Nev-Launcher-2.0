@@ -20,40 +20,50 @@ package com.movtery.zalithlauncher.ui.screens.game.elements
 
 import android.widget.Toast
 import androidx.compose.animation.AnimatedVisibility
+import androidx.compose.animation.Crossfade
+import androidx.compose.animation.animateColorAsState
 import androidx.compose.animation.expandVertically
 import androidx.compose.animation.fadeIn
 import androidx.compose.animation.fadeOut
 import androidx.compose.animation.shrinkVertically
+import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
+import androidx.compose.foundation.layout.Box
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
 import androidx.compose.foundation.layout.Spacer
+import androidx.compose.foundation.layout.fillMaxHeight
 import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.foundation.layout.fillMaxWidth
 import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
+import androidx.compose.foundation.layout.width
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.rememberLazyListState
-import androidx.compose.foundation.pager.HorizontalPager
-import androidx.compose.foundation.pager.rememberPagerState
+import androidx.compose.foundation.rememberScrollState
+import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.Icon
+import androidx.compose.material3.IconButton
 import androidx.compose.material3.MaterialTheme
-import androidx.compose.material3.SecondaryScrollableTabRow
-import androidx.compose.material3.Tab
 import androidx.compose.material3.Text
+import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
-import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.remember
+import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
+import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.platform.LocalContext
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
-import androidx.compose.ui.unit.Dp
+import androidx.compose.ui.text.style.TextAlign
+import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.game.sdl.SdlBridge
@@ -67,7 +77,7 @@ import com.movtery.zalithlauncher.setting.unit.floatRange
 import com.movtery.zalithlauncher.ui.AndroidStringText
 import com.movtery.zalithlauncher.ui.androidText
 import com.movtery.zalithlauncher.ui.components.BackgroundCard
-import com.movtery.zalithlauncher.ui.components.DualMenuSubscreen
+import com.movtery.zalithlauncher.ui.components.CenterMenuSubscreen
 import com.movtery.zalithlauncher.ui.components.IntInputField
 import com.movtery.zalithlauncher.ui.components.MenuListLayout
 import com.movtery.zalithlauncher.ui.components.MenuSliderLayout
@@ -86,19 +96,30 @@ import com.movtery.zalithlauncher.utils.ensureCustomResolutionInitialized
 import com.movtery.zalithlauncher.utils.getRealScreenSize
 import com.movtery.zalithlauncher.viewmodel.GamepadViewModel
 
-private data class IconTab(val iconRes: Int, val iconSize: Dp = 18.dp)
+/**
+ * 游戏内菜单的分类：图标 + 名称
+ */
+private data class MenuCategory(val iconRes: Int, val titleRes: Int)
 
-private val controlTabs = listOf(
-    //概览
-    IconTab(R.drawable.ic_dashboard_filled),
-    //虚拟鼠标设置
-    IconTab(R.drawable.ic_mouse_filled, iconSize = 16.dp),
-    //手柄设置
-    IconTab(R.drawable.ic_sports_esports_filled),
-    //手势控制设置
-    IconTab(R.drawable.ic_touch_app_filled),
-    //陀螺仪设置
-    IconTab(R.drawable.ic_mobile_rotate_filled)
+private val menuCategories = listOf(
+    //0 常规：强制关闭、日志、联机
+    MenuCategory(R.drawable.ic_dashboard_filled, R.string.game_menu_category_general),
+    //1 输入：输入法、发送键值
+    MenuCategory(R.drawable.ic_keyboard_filled, R.string.game_menu_category_input),
+    //2 控制布局：更换/编辑布局、不透明度
+    MenuCategory(R.drawable.ic_build_filled, R.string.game_menu_category_layout),
+    //3 虚拟鼠标
+    MenuCategory(R.drawable.ic_mouse_filled, R.string.game_menu_category_mouse),
+    //4 手柄
+    MenuCategory(R.drawable.ic_sports_esports_filled, R.string.game_menu_category_gamepad),
+    //5 手势与快捷栏
+    MenuCategory(R.drawable.ic_touch_app_filled, R.string.game_menu_category_gesture),
+    //6 陀螺仪
+    MenuCategory(R.drawable.ic_mobile_rotate_filled, R.string.game_menu_category_gyroscope),
+    //7 显示：悬浮窗、FPS、内存、刷新率
+    MenuCategory(R.drawable.ic_desktop_windows_filled, R.string.game_menu_category_display),
+    //8 分辨率
+    MenuCategory(R.drawable.ic_aspect_ratio_filled, R.string.game_menu_category_resolution),
 )
 
 @Composable
@@ -119,104 +140,162 @@ fun GameMenuSubscreen(
     onEditLayout: () -> Unit,
     onShowToast: (AndroidStringText, Int) -> Unit
 ) {
-    DualMenuSubscreen(
+    val selected = controlMenuTabIndex.coerceIn(0, menuCategories.lastIndex)
+
+    CenterMenuSubscreen(
         state = state,
         closeScreen = closeScreen,
-        leftMenuContent = {
-            val pagerState = rememberPagerState(pageCount = { controlTabs.size })
-
-            LaunchedEffect(controlMenuTabIndex) {
-                pagerState.animateScrollToPage(controlMenuTabIndex)
-            }
-
-            Column {
-                //顶贴标签栏
-                SecondaryScrollableTabRow(
-                    selectedTabIndex = controlMenuTabIndex,
-                    edgePadding = 0.dp,
-                    minTabWidth = 58.dp,
-                    containerColor = cardTitleColor(),
-                ) {
-                    controlTabs.forEachIndexed { index, iconTab ->
-                        Tab(
-                            selected = index == controlMenuTabIndex,
-                            onClick = {
-                                onControlMenuTabChange(index)
-                            },
-                            icon = {
-                                Icon(
-                                    modifier = Modifier.size(iconTab.iconSize),
-                                    painter = painterResource(iconTab.iconRes),
-                                    contentDescription = null
-                                )
-                            }
-                        )
-                    }
-                }
-
-                HorizontalPager(
-                    state = pagerState,
-                    userScrollEnabled = false,
-                    modifier = Modifier
-                        .fillMaxWidth()
-                        .weight(1f, fill = false)
-                ) { page ->
-                    when (page) {
-                        0 -> {
-                            ControlOverview(
-                                modifier = Modifier.fillMaxSize(),
-                                closeScreen = closeScreen,
-                                onInputMethod = onInputMethod,
-                                onSendKeycode = onSendKeycode,
-                                onReplacementControl = onReplacementControl,
-                                onEditLayout = onEditLayout
-                            )
-                        }
-                        1 -> ControlMouse(modifier = Modifier.fillMaxSize())
-                        2 -> ControlGamepad(
-                            modifier = Modifier.fillMaxSize(),
-                            gamepadViewModel = gamepadViewModel
-                        )
-                        3 -> ControlGesture(modifier = Modifier.fillMaxSize())
-                        4 -> ControlGyroscope(modifier = Modifier.fillMaxSize())
-                    }
-                }
-            }
-        },
-        rightMenuTitle = {
+        title = {
             Text(
                 modifier = Modifier.padding(all = 8.dp),
                 text = stringResource(R.string.game_menu_title),
                 style = MaterialTheme.typography.titleMedium
             )
-        },
-        rightMenuContent = {
-            GameActionContent(
-                modifier = Modifier.weight(1f),
-                onForceClose = onForceClose,
-                onSwitchLog = onSwitchLog,
-                enableTerracotta = enableTerracotta,
-                onOpenTerracottaMenu = onOpenTerracottaMenu,
-                onRefreshWindowSize = onRefreshWindowSize,
-                onShowToast = onShowToast
-            )
+            IconButton(
+                modifier = Modifier.align(Alignment.CenterEnd),
+                onClick = closeScreen
+            ) {
+                Icon(
+                    modifier = Modifier.size(20.dp),
+                    painter = painterResource(R.drawable.ic_close),
+                    contentDescription = null
+                )
+            }
         }
-    )
+    ) {
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .weight(1f)
+        ) {
+            //左侧分类栏
+            CategoryRail(
+                selectedIndex = selected,
+                onSelect = onControlMenuTabChange,
+                modifier = Modifier.fillMaxHeight()
+            )
+            VerticalDivider(modifier = Modifier.fillMaxHeight())
+
+            //右侧内容
+            Crossfade(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxHeight(),
+                targetState = selected,
+                label = "GameMenuCategory"
+            ) { page ->
+                when (page) {
+                    0 -> GameActionPage(
+                        modifier = Modifier.fillMaxSize(),
+                        onForceClose = onForceClose,
+                        onSwitchLog = onSwitchLog,
+                        enableTerracotta = enableTerracotta,
+                        onOpenTerracottaMenu = onOpenTerracottaMenu
+                    )
+                    1 -> ControlInputPage(
+                        modifier = Modifier.fillMaxSize(),
+                        closeScreen = closeScreen,
+                        onInputMethod = onInputMethod,
+                        onSendKeycode = onSendKeycode
+                    )
+                    2 -> ControlLayoutPage(
+                        modifier = Modifier.fillMaxSize(),
+                        closeScreen = closeScreen,
+                        onReplacementControl = onReplacementControl,
+                        onEditLayout = onEditLayout
+                    )
+                    3 -> ControlMouse(modifier = Modifier.fillMaxSize())
+                    4 -> ControlGamepad(
+                        modifier = Modifier.fillMaxSize(),
+                        gamepadViewModel = gamepadViewModel
+                    )
+                    5 -> ControlGesture(modifier = Modifier.fillMaxSize())
+                    6 -> ControlGyroscope(modifier = Modifier.fillMaxSize())
+                    7 -> GameDisplayPage(
+                        modifier = Modifier.fillMaxSize(),
+                        onShowToast = onShowToast
+                    )
+                    8 -> GameResolutionPage(
+                        modifier = Modifier.fillMaxSize(),
+                        onRefreshWindowSize = onRefreshWindowSize
+                    )
+                }
+            }
+        }
+    }
 }
 
+/**
+ * 左侧分类栏：图标在上、名称在下，选中项高亮
+ */
 @Composable
-private fun GameActionContent(
+private fun CategoryRail(
+    selectedIndex: Int,
+    onSelect: (Int) -> Unit,
+    modifier: Modifier = Modifier
+) {
+    val scrollState = rememberScrollState()
+    val primary = MaterialTheme.colorScheme.primary
+    val normalColor = onCardColor()
+
+    Column(
+        modifier = modifier
+            .width(84.dp)
+            .background(cardTitleColor())
+            .verticalScroll(scrollState)
+            .padding(horizontal = 6.dp, vertical = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(4.dp)
+    ) {
+        menuCategories.forEachIndexed { index, category ->
+            val isSelected = index == selectedIndex
+            val containerColor by animateColorAsState(
+                targetValue = if (isSelected) primary.copy(alpha = 0.22f) else Color.Transparent,
+                label = "CategoryContainer"
+            )
+            val contentColor = if (isSelected) primary else normalColor
+
+            Column(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .clip(RoundedCornerShape(14.dp))
+                    .background(containerColor)
+                    .clickable { onSelect(index) }
+                    .padding(horizontal = 2.dp, vertical = 8.dp),
+                horizontalAlignment = Alignment.CenterHorizontally
+            ) {
+                Icon(
+                    modifier = Modifier.size(22.dp),
+                    painter = painterResource(category.iconRes),
+                    contentDescription = null,
+                    tint = contentColor
+                )
+                Spacer(modifier = Modifier.height(3.dp))
+                Text(
+                    text = stringResource(category.titleRes),
+                    style = MaterialTheme.typography.labelSmall,
+                    color = contentColor,
+                    textAlign = TextAlign.Center,
+                    maxLines = 1,
+                    overflow = TextOverflow.Ellipsis
+                )
+            }
+        }
+    }
+}
+
+/**
+ * 常规：强制关闭、日志输出、联机菜单
+ */
+@Composable
+private fun GameActionPage(
     onForceClose: () -> Unit,
     onSwitchLog: () -> Unit,
     enableTerracotta: Boolean,
     onOpenTerracottaMenu: () -> Unit,
-    onRefreshWindowSize: () -> Unit,
-    onShowToast: (AndroidStringText, Int) -> Unit,
     modifier: Modifier = Modifier,
     color: Color = cardColor(false),
     contentColor: Color = onCardColor(),
 ) {
-    val context = LocalContext.current
     val listState = rememberLazyListState()
     LazyColumn(
         modifier = modifier.lazyScrollWithBar(listState),
@@ -262,11 +341,26 @@ private fun GameActionContent(
                 )
             }
         }
+    }
+}
 
-        item {
-            Spacer(modifier = Modifier.height(8.dp))
-        }
-
+/**
+ * 显示：菜单悬浮窗、帧率、内存、最高刷新率
+ */
+@Composable
+private fun GameDisplayPage(
+    onShowToast: (AndroidStringText, Int) -> Unit,
+    modifier: Modifier = Modifier,
+    color: Color = cardColor(false),
+    contentColor: Color = onCardColor(),
+) {
+    val listState = rememberLazyListState()
+    LazyColumn(
+        modifier = modifier.lazyScrollWithBar(listState),
+        state = listState,
+        contentPadding = PaddingValues(all = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
         //开启菜单悬浮窗
         item {
             MenuSwitchButton(
@@ -356,11 +450,27 @@ private fun GameActionContent(
                 contentColor = contentColor,
             )
         }
+    }
+}
 
-        item {
-            Spacer(modifier = Modifier.height(8.dp))
-        }
-
+/**
+ * 分辨率：分辨率规则、百分比、自定义宽高
+ */
+@Composable
+private fun GameResolutionPage(
+    onRefreshWindowSize: () -> Unit,
+    modifier: Modifier = Modifier,
+    color: Color = cardColor(false),
+    contentColor: Color = onCardColor(),
+) {
+    val context = LocalContext.current
+    val listState = rememberLazyListState()
+    LazyColumn(
+        modifier = modifier.lazyScrollWithBar(listState),
+        state = listState,
+        contentPadding = PaddingValues(all = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
         // 分辨率规则与游戏窗口分辨率
         item {
             Column(
@@ -493,16 +603,17 @@ private fun CustomResolutionContent(
     }
 }
 
+/**
+ * 输入：切换输入法、自动唤起输入法（SDL）、发送键值
+ */
 @Composable
-private fun ControlOverview(
+private fun ControlInputPage(
     modifier: Modifier = Modifier,
     color: Color = cardColor(false),
     contentColor: Color = onCardColor(),
     closeScreen: () -> Unit,
     onInputMethod: () -> Unit,
-    onSendKeycode: () -> Unit,
-    onReplacementControl: () -> Unit,
-    onEditLayout: () -> Unit
+    onSendKeycode: () -> Unit
 ) {
     val listState = rememberLazyListState()
     val sdlEnabled by SdlBridge.enabled.collectAsState()
@@ -538,11 +649,6 @@ private fun ControlOverview(
                 contentColor = contentColor,
             )
         }
-
-        item {
-            Spacer(modifier = Modifier.height(8.dp))
-        }
-
         //发送键值
         item {
             MenuTextButton(
@@ -556,6 +662,29 @@ private fun ControlOverview(
                 contentColor = contentColor,
             )
         }
+    }
+}
+
+/**
+ * 控制布局：更换布局、编辑布局、布局不透明度
+ */
+@Composable
+private fun ControlLayoutPage(
+    modifier: Modifier = Modifier,
+    color: Color = cardColor(false),
+    contentColor: Color = onCardColor(),
+    closeScreen: () -> Unit,
+    onReplacementControl: () -> Unit,
+    onEditLayout: () -> Unit
+) {
+    val listState = rememberLazyListState()
+
+    LazyColumn(
+        modifier = modifier.lazyScrollWithBar(listState),
+        state = listState,
+        contentPadding = PaddingValues(all = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
         //更换控制布局
         item {
             MenuTextButton(
