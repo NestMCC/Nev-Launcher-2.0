@@ -1552,4 +1552,6 @@
     <string name="game_menu_category_gyroscope">Gyroscope</string>
     <string name="game_menu_category_display">Display</string>
     <string name="game_menu_category_resolution">Resolution</string>
+    <string name="control_editor_style_presets">Style presets</string>
+    <string name="control_editor_style_presets_hint">Tap a preset to add it to your styles</string>
 </resources>

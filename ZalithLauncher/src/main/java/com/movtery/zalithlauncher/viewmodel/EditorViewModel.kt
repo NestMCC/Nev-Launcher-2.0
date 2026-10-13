@@ -211,6 +211,13 @@ class EditorViewModel : ViewModel() {
     }
 
     /**
+     * Tambah gaya siap pakai (preset) sebagai gaya baru
+     */
+    fun addStylePreset(preset: com.movtery.zalithlauncher.ui.screens.main.control_editor.edit_style.ButtonStylePreset) {
+        observableLayout.addStyle(preset.create())
+    }
+
+    /**
      * 复制控件外观
      */
     fun cloneStyle(style: ObservableButtonStyle) {

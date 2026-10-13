@@ -27,6 +27,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.lazy.grid.GridCells
+import androidx.compose.foundation.lazy.grid.GridItemSpan
 import androidx.compose.foundation.lazy.grid.LazyVerticalGrid
 import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.material3.RadioButton
@@ -111,6 +112,14 @@ private fun MainContent(
                     onSelectedChange = { selected ->
                         onButtonStyleChanged(if (selected) style.uuid else null)
                     }
+                )
+            }
+            //Pintasan ke daftar gaya: tambah gaya siap pakai (preset) atau buat gaya baru
+            item(span = { GridItemSpan(maxLineSpan) }) {
+                InfoLayoutTextItem(
+                    modifier = Modifier.padding(all = 8.dp),
+                    title = stringResource(R.string.control_editor_style_presets),
+                    onClick = openStyleList
                 )
             }
         }

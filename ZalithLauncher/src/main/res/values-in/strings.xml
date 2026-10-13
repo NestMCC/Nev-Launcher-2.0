@@ -1442,4 +1442,6 @@
     <string name="game_menu_category_gyroscope">Giroskop</string>
     <string name="game_menu_category_display">Tampilan</string>
     <string name="game_menu_category_resolution">Resolusi</string>
+    <string name="control_editor_style_presets">Preset gaya</string>
+    <string name="control_editor_style_presets_hint">Ketuk salah satu gaya siap pakai untuk menambahkannya</string>
 </resources>

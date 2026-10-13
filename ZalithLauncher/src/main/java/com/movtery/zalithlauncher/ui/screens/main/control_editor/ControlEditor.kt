@@ -78,6 +78,7 @@ import com.movtery.zalithlauncher.ui.screens.main.control_editor.edit_joystick.J
 import com.movtery.zalithlauncher.ui.screens.main.control_editor.edit_layer.EditControlLayerDialog
 import com.movtery.zalithlauncher.ui.screens.main.control_editor.edit_layer.EditSwitchLayersVisibilityDialog
 import com.movtery.zalithlauncher.ui.screens.main.control_editor.edit_style.EditButtonStyleDialog
+import com.movtery.zalithlauncher.ui.screens.main.control_editor.edit_style.ButtonStylePreset
 import com.movtery.zalithlauncher.ui.screens.main.control_editor.edit_style.StyleListDialog
 import com.movtery.zalithlauncher.ui.screens.main.control_editor.edit_translatable.EditTranslatableTextDialog
 import com.movtery.zalithlauncher.ui.screens.main.control_editor.edit_widget.EditWidgetDialog
@@ -395,6 +396,9 @@ fun BoxWithConstraintsScope.ControlEditor(
         onCreateStyle = { name ->
             viewModel.createNewStyle(name)
         },
+        onAddStylePreset = { preset ->
+            viewModel.addStylePreset(preset)
+        },
         onCloneStyle = { style ->
             viewModel.cloneStyle(style)
         },
@@ -483,6 +487,7 @@ private fun EditorOperation(
     onHideChange: (Boolean, ObservableControlLayer) -> Unit,
     onEditStyle: (ObservableButtonStyle) -> Unit,
     onCreateStyle: (name: String) -> Unit,
+    onAddStylePreset: (ButtonStylePreset) -> Unit,
     onCloneStyle: (ObservableButtonStyle) -> Unit,
     onDeleteStyle: (ObservableButtonStyle) -> Unit,
     onEditJoystickStyle: (ObservableJoystickStyle) -> Unit,
@@ -540,6 +545,7 @@ private fun EditorOperation(
                 onCreate = {
                     changeOperation(EditorOperation.CreateStyle)
                 },
+                onAddPreset = onAddStylePreset,
                 onClone = { style ->
                     onCloneStyle(style)
                 },
