@@ -1,51 +1,103 @@
 # NEV Launcher
 
-**NEV Launcher** adalah proyek launcher Android untuk menjalankan **Minecraft: Java Edition**. Proyek ini dikembangkan dengan fokus pada identitas NEV Launcher, pengalaman penggunaan di perangkat Android, serta pengembangan antarmuka dan fitur launcher.
+<div align="center">
+
+**Launcher Minecraft: Java Edition untuk Android**
+
+Launcher komunitas yang dikembangkan dengan identitas NEV Launcher, dengan fokus pada pengalaman mobile, pengembangan UI, dan peningkatan fitur secara bertahap.
+
+[![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](./LICENSE)
+[![Platform: Android](https://img.shields.io/badge/Platform-Android-3DDC84?logo=android&logoColor=white)](https://developer.android.com)
+[![UI: Jetpack Compose](https://img.shields.io/badge/UI-Jetpack%20Compose-4285F4?logo=jetpackcompose&logoColor=white)](https://developer.android.com/jetpack/compose)
+[![Unofficial](https://img.shields.io/badge/Project-Unofficial%20Modification-orange.svg)](#penafian)
+
+</div>
 
 > [!IMPORTANT]
-> NEV Launcher adalah **modifikasi tidak resmi** dan tidak berafiliasi dengan Mojang atau Microsoft. Minecraft: Java Edition merupakan produk Mojang Studios/Microsoft dan tidak termasuk dalam proyek ini. Gunakan akun Microsoft yang sah dan patuhi ketentuan layanan Minecraft.
+> **NEV Launcher adalah modifikasi tidak resmi.** Proyek ini tidak berafiliasi dengan, tidak didukung oleh, dan tidak disponsori oleh Zalith Launcher, PojavLauncher, Mojang Studios, atau Microsoft. Minecraft adalah produk dan merek dagang pemiliknya masing-masing.
 
-## Informasi proyek
+## Daftar isi
 
-- **Nama:** NEV Launcher
-- **Versi yang dikonfigurasi:** 2.7
-- **Platform:** Android
-- **Teknologi UI:** Kotlin dan Jetpack Compose
-- **Status:** Pengembangan aktif
-- **Bahasa dokumentasi:** Indonesia
+- [Tentang proyek](#tentang-proyek)
+- [Arah pengembangan](#arah-pengembangan)
+- [Unduhan](#unduhan)
+- [Pelaporan masalah](#pelaporan-masalah)
+- [Lisensi dan kepatuhan](#lisensi-dan-kepatuhan)
+- [Kredit dan proyek hulu](#kredit-dan-proyek-hulu)
+- [Penafian](#penafian)
 
-Nomor versi di atas adalah versi yang tercantum dalam konfigurasi proyek; itu tidak berarti setiap build telah diuji atau dirilis.
+## Tentang proyek
 
-## Tujuan pengembangan
+NEV Launcher adalah proyek launcher Android untuk menjalankan Minecraft: Java Edition. Repositori ini digunakan untuk mengembangkan identitas visual NEV Launcher, antarmuka, serta fitur launcher.
 
-NEV Launcher berfokus pada:
-- Pengembangan tampilan dan identitas visual NEV Launcher.
-- Pengalaman launcher yang nyaman digunakan di layar ponsel.
-- Peningkatan fitur dan perbaikan bug secara bertahap.
-- Kompatibilitas Minecraft Java Edition, dengan perhatian pada versi 1.21.x.
+| Informasi | Detail |
+|---|---|
+| Nama proyek | NEV Launcher |
+| Versi konfigurasi | 2.7 |
+| Platform | Android |
+| Teknologi UI | Kotlin dan Jetpack Compose |
+| Lisensi proyek | GNU GPL v3.0 — lihat [LICENSE](./LICENSE) |
+| Status | Dalam pengembangan |
 
-Fitur yang masih direncanakan atau sedang dikembangkan belum tentu tersedia pada build saat ini. Periksa catatan rilis dan hasil pengujian sebelum memasang build.
+**Catatan versi:** angka 2.7 merujuk pada versi yang tercantum di konfigurasi proyek. Angka ini bukan jaminan bahwa APK untuk versi tersebut sudah dirilis, berhasil dibangun, atau telah diuji pada semua perangkat.
 
-## Unduhan dan rilis
+## Arah pengembangan
 
-Lihat halaman [Releases](https://github.com/ridssatrian-lgtm/Nev-Launcher-2.0/releases) untuk memeriksa apakah build telah dipublikasikan.
+Prioritas pengembangan NEV Launcher meliputi:
 
-Jika belum ada rilis yang tersedia, jangan menganggap APK sudah siap digunakan. Build harus berhasil dibuat dan diuji terlebih dahulu.
+- Identitas visual dan pengalaman penggunaan yang khas NEV Launcher.
+- Antarmuka yang nyaman digunakan pada layar ponsel Android.
+- Perbaikan bug dan peningkatan kualitas secara bertahap.
+- Pengujian kompatibilitas Minecraft Java Edition, dengan perhatian pada seri 1.21.x.
 
-## Pelaporan bug
+Fitur yang direncanakan tidak otomatis tersedia pada versi saat ini. Periksa kode, catatan rilis, dan hasil pengujian sebelum mengandalkan suatu fitur.
 
-Jika menemukan masalah, silakan buat laporan melalui [Issues](https://github.com/ridssatrian-lgtm/Nev-Launcher-2.0/issues). Sertakan:
-- Versi NEV Launcher yang digunakan.
-- Versi Android dan perangkat.
-- Versi Minecraft yang dipilih.
-- Langkah untuk mengulangi masalah serta log yang relevan (hapus informasi pribadi atau rahasia terlebih dahulu).
+## Unduhan
 
-## Pengembangan
+Kunjungi halaman [GitHub Releases](https://github.com/ridssatrian-lgtm/Nev-Launcher-2.0/releases).
 
-Proyek Android ini menggunakan Gradle. Untuk melakukan build, gunakan lingkungan pengembangan Android yang sesuai dan ikuti konfigurasi serta dokumentasi yang tersedia di repositori.
+Jika belum ada rilis APK yang dipublikasikan, berarti belum ada paket rilis yang dapat dipastikan tersedia melalui halaman tersebut. Jangan menganggap build berhasil atau aman diuji sebelum proses build dan pengujiannya benar-benar selesai.
 
-## Lisensi dan atribusi
+## Pelaporan masalah
 
-Proyek ini didistribusikan di bawah **GNU General Public License v3.0 (GPL-3.0)**. Lihat berkas [LICENSE](./LICENSE) untuk ketentuan lengkapnya.
+Laporkan bug melalui [GitHub Issues](https://github.com/ridssatrian-lgtm/Nev-Launcher-2.0/issues). Jika memungkinkan, sertakan:
 
-NEV Launcher merupakan versi modifikasi tidak resmi. Pemberitahuan hak cipta dan ketentuan lisensi dari proyek serta pustaka yang digunakan harus tetap dipertahankan. Lihat berkas lisensi dan atribusi yang disertakan di repositori untuk detailnya.
+- Versi NEV Launcher atau commit yang digunakan.
+- Model perangkat dan versi Android.
+- Versi Minecraft serta renderer yang dipilih, jika relevan.
+- Langkah untuk mereproduksi masalah dan potongan log yang relevan.
+
+**Jangan unggah kata sandi, token akses, kode autentikasi, atau data pribadi** ke issue publik.
+
+## Lisensi dan kepatuhan
+
+Repositori ini menyertakan teks **GNU General Public License v3.0 (GPL-3.0)** di [LICENSE](./LICENSE). Sebelum mendistribusikan, memodifikasi, atau menerbitkan APK, baca lisensi tersebut dan periksa juga lisensi setiap komponen yang digunakan.
+
+Hal penting untuk distribusi versi modifikasi:
+
+1. **Pertahankan pemberitahuan hak cipta dan lisensi** yang berlaku pada kode sumber serta komponen pihak ketiga. Jangan menghapus atribusi pengembang asli.
+2. **Tandai perubahan dengan jelas.** Nyatakan bahwa NEV Launcher merupakan versi modifikasi yang berbeda dari proyek hulu, termasuk informasi perubahan dan versi yang relevan.
+3. **Sediakan kode sumber yang sesuai.** Jika mendistribusikan APK yang tercakup GPL, ikuti ketentuan GPL-3.0 mengenai penyediaan *Corresponding Source* dan cara distribusinya.
+4. **Periksa lisensi dependensi satu per satu.** Tidak semua pustaka yang dipakai sebuah aplikasi harus memiliki lisensi yang sama. Pertahankan pemberitahuan dan penuhi ketentuan masing-masing lisensi, termasuk lisensi permisif maupun copyleft.
+5. **Jangan menyatakan kepemilikan atas kode pihak lain.** Perubahan yang dibuat untuk NEV Launcher tidak menghapus hak cipta maupun lisensi yang dimiliki para kontributor sebelumnya.
+6. **Nama dan merek tetap terpisah.** Gunakan nama serta identitas NEV Launcher yang berbeda dan jangan membuat pengguna mengira aplikasi ini adalah rilis resmi dari proyek hulu atau Minecraft.
+
+README ini merupakan ringkasan praktis, bukan pengganti teks lisensi. Jika ada perbedaan, teks lisensi yang berlaku pada komponen terkait dan ketentuan hukum yang berlaku harus diperiksa secara langsung.
+
+## Kredit dan proyek hulu
+
+NEV Launcher menggunakan atau mengadaptasi kode dari proyek sumber terbuka. Kredit berikut dicantumkan sebagai titik awal untuk menelusuri proyek hulu; periksa riwayat repositori dan pemberitahuan di masing-masing berkas untuk atribusi yang lebih terperinci.
+
+- [ZalithLauncher2](https://github.com/ZalithLauncher/ZalithLauncher2) — proyek launcher Minecraft Java Edition untuk Android.
+- [PojavLauncher](https://github.com/PojavLauncherTeam/PojavLauncher) — proyek launcher Minecraft Java Edition untuk Android yang menjadi bagian dari ekosistem teknologi hulu.
+- Para kontributor dan pemelihara pustaka pihak ketiga yang tercantum dalam kode, berkas lisensi, dan pemberitahuan masing-masing dependensi.
+
+Daftar ini bukan inventaris lengkap dependensi. Kredit, hak cipta, dan lisensi spesifik harus tetap mengikuti berkas sumber serta komponen yang benar-benar disertakan dalam versi yang didistribusikan.
+
+## Penafian
+
+NEV Launcher adalah proyek komunitas yang tidak resmi. Minecraft, nama, logo, dan aset terkait merupakan milik pemegang hak masing-masing. NEV Launcher tidak menyertakan kepemilikan atas Minecraft dan pengguna tetap bertanggung jawab untuk mematuhi ketentuan layanan serta persyaratan akun yang berlaku.
+
+---
+
+Dikelola di [repositori NEV Launcher 2.0](https://github.com/ridssatrian-lgtm/Nev-Launcher-2.0).
