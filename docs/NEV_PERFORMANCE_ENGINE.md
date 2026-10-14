@@ -1,6 +1,6 @@
 # NEV Performance Engine — Rancangan Implementasi
 
-> Status: fondasi perencanaan. Belum terintegrasi ke APK dan belum merupakan modpack siap pasang.
+> Status: menu Performance + penerapan profil grafis ke `options.txt` sudah ada di launcher (belum diuji di perangkat). Modpack belum ada dan belum dipasang otomatis.
 
 ## Tujuan
 NEV Performance adalah fitur Nev Launcher + dua profil modpack terpisah untuk Minecraft Java Android:
@@ -45,5 +45,17 @@ Angka di atas adalah nilai awal pengujian, bukan rekomendasi universal atau hasi
 6. Bandingkan dengan baseline tanpa mod: FPS median/1% low bila tersedia, waktu muat, penggunaan RAM, crash, dan visual.
 7. Rilis hanya paket yang lolos tes. Jangan menyatakan APK atau paket siap sebelum build dan pengujian nyata selesai.
 
+## Yang sudah diimplementasikan di launcher
+- Menu **Performance** di sidebar; layar mengikuti versi game yang sedang dipilih.
+- Tiga profil (Balanced, Clear Graphics, Performance) plus pengaturan kustom: render distance, simulation distance, batas FPS, grafis (Fast/Fancy), awan, partikel, dan jarak entitas.
+- Pengaturan disimpan **per versi game** (profil global lama dipakai sebagai nilai awal).
+- Penerapan ke `options.txt`: urutan baris, gaya akhir baris, dan tanda kutip nilai dipertahankan; kunci inti (`renderDistance`, `simulationDistance`, `maxFps`) ditambahkan bila belum ada, kunci lain hanya diubah bila sudah ada dan yang dilewati dilaporkan.
+- Cadangan otomatis sebelum menulis (5 terbaru disimpan) dan tombol **Pulihkan Cadangan Terakhir**; isi sebelum dipulihkan disimpan sebagai `options.txt.nev-prerestore`. Dunia tidak pernah disentuh.
+- Petunjuk apakah versi game punya profil dasar (`packs/1.21.11`, `packs/26.2`).
+- Logika murni (`performance/NevOptionsEditor.kt`) punya unit test.
+
 ## Batasan
-GitHub repository change ini hanya menambahkan dokumentasi fondasi. Integrasi kode, artefak modpack, APK, dan pengujian perangkat adalah tahap terpisah.
+- Belum ada mod yang dipasang otomatis (Sodium, Lithium, ImmediatelyFast, Entity Culling) karena dukungan renderer Android belum terbukti; lihat `COMPATIBILITY_MATRIX.md`.
+- Nama kunci `options.txt` bisa berbeda pada versi game baru (mis. 26.x). Kunci yang tidak ditemukan dilewati, bukan ditebak.
+- Tidak ada klaim FPS atau jarak render; semua angka adalah titik awal pengujian.
+- Pengujian di perangkat Android adalah tahap terpisah dan belum dilakukan.
