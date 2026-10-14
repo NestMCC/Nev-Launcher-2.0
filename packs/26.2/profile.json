@@ -1,0 +1,30 @@
+{
+  "schemaVersion": 1,
+  "id": "nev-performance-26.2",
+  "name": "NEV Performance 26.2",
+  "minecraftVersion": "26.2",
+  "status": "baseline-pending-validation",
+  "loader": {
+    "id": "fabric",
+    "version": null,
+    "status": "must-verify"
+  },
+  "mods": [],
+  "graphics": {
+    "shader": "off",
+    "graphics": "fancy-if-stable",
+    "clouds": "fast",
+    "particles": "decreased",
+    "entityDistancePercent": 75,
+    "renderDistanceChunks": 10,
+    "simulationDistanceChunks": 6,
+    "fpsLimitCandidates": [45, 60],
+    "vSync": "test-both"
+  },
+  "safety": {
+    "backupOptionsBeforeApply": true,
+    "neverModifyWorlds": true,
+    "requireVerifiedDownloads": true,
+    "allowRestoreDefaults": true
+  }
+}
