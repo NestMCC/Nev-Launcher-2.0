@@ -1555,6 +1555,23 @@
     <string name="game_menu_category_gyroscope">Gyroscope</string>
     <string name="game_menu_category_display">Display</string>
     <string name="game_menu_category_resolution">Resolution</string>
+    <string name="game_menu_category_record">Record</string>
+    <string name="record_start">Start recording</string>
+    <string name="record_stop">Stop and save</string>
+    <string name="record_status_idle">Not recording. Your video will be saved to Movies/NEV Launcher.</string>
+    <string name="record_status_recording">Recording… %1$s</string>
+    <string name="record_option_microphone">Record microphone</string>
+    <string name="record_option_microphone_summary">Game sound is not captured, only the microphone.</string>
+    <string name="record_option_60fps">60 FPS</string>
+    <string name="record_option_bitrate">Video bitrate</string>
+    <string name="record_option_locked_hint">Settings can only be changed while not recording.</string>
+    <string name="record_toast_saved">Recording saved to %1$s</string>
+    <string name="record_toast_too_short">Recording was too short and was discarded</string>
+    <string name="record_toast_failed">Failed to record: %1$s</string>
+    <string name="record_toast_permission_denied">Screen capture permission was not granted</string>
+    <string name="notification_record_service_name">Screen Recording Service</string>
+    <string name="notification_record_title">Recording the game screen</string>
+    <string name="notification_record_stop">Stop</string>
     <string name="control_editor_style_presets">Style presets</string>
     <string name="control_editor_style_presets_hint">Tap a preset to add it to your styles</string>
 

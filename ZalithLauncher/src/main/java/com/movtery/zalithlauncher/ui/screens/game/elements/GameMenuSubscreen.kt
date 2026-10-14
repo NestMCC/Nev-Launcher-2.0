@@ -18,7 +18,14 @@
 
 package com.movtery.zalithlauncher.ui.screens.game.elements
 
+import android.Manifest
+import android.app.Activity
+import android.content.pm.PackageManager
+import android.media.projection.MediaProjectionManager
+import android.os.SystemClock
 import android.widget.Toast
+import androidx.activity.compose.rememberLauncherForActivityResult
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.animateColorAsState
@@ -52,9 +59,12 @@ import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Text
 import androidx.compose.material3.VerticalDivider
 import androidx.compose.runtime.Composable
+import androidx.compose.runtime.LaunchedEffect
 import androidx.compose.runtime.collectAsState
 import androidx.compose.runtime.getValue
+import androidx.compose.runtime.mutableLongStateOf
 import androidx.compose.runtime.remember
+import androidx.compose.runtime.setValue
 import androidx.compose.ui.Alignment
 import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.clip
@@ -65,7 +75,10 @@ import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.style.TextAlign
 import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
+import androidx.core.content.ContextCompat
 import com.movtery.zalithlauncher.R
+import com.movtery.zalithlauncher.game.record.ScreenRecordService
+import com.movtery.zalithlauncher.game.record.ScreenRecordState
 import com.movtery.zalithlauncher.game.sdl.SdlBridge
 import com.movtery.zalithlauncher.setting.AllSettings
 import com.movtery.zalithlauncher.setting.enums.FpsDisplayMode
@@ -120,6 +133,8 @@ private val menuCategories = listOf(
     MenuCategory(R.drawable.ic_desktop_windows_filled, R.string.game_menu_category_display),
     //8 分辨率
     MenuCategory(R.drawable.ic_aspect_ratio_filled, R.string.game_menu_category_resolution),
+    //9 录屏
+    MenuCategory(R.drawable.ic_movie_filled, R.string.game_menu_category_record),
 )
 
 @Composable
@@ -218,6 +233,11 @@ fun GameMenuSubscreen(
                     8 -> GameResolutionPage(
                         modifier = Modifier.fillMaxSize(),
                         onRefreshWindowSize = onRefreshWindowSize
+                    )
+                    9 -> GameRecordPage(
+                        modifier = Modifier.fillMaxSize(),
+                        closeScreen = closeScreen,
+                        onShowToast = onShowToast
                     )
                 }
             }
@@ -451,6 +471,162 @@ private fun GameDisplayPage(
             )
         }
     }
+}
+
+/**
+ * 录屏：开始/停止、麦克风、帧率、码率
+ *
+ * 屏幕捕获授权每次录制都需要重新申请（Android 14 起授权只能使用一次）
+ */
+@Composable
+private fun GameRecordPage(
+    closeScreen: () -> Unit,
+    onShowToast: (AndroidStringText, Int) -> Unit,
+    modifier: Modifier = Modifier,
+    color: Color = cardColor(false),
+    contentColor: Color = onCardColor(),
+) {
+    val context = LocalContext.current
+    val recordState by ScreenRecordState.state.collectAsState()
+    val recording = recordState.recording
+
+    //录制时长，每秒刷新
+    var elapsedSeconds by remember { mutableLongStateOf(0L) }
+    LaunchedEffect(recordState.startedAt, recording) {
+        while (recording) {
+            elapsedSeconds = (SystemClock.elapsedRealtime() - recordState.startedAt) / 1000
+            kotlinx.coroutines.delay(500)
+        }
+        elapsedSeconds = 0L
+    }
+
+    val captureLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.StartActivityForResult()
+    ) { result ->
+        val data = result.data
+        if (result.resultCode == Activity.RESULT_OK && data != null) {
+            ScreenRecordService.start(
+                context = context,
+                resultCode = result.resultCode,
+                data = data,
+                recordAudio = AllSettings.recordMicrophone.state,
+                bitrateMbps = AllSettings.recordBitrateMbps.state,
+                highFps = AllSettings.recordHighFps.state
+            )
+            //录制开始后收起菜单，避免菜单出现在视频里
+            closeScreen()
+        } else {
+            onShowToast(androidText(R.string.record_toast_permission_denied), Toast.LENGTH_SHORT)
+        }
+    }
+
+    fun requestCapture() {
+        val manager = context.getSystemService(MediaProjectionManager::class.java)
+        captureLauncher.launch(manager.createScreenCaptureIntent())
+    }
+
+    //麦克风权限无论是否授予都继续录制：被拒绝时服务会自动退回仅录制画面
+    val micPermissionLauncher = rememberLauncherForActivityResult(
+        ActivityResultContracts.RequestPermission()
+    ) { requestCapture() }
+
+    fun startRecording() {
+        val needMic = AllSettings.recordMicrophone.state &&
+                ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED
+        if (needMic) micPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO) else requestCapture()
+    }
+
+    val listState = rememberLazyListState()
+    LazyColumn(
+        modifier = modifier.lazyScrollWithBar(listState),
+        state = listState,
+        contentPadding = PaddingValues(all = 8.dp),
+        verticalArrangement = Arrangement.spacedBy(8.dp)
+    ) {
+        //状态
+        item {
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 4.dp, vertical = 2.dp),
+                text = if (recording) {
+                    stringResource(R.string.record_status_recording, formatElapsed(elapsedSeconds))
+                } else {
+                    stringResource(R.string.record_status_idle)
+                },
+                style = MaterialTheme.typography.bodyMedium,
+                color = if (recording) MaterialTheme.colorScheme.primary else contentColor
+            )
+        }
+        //开始 / 停止
+        item {
+            MenuTextButton(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(if (recording) R.string.record_stop else R.string.record_start),
+                onClick = {
+                    if (recording) ScreenRecordService.stop(context) else startRecording()
+                },
+                color = if (recording) MaterialTheme.colorScheme.primary.copy(alpha = 0.3f) else color,
+                contentColor = contentColor,
+            )
+        }
+        //麦克风
+        item {
+            MenuSwitchButton(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(R.string.record_option_microphone),
+                switch = AllSettings.recordMicrophone.state,
+                onSwitch = { AllSettings.recordMicrophone.save(it) },
+                color = color,
+                contentColor = contentColor,
+                enabled = !recording
+            )
+        }
+        //60 FPS
+        item {
+            MenuSwitchButton(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(R.string.record_option_60fps),
+                switch = AllSettings.recordHighFps.state,
+                onSwitch = { AllSettings.recordHighFps.save(it) },
+                color = color,
+                contentColor = contentColor,
+                enabled = !recording
+            )
+        }
+        //码率
+        item {
+            MenuSliderLayout(
+                modifier = Modifier.fillMaxWidth(),
+                title = stringResource(R.string.record_option_bitrate),
+                value = AllSettings.recordBitrateMbps.state,
+                valueRange = AllSettings.recordBitrateMbps.floatRange,
+                onValueChange = { AllSettings.recordBitrateMbps.updateState(it) },
+                onValueChangeFinished = { AllSettings.recordBitrateMbps.save(it) },
+                suffix = " Mbps",
+                color = color,
+                contentColor = contentColor,
+                enabled = !recording
+            )
+        }
+        item {
+            Text(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .padding(horizontal = 4.dp),
+                text = stringResource(R.string.record_option_microphone_summary),
+                style = MaterialTheme.typography.labelSmall,
+                color = contentColor.copy(alpha = 0.7f)
+            )
+        }
+    }
+}
+
+private fun formatElapsed(totalSeconds: Long): String {
+    val h = totalSeconds / 3600
+    val m = (totalSeconds % 3600) / 60
+    val s = totalSeconds % 60
+    return if (h > 0) "%d:%02d:%02d".format(h, m, s) else "%02d:%02d".format(m, s)
 }
 
 /**

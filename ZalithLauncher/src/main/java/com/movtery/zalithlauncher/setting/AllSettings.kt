@@ -512,6 +512,21 @@ object AllSettings : SettingsRegistry() {
     val showMenuBall = boolSetting("showMenuBall", true)
 
     /**
+     * 录屏：同时录制麦克风声音
+     */
+    val recordMicrophone = boolSetting("recordMicrophone", false)
+
+    /**
+     * 录屏：使用 60 FPS 录制（关闭则为 30 FPS）
+     */
+    val recordHighFps = boolSetting("recordHighFps", false)
+
+    /**
+     * 录屏：视频码率，单位 Mbps
+     */
+    val recordBitrateMbps = intSetting("recordBitrateMbps", 12, 2..40)
+
+    /**
      * 游戏菜单悬浮窗位置
      */
     val menuBallPos = offsetSetting("menuBallPos", Offset.Zero)

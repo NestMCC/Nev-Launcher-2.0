@@ -83,6 +83,7 @@ import com.movtery.zalithlauncher.game.input.AWTCharSender
 import com.movtery.zalithlauncher.game.input.CharacterSenderStrategy
 import com.movtery.zalithlauncher.game.input.LWJGLCharSender
 import com.movtery.zalithlauncher.game.launch.GameLauncher
+import com.movtery.zalithlauncher.game.record.ScreenRecordService
 import com.movtery.zalithlauncher.game.launch.GameService
 import com.movtery.zalithlauncher.game.launch.JvmLaunchInfo
 import com.movtery.zalithlauncher.game.launch.JvmLauncher
@@ -661,6 +662,7 @@ class VMActivity : BaseAppCompatActivity(), SurfaceTextureListener, SurfaceHolde
     }
 
     private fun stopAllService() {
+        ScreenRecordService.stop(this)
         stopService(Intent(this, GameService::class.java))
         if (TerracottaVPNService.isRunning()) {
             //停止指令必须用 stopService 下发

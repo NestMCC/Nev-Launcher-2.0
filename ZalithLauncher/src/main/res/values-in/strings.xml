@@ -1442,6 +1442,23 @@
     <string name="game_menu_category_gyroscope">Giroskop</string>
     <string name="game_menu_category_display">Tampilan</string>
     <string name="game_menu_category_resolution">Resolusi</string>
+    <string name="game_menu_category_record">Rekam</string>
+    <string name="record_start">Mulai merekam</string>
+    <string name="record_stop">Berhenti dan simpan</string>
+    <string name="record_status_idle">Tidak sedang merekam. Video akan disimpan di Movies/NEV Launcher.</string>
+    <string name="record_status_recording">Merekam… %1$s</string>
+    <string name="record_option_microphone">Rekam mikrofon</string>
+    <string name="record_option_microphone_summary">Suara game tidak ikut terekam, hanya mikrofon.</string>
+    <string name="record_option_60fps">60 FPS</string>
+    <string name="record_option_bitrate">Bitrate video</string>
+    <string name="record_option_locked_hint">Pengaturan hanya bisa diubah saat tidak merekam.</string>
+    <string name="record_toast_saved">Rekaman disimpan di %1$s</string>
+    <string name="record_toast_too_short">Rekaman terlalu singkat dan dibuang</string>
+    <string name="record_toast_failed">Gagal merekam: %1$s</string>
+    <string name="record_toast_permission_denied">Izin perekaman layar tidak diberikan</string>
+    <string name="notification_record_service_name">Layanan Perekam Layar</string>
+    <string name="notification_record_title">Merekam layar game</string>
+    <string name="notification_record_stop">Berhenti</string>
     <string name="control_editor_style_presets">Preset gaya</string>
     <string name="control_editor_style_presets_hint">Ketuk salah satu gaya siap pakai untuk menambahkannya</string>
 
