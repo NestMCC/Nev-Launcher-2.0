@@ -52,8 +52,12 @@ data class HubServer(
     val account: String? = null,
     val accountNote: String? = null,
     val location: String? = null,
-    val featured: Boolean = false
+    val featured: Boolean = false,
+    /** Asal server: "indonesia" atau "luar" */
+    val origin: String = ORIGIN_OUTSIDE
 ) {
+    val isIndonesia: Boolean get() = origin.equals(ORIGIN_INDONESIA, ignoreCase = true)
+
     /** Alamat Bedrock lengkap "host:port", atau null jika server tidak punya Bedrock */
     fun bedrockTarget(): String? = bedrockAddress?.trim()?.takeIf { it.isNotEmpty() }?.let {
         if (':' in it) it else "$it:$bedrockPort"
@@ -67,6 +71,9 @@ private data class HubServerList(
 
 /** Port Bedrock bawaan */
 const val BEDROCK_DEFAULT_PORT = 19132
+
+const val ORIGIN_INDONESIA = "indonesia"
+const val ORIGIN_OUTSIDE = "luar"
 
 /** Pisahkan "host" atau "host:port" Bedrock */
 fun parseBedrockAddress(address: String): Pair<String, Int> {
@@ -99,7 +106,7 @@ object ServerHubManager {
     const val REMOTE_URL =
         "https://raw.githubusercontent.com/ridssatrian-lgtm/nev-launcher-2.0/main/servers.json"
 
-    private const val KEY_CACHE = "servers_json_v2"
+    private const val KEY_CACHE = "servers_json_v3"
     private const val PING_COOLDOWN_MS = 20_000L
 
     private val mmkv: MMKV by lazy { MMKV.mmkvWithID("nev_server_hub") }
@@ -110,47 +117,50 @@ object ServerHubManager {
     /** Cadangan jika belum pernah berhasil mengunduh servers.json. Samakan dengan servers.json. */
     private val bundled = listOf(
         HubServer(
+            name = "Kaizen Network",
+            address = "play.kaizenmc.id",
+            bedrockAddress = "play.kaizenmc.id",
+            description = "Survival Mix (TERRA), SkyBlock Tycoon (ASTRA), dan Creative (ILLUSTRA). Crossplay Java-Bedrock.",
+            categories = listOf("Survival", "SkyBlock", "Creative", "Roleplay", "PvP", "Crossplay"),
+            edition = "Java & Bedrock",
+            version = "1.21.6+",
+            account = "both",
+            accountNote = "Premium masuk otomatis. Non-premium: /register <sandi> <sandi>, lalu /login <sandi> tiap masuk. Akun alt dilarang.",
+            origin = ORIGIN_INDONESIA
+        ),
+        HubServer(
             name = "AlwiNation",
             address = "alwination.id",
             bedrockAddress = "alwination.id",
             description = "Server Indonesia; mode Survival dan SkyBlock.",
             categories = listOf("Survival", "SkyBlock"),
             edition = "Java & Bedrock",
-            location = "Indonesia",
-            featured = true
+            origin = ORIGIN_INDONESIA
         ),
         HubServer(
             name = "Minesive",
             address = "minesive.com",
             bedrockAddress = "be.minesive.com",
-            description = "Server fokus ekonomi, PvP, dan survival.",
-            categories = listOf("Economy", "PvP", "Lifesteal", "Survival"),
+            description = "Server fokus ekonomi, OneBlock, PvP, dan survival.",
+            categories = listOf("Survival", "Economy", "OneBlock", "PvP", "SMP"),
             edition = "Java & Bedrock",
-            location = "Singapura",
-            featured = true
+            origin = ORIGIN_INDONESIA
         ),
         HubServer(
-            name = "RelxMC",
-            address = "play.relxmc.com",
-            bedrockAddress = "play.relxmc.com",
-            description = "Server crossplay Java dan Bedrock.",
-            categories = listOf("Survival", "Economy", "Crossplay"),
-            edition = "Java & Bedrock",
-            location = "Indonesia",
-            featured = true
+            name = "Cobblemon.gg",
+            address = "hub.cobblemon.gg",
+            description = "Server Cobblemon (Pokemon di Minecraft).",
+            categories = listOf("Cobblemon"),
+            edition = "Java",
+            origin = ORIGIN_OUTSIDE
         ),
         HubServer(
-            name = "Kaizen Network",
-            address = "play.kaizenmc.id",
-            bedrockAddress = "play.kaizenmc.id",
-            description = "Survival Mix (TERRA), SkyBlock Tycoon (ASTRA), dan Creative (ILLUSTRA). Crossplay Java-Bedrock.",
-            categories = listOf("Survival", "SkyBlock", "Tycoon", "Creative", "Crossplay"),
-            edition = "Java & Bedrock",
-            version = "1.21.6+",
-            account = "both",
-            accountNote = "Premium masuk otomatis. Non-premium: /register <sandi> <sandi>, lalu /login <sandi> tiap masuk. Akun alt dilarang.",
-            location = "Indonesia",
-            featured = true
+            name = "EarthMC",
+            address = "org.earthmc.net",
+            description = "Peta Bumi sungguhan dengan negara dan kota buatan pemain.",
+            categories = listOf("Earth"),
+            edition = "Java",
+            origin = ORIGIN_OUTSIDE
         )
     )
 

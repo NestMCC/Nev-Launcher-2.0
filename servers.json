@@ -1,51 +1,177 @@
 {
   "servers": [
     {
+      "name": "Kaizen Network",
+      "address": "play.kaizenmc.id",
+      "bedrockAddress": "play.kaizenmc.id",
+      "description": "Survival Mix (TERRA), SkyBlock Tycoon (ASTRA), dan Creative (ILLUSTRA). Crossplay Java-Bedrock.",
+      "categories": ["Survival", "SkyBlock", "Creative", "Roleplay", "PvP", "Crossplay"],
+      "edition": "Java & Bedrock",
+      "version": "1.21.6+",
+      "account": "both",
+      "accountNote": "Premium masuk otomatis. Non-premium: /register <sandi> <sandi>, lalu /login <sandi> tiap masuk. Akun alt dilarang.",
+      "origin": "indonesia"
+    },
+    {
       "name": "AlwiNation",
       "address": "alwination.id",
       "bedrockAddress": "alwination.id",
-      "bedrockPort": 19132,
       "description": "Server Indonesia; mode Survival dan SkyBlock.",
       "categories": ["Survival", "SkyBlock"],
       "edition": "Java & Bedrock",
-      "location": "Indonesia",
-      "featured": true
+      "origin": "indonesia"
     },
     {
       "name": "Minesive",
       "address": "minesive.com",
       "bedrockAddress": "be.minesive.com",
-      "bedrockPort": 19132,
-      "description": "Server fokus ekonomi, PvP, dan survival.",
-      "categories": ["Economy", "PvP", "Lifesteal", "Survival"],
+      "description": "Server fokus ekonomi, OneBlock, PvP, dan survival.",
+      "categories": ["Survival", "Economy", "OneBlock", "PvP", "SMP"],
       "edition": "Java & Bedrock",
-      "location": "Singapura",
-      "featured": true
+      "origin": "indonesia"
     },
     {
-      "name": "RelxMC",
-      "address": "play.relxmc.com",
-      "bedrockAddress": "play.relxmc.com",
-      "bedrockPort": 19132,
-      "description": "Server crossplay Java dan Bedrock.",
-      "categories": ["Survival", "Economy", "Crossplay"],
-      "edition": "Java & Bedrock",
-      "location": "Indonesia",
-      "featured": true
+      "name": "AlamNusa",
+      "address": "mc.alamnusa.net",
+      "description": "Server RPG dan petualangan dengan ekonomi.",
+      "categories": ["Survival", "Economy", "RPG"],
+      "edition": "Java",
+      "origin": "indonesia"
     },
     {
-      "name": "Kaizen Network",
-      "address": "play.kaizenmc.id",
-      "bedrockAddress": "play.kaizenmc.id",
-      "bedrockPort": 19132,
-      "description": "Survival Mix (TERRA), SkyBlock Tycoon (ASTRA), dan Creative (ILLUSTRA). Crossplay Java-Bedrock.",
-      "categories": ["Survival", "SkyBlock", "Tycoon", "Creative", "Crossplay"],
+      "name": "Nawasena",
+      "address": "mc.nawa-sena.com:25732",
+      "bedrockAddress": "mc.nawa-sena.com:25732",
+      "description": "Survival santai dengan progres dan banyak aktivitas.",
+      "categories": ["Survival", "Economy", "Hardcore", "Towny", "PvP"],
       "edition": "Java & Bedrock",
-      "version": "1.21.6+",
-      "account": "both",
-      "accountNote": "Premium masuk otomatis. Non-premium: /register <sandi> <sandi>, lalu /login <sandi> tiap masuk. Akun alt dilarang.",
-      "location": "Indonesia",
-      "featured": true
+      "origin": "indonesia"
+    },
+    {
+      "name": "MariysCraft",
+      "address": "play.mariyscraft.my.id:25571",
+      "description": "Survival ekonomi dengan jobs, player shop, dan quest.",
+      "categories": ["Survival", "Economy", "SMP", "PvP"],
+      "edition": "Java",
+      "origin": "indonesia"
+    },
+    {
+      "name": "TouchCraft",
+      "address": "play.touchcraft.my.id:25650",
+      "bedrockAddress": "play.touchcraft.my.id:25650",
+      "description": "Server Indonesia dengan mode survival, RPG, dan petualangan.",
+      "categories": ["Survival", "RPG", "PvP", "Economy", "Adventure"],
+      "edition": "Java & Bedrock",
+      "origin": "indonesia"
+    },
+    {
+      "name": "CookieSMP",
+      "address": "play.cookiesmp.my.id",
+      "description": "Economy Crystal PvP, Strength SMP, dan Practice.",
+      "categories": ["Anarchy", "Economy", "PvP", "SMP"],
+      "edition": "Java",
+      "account": "nonpremium",
+      "origin": "indonesia"
+    },
+    {
+      "name": "Only Empire",
+      "address": "mc.onlycommunity.my.id:24947",
+      "bedrockAddress": "mc.onlycommunity.my.id:24947",
+      "description": "Survival dengan free rank, Slimefun, dan ekonomi.",
+      "categories": ["Survival", "Economy"],
+      "edition": "Java & Bedrock",
+      "account": "nonpremium",
+      "origin": "indonesia"
+    },
+    {
+      "name": "Apeiron Craft",
+      "address": "msid.apeironcraft.id",
+      "bedrockAddress": "msid.apeironcraft.id",
+      "description": "Survival santai bareng teman; host di Singapura.",
+      "categories": ["Economy", "SMP", "OneBlock", "Parkour"],
+      "edition": "Java & Bedrock",
+      "account": "nonpremium",
+      "origin": "indonesia"
+    },
+    {
+      "name": "Complex Gaming",
+      "address": "org.mc-complex.com",
+      "description": "Jaringan server besar dengan banyak realm.",
+      "categories": ["Pixelmon", "Factions", "Creative"],
+      "edition": "Java",
+      "origin": "luar"
+    },
+    {
+      "name": "InsanityCraft",
+      "address": "join.insanitycraft.net",
+      "description": "Server internasional populer.",
+      "categories": [],
+      "edition": "Java",
+      "origin": "luar"
+    },
+    {
+      "name": "EarthMC",
+      "address": "org.earthmc.net",
+      "description": "Peta Bumi sungguhan dengan negara dan kota buatan pemain.",
+      "categories": ["Earth"],
+      "edition": "Java",
+      "origin": "luar"
+    },
+    {
+      "name": "Cobblemon.gg",
+      "address": "hub.cobblemon.gg",
+      "description": "Server Cobblemon (Pokemon di Minecraft).",
+      "categories": ["Cobblemon"],
+      "edition": "Java",
+      "origin": "luar"
+    },
+    {
+      "name": "CobbleGalaxy",
+      "address": "hub.cobblegalaxy.com",
+      "description": "Server Cobblemon.",
+      "categories": ["Cobblemon"],
+      "edition": "Java",
+      "origin": "luar"
+    },
+    {
+      "name": "OPBlocks",
+      "address": "hub.opblocks.com",
+      "description": "Server internasional dengan banyak pemain.",
+      "categories": [],
+      "edition": "Java",
+      "origin": "luar"
+    },
+    {
+      "name": "ManaCube",
+      "address": "hub.manacube.com",
+      "description": "Server internasional dengan banyak mode.",
+      "categories": [],
+      "edition": "Java",
+      "origin": "luar"
+    },
+    {
+      "name": "Lifesteal",
+      "address": "play.lifesteal.net",
+      "description": "Server Lifesteal.",
+      "categories": ["Lifesteal"],
+      "edition": "Java",
+      "origin": "luar"
+    },
+    {
+      "name": "TalonMC",
+      "address": "org.talonmc.net",
+      "description": "Server internasional.",
+      "categories": [],
+      "edition": "Java",
+      "origin": "luar"
+    },
+    {
+      "name": "LemonCloud",
+      "address": "one.lemoncloud.net",
+      "description": "Server internasional dengan banyak pemain.",
+      "categories": [],
+      "edition": "Java",
+      "origin": "luar"
     }
   ]
 }

@@ -132,6 +132,10 @@ private fun ServerHubContent(
 
     var tab by rememberSaveable { mutableIntStateOf(0) }
     var category by rememberSaveable { mutableStateOf<String?>(null) }
+    //filter asal (hanya di Jelajah): null = Semua, "indonesia", "luar"
+    var origin by rememberSaveable { mutableStateOf<String?>(null) }
+    //filter jumlah pemain online minimal (kelipatan 50)
+    var minPlayers by rememberSaveable { mutableStateOf<Int?>(null) }
     var detailAddress by remember { mutableStateOf<String?>(null) }
     var showAdd by remember { mutableStateOf(false) }
     var renameTarget by remember { mutableStateOf<ServerEntry?>(null) }
@@ -148,11 +152,35 @@ private fun ServerHubContent(
 
     val savedAddresses = remember(savedCards) { savedCards.map { it.record.cardId }.toSet() }
 
-    val discoverEntries = remember(servers, savedAddresses, category) {
-        servers
+    //Tab: 0 = Jelajah (semua), 1 = Server Saya, 2 = Server Indonesia, 3 = Server Luar
+    val baseServers = remember(servers, tab) {
+        when (tab) {
+            2 -> servers.filter { it.isIndonesia }
+            3 -> servers.filter { !it.isIndonesia }
+            else -> servers
+        }
+    }
+    val maxOnline = remember(baseServers, pings) {
+        baseServers.maxOfOrNull { (pings[it.address] as? HubPing.Online)?.online ?: 0 } ?: 0
+    }
+    //batas pemain yang punya server cocok: 50+, 100+, ... (kelipatan 50, sampai 500+)
+    val playerSteps = remember(maxOnline) { (50..500 step 50).filter { it <= maxOnline } }
+
+    val discoverEntries = remember(baseServers, savedAddresses, category, origin, minPlayers, tab, pings) {
+        baseServers
             .filter { server ->
                 category == null || server.categories.any { it.equals(category, ignoreCase = true) }
             }
+            .filter { server ->
+                tab != 0 || origin == null ||
+                    (origin == ORIGIN_INDONESIA) == server.isIndonesia
+            }
+            .filter { server ->
+                val min = minPlayers
+                min == null || ((pings[server.address] as? HubPing.Online)?.online ?: 0) >= min
+            }
+            //pemain online terbanyak di atas
+            .sortedByDescending { (pings[it.address] as? HubPing.Online)?.online ?: -1 }
             .map { server ->
                 ServerEntry(
                     name = server.name,
@@ -171,8 +199,8 @@ private fun ServerHubContent(
                 )
             }
     }
-    val categories = remember(servers) {
-        servers.flatMap { it.categories }.distinctBy { it.lowercase() }.sorted()
+    val categories = remember(baseServers) {
+        baseServers.flatMap { it.categories }.distinctBy { it.lowercase() }.sorted()
     }
     val savedEntries = remember(savedCards) {
         savedCards.map { card ->
@@ -189,13 +217,17 @@ private fun ServerHubContent(
             )
         }
     }
-    val entries = if (tab == 0) discoverEntries else savedEntries
+    val entries = if (tab == 1) savedEntries else discoverEntries
 
-    //ping semua server yang sedang tampil
-    LaunchedEffect(entries.map { it.address to it.bedrock }) {
-        entries.forEach { entry ->
-            ServerHubManager.ping(entry.address)
-            entry.bedrock?.let { ServerHubManager.pingBedrock(it) }
+    //ping semua server pada tab ini (bukan hanya yang lolos filter, agar filter pemain bisa bekerja)
+    val pingTargets = remember(tab, baseServers, savedEntries) {
+        if (tab == 1) savedEntries.map { it.address to it.bedrock }
+        else baseServers.map { it.address to it.bedrockTarget() }
+    }
+    LaunchedEffect(pingTargets) {
+        pingTargets.forEach { (address, bedrock) ->
+            ServerHubManager.ping(address)
+            bedrock?.let { ServerHubManager.pingBedrock(it) }
         }
     }
 
@@ -236,9 +268,9 @@ private fun ServerHubContent(
             IconButton(
                 onClick = {
                     ServerHubManager.refreshList()
-                    entries.forEach { entry ->
-                        ServerHubManager.ping(entry.address, force = true)
-                        entry.bedrock?.let { ServerHubManager.pingBedrock(it, force = true) }
+                    pingTargets.forEach { (address, bedrock) ->
+                        ServerHubManager.ping(address, force = true)
+                        bedrock?.let { ServerHubManager.pingBedrock(it, force = true) }
                     }
                 }
             ) {
@@ -251,18 +283,30 @@ private fun ServerHubContent(
 
         Spacer(Modifier.height(8.dp))
 
-        //Tab: Jelajah | Server Saya
-        Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
-            HubChip(selected = tab == 0, label = "Jelajah", onClick = { tab = 0 })
+        //Tab: Jelajah | Server Saya | Server Indonesia | Server Luar
+        Row(
+            modifier = Modifier
+                .fillMaxWidth()
+                .horizontalScroll(rememberScrollState()),
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            val switchTab = { index: Int ->
+                tab = index
+                category = null
+                minPlayers = null
+            }
+            HubChip(selected = tab == 0, label = "Jelajah", onClick = { switchTab(0) })
             HubChip(
                 selected = tab == 1,
                 label = "Server Saya (${savedCards.size})",
-                onClick = { tab = 1 }
+                onClick = { switchTab(1) }
             )
+            HubChip(selected = tab == 2, label = "Server Indonesia", onClick = { switchTab(2) })
+            HubChip(selected = tab == 3, label = "Server Luar", onClick = { switchTab(3) })
         }
 
-        //Kategori (hanya di Jelajah)
-        if (tab == 0) {
+        //Filter asal + jumlah pemain (Jelajah, Server Indonesia, Server Luar)
+        if (tab != 1) {
             Spacer(Modifier.height(8.dp))
             Row(
                 modifier = Modifier
@@ -270,7 +314,37 @@ private fun ServerHubContent(
                     .horizontalScroll(rememberScrollState()),
                 horizontalArrangement = Arrangement.spacedBy(8.dp)
             ) {
-                HubChip(selected = category == null, label = "Semua", onClick = { category = null })
+                if (tab == 0) {
+                    HubChip(selected = origin == null, label = "Semua", onClick = { origin = null })
+                    HubChip(
+                        selected = origin == ORIGIN_INDONESIA,
+                        label = "Indonesia",
+                        onClick = { origin = if (origin == ORIGIN_INDONESIA) null else ORIGIN_INDONESIA }
+                    )
+                    HubChip(
+                        selected = origin == ORIGIN_OUTSIDE,
+                        label = "Luar",
+                        onClick = { origin = if (origin == ORIGIN_OUTSIDE) null else ORIGIN_OUTSIDE }
+                    )
+                }
+                playerSteps.forEach { step ->
+                    HubChip(
+                        selected = minPlayers == step,
+                        label = "$step+",
+                        onClick = { minPlayers = if (minPlayers == step) null else step }
+                    )
+                }
+            }
+
+            //Kategori mode
+            Spacer(Modifier.height(8.dp))
+            Row(
+                modifier = Modifier
+                    .fillMaxWidth()
+                    .horizontalScroll(rememberScrollState()),
+                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            ) {
+                HubChip(selected = category == null, label = "Semua mode", onClick = { category = null })
                 categories.forEach { name ->
                     HubChip(
                         selected = category == name,
@@ -299,8 +373,8 @@ private fun ServerHubContent(
             if (entries.isEmpty()) {
                 item(key = "empty", span = { GridItemSpan(maxLineSpan) }) {
                     EmptyInfo(
-                        text = if (tab == 0) {
-                            if (loading) "Memuat daftar server…" else "Belum ada server di kategori ini."
+                        text = if (tab != 1) {
+                            if (loading) "Memuat daftar server…" else "Belum ada server yang cocok dengan filter ini."
                         } else {
                             "Belum ada server tersimpan. Tambahkan lewat tombol di atas, atau simpan dari Jelajah."
                         }
