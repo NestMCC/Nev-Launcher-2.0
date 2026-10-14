@@ -80,9 +80,9 @@ import com.movtery.zalithlauncher.ui.theme.onCardColor
 import com.movtery.zalithlauncher.utils.network.ServerAddress
 import com.movtery.zalithlauncher.viewmodel.ScreenBackStackViewModel
 
-private val OnlineColor = Color(0xFF4CAF50)
-private val OfflineColor = Color(0xFFE53935)
-private val LoadingColor = Color(0xFF9E9E9E)
+internal val OnlineColor = Color(0xFF4CAF50)
+internal val OfflineColor = Color(0xFFE53935)
+internal val LoadingColor = Color(0xFF9E9E9E)
 
 /** Data yang ditampilkan di kartu dan halaman detail */
 private data class ServerEntry(
@@ -189,7 +189,11 @@ private fun ServerHubContent(
             )
         }
     }
-    val entries = if (tab == 0) discoverEntries else savedEntries
+    val entries = when (tab) {
+        0 -> discoverEntries
+        1 -> savedEntries
+        else -> emptyList() //tab Server Indonesia mengurus datanya sendiri
+    }
 
     //ping semua server yang sedang tampil
     LaunchedEffect(entries.map { it.address to it.bedrock }) {
@@ -235,6 +239,7 @@ private fun ServerHubContent(
             }
             IconButton(
                 onClick = {
+                    if (tab == 2) MsidDirectory.reload()
                     ServerHubManager.refreshList()
                     entries.forEach { entry ->
                         ServerHubManager.ping(entry.address, force = true)
@@ -259,6 +264,7 @@ private fun ServerHubContent(
                 label = "Server Saya (${savedCards.size})",
                 onClick = { tab = 1 }
             )
+            HubChip(selected = tab == 2, label = "Server Indonesia", onClick = { tab = 2 })
         }
 
         //Kategori (hanya di Jelajah)
@@ -281,7 +287,15 @@ private fun ServerHubContent(
             }
         }
 
-        LazyVerticalGrid(
+        if (tab == 2) {
+            MsidDirectoryTab(
+                modifier = Modifier
+                    .weight(1f)
+                    .fillMaxWidth(),
+                savedAddresses = savedAddresses,
+                onPlayServer = onPlayServer
+            )
+        } else LazyVerticalGrid(
             modifier = Modifier
                 .weight(1f)
                 .fillMaxWidth(),
@@ -382,7 +396,7 @@ private fun ServerHubContent(
 
 @OptIn(ExperimentalMaterial3Api::class)
 @Composable
-private fun HubChip(selected: Boolean, label: String, onClick: () -> Unit) {
+internal fun HubChip(selected: Boolean, label: String, onClick: () -> Unit) {
     FilterChip(
         selected = selected,
         onClick = onClick,
@@ -391,7 +405,7 @@ private fun HubChip(selected: Boolean, label: String, onClick: () -> Unit) {
 }
 
 @Composable
-private fun EmptyInfo(text: String) {
+internal fun EmptyInfo(text: String) {
     Box(
         modifier = Modifier
             .fillMaxWidth()
@@ -495,7 +509,7 @@ private fun ServerCard(
 }
 
 @Composable
-private fun StatusLine(ping: HubPing?, label: String? = null) {
+internal fun StatusLine(ping: HubPing?, label: String? = null) {
     val prefix = if (label != null) "$label  " else ""
     val (color, text) = when (ping) {
         is HubPing.Online -> OnlineColor to "${prefix}Online  ${ping.online}/${ping.max}  •  ${ping.pingMs} ms"
@@ -710,7 +724,7 @@ private fun accountLong(account: String?): String = when (account) {
 
 /** Baris alamat dengan tombol salin */
 @Composable
-private fun AddressRow(label: String, value: String) {
+internal fun AddressRow(label: String, value: String) {
     val context = LocalContext.current
     val primary = MaterialTheme.colorScheme.primary
     Surface(
@@ -753,7 +767,7 @@ private fun AddressRow(label: String, value: String) {
 }
 
 @Composable
-private fun InfoRow(label: String, value: String) {
+internal fun InfoRow(label: String, value: String) {
     Row(horizontalArrangement = Arrangement.spacedBy(8.dp)) {
         Text(
             modifier = Modifier.width(96.dp),
