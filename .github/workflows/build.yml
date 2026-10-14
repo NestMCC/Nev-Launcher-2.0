@@ -26,7 +26,8 @@ jobs:
       actions: write
     strategy:
       matrix:
-        arch: ["arm64"]
+        # Nev Launcher: "all" = 1 APK universal (arm64-v8a, armeabi-v7a, x86, x86_64)
+        arch: ["all"]
       fail-fast: false
 
     env:
@@ -65,7 +66,7 @@ jobs:
         run: |
           # Remove only older debug APK artifacts, leaving unrelated workflow artifacts alone.
           gh api --paginate "repos/$REPO/actions/artifacts?per_page=100" \
-            -q '.artifacts[] | select(.name == "debug apk (arm64)") | .id' |
+            -q '.artifacts[] | select(.name | startswith("debug apk")) | .id' |
           while read -r id; do
             [ -n "$id" ] && gh api -X DELETE "repos/$REPO/actions/artifacts/$id" || true
           done
