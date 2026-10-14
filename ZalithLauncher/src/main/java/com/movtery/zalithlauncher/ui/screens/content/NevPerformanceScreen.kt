@@ -81,7 +81,7 @@ fun NevPerformanceScreen() {
                 fpsLimit = 30
             }
         }
-        status = "Profil \${preset.label} dipilih. Tekan Simpan Profil untuk menyimpan."
+        status = "Profil ${preset.label} dipilih. Tekan Simpan Profil untuk menyimpan."
     }
 
     fun saveProfile() {
@@ -132,9 +132,9 @@ fun NevPerformanceScreen() {
             target.copyTo(backup, overwrite = false)
             target.writeText(lines.joinToString("\n"), Charsets.UTF_8)
             saveProfile()
-            status = "Pengaturan yang tersedia diterapkan. Cadangan dibuat: \${backup.name}. Tutup lalu buka ulang Minecraft agar perubahan terbaca."
+            status = "Pengaturan yang tersedia diterapkan. Cadangan dibuat: ${backup.name}. Tutup lalu buka ulang Minecraft agar perubahan terbaca."
         } catch (error: Exception) {
-            status = "Gagal menerapkan pengaturan: \${error.message ?: "kesalahan file"}. Periksa izin penyimpanan dan coba lagi."
+            status = "Gagal menerapkan pengaturan: ${error.message ?: "kesalahan file"}. Periksa izin penyimpanan dan coba lagi."
         }
     }
 
