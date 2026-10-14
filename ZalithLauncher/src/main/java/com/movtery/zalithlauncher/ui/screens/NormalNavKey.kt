@@ -69,6 +69,11 @@ sealed interface NormalNavKey : TitledNavKey {
         @Contextual override val title: AndroidStringText = androidText("Server")
     }
 
+    /** NEV Performance optimization screen */
+    @Serializable data object Performance : NormalNavKey {
+        @Contextual override val title: AndroidStringText = androidText("NEV Performance")
+    }
+
     /** 查看日志屏幕 */
     @Serializable data class LogView(
         val logPath: String
