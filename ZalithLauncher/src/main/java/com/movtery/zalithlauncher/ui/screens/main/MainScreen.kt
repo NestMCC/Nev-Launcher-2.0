@@ -110,6 +110,7 @@ import com.movtery.zalithlauncher.ui.screens.content.LauncherScreen
 import com.movtery.zalithlauncher.ui.screens.content.LicenseScreen
 import com.movtery.zalithlauncher.ui.screens.content.LogViewScreen
 import com.movtery.zalithlauncher.ui.screens.content.MultiplayerScreen
+import com.movtery.zalithlauncher.ui.screens.content.NevPerformanceScreen
 import com.movtery.zalithlauncher.ui.screens.content.server.ServerHubScreen
 import com.movtery.zalithlauncher.ui.screens.content.SettingsScreen
 import com.movtery.zalithlauncher.ui.screens.content.VersionExportScreen
@@ -262,9 +263,16 @@ fun MainScreen(
                 inLauncherScreen = inLauncherScreen,
                 inServerScreen = mainScreenKey is NormalNavKey.ServerHub,
                 inMultiplayerScreen = mainScreenKey is NormalNavKey.Multiplayer,
+                inPerformanceScreen = mainScreenKey is NormalNavKey.Performance,
                 inDownloadScreen = mainScreenKey is NestedNavKey.Download,
                 inSettingsScreen = mainScreenKey is NestedNavKey.Settings,
                 toMainScreen = toMainScreen,
+                toPerformanceScreen = {
+                    screenBackStackModel.mainScreen.removeAndNavigateTo(
+                        removes = screenBackStackModel.clearBeforeNavKeys,
+                        screenKey = NormalNavKey.Performance
+                    )
+                },
                 toServerScreen = {
                     screenBackStackModel.mainScreen.removeAndNavigateTo(
                         removes = screenBackStackModel.clearBeforeNavKeys,
@@ -692,6 +700,9 @@ private fun NavigationUI(
                         eventViewModel = eventViewModel
                     )
                 }
+                entry<NormalNavKey.Performance> {
+                    NevPerformanceScreen()
+                }
                 entry<NormalNavKey.ServerHub> {
                     ServerHubScreen(
                         backScreenViewModel = screenBackStackModel,
@@ -944,9 +955,11 @@ private fun NevSideRail(
     inLauncherScreen: Boolean,
     inServerScreen: Boolean,
     inMultiplayerScreen: Boolean,
+    inPerformanceScreen: Boolean,
     inDownloadScreen: Boolean,
     inSettingsScreen: Boolean,
     toMainScreen: () -> Unit,
+    toPerformanceScreen: () -> Unit,
     openFileManager: () -> Unit,
     toServerScreen: () -> Unit,
     toMultiplayerScreen: () -> Unit,
@@ -974,6 +987,12 @@ private fun NevSideRail(
             painter = painterResource(R.drawable.ic_dns_outlined),
             text = "Server",
             onClick = { if (!inServerScreen) toServerScreen() }
+        )
+        NevRailItem(
+            selected = inPerformanceScreen,
+            painter = painterResource(R.drawable.ic_rocket_launch_filled),
+            text = "Performance",
+            onClick = { if (!inPerformanceScreen) toPerformanceScreen() }
         )
         NevRailItem(
             selected = false,
