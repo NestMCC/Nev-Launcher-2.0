@@ -399,7 +399,9 @@ class VMActivity : BaseAppCompatActivity(), SurfaceTextureListener, SurfaceHolde
                     val logPath = withLauncher {
                         getLogFile().absolutePath
                     }
-                    showExitMessage(this@VMActivity, exitCode, isSignal, logPath)
+                    //用于崩溃分析查找 crash-reports；获取失败不应影响错误页面的显示
+                    val gameDir = runCatching { withLauncher { chdir() } }.getOrNull()
+                    showExitMessage(this@VMActivity, exitCode, isSignal, logPath, gameDir)
                 } else {
                     //重启启动器
                     ProcessPhoenix.triggerRebirth(this@VMActivity)

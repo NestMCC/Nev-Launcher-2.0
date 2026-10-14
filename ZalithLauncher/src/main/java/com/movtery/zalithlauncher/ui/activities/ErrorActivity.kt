@@ -28,13 +28,20 @@ import androidx.compose.foundation.layout.fillMaxSize
 import androidx.compose.material3.MaterialTheme
 import androidx.compose.material3.Surface
 import androidx.compose.material3.Text
+import androidx.compose.runtime.getValue
+import androidx.compose.runtime.produceState
 import androidx.compose.ui.Modifier
 import com.jakewharton.processphoenix.ProcessPhoenix
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.context.COPY_LABEL_LINK
+import com.movtery.zalithlauncher.crashanalyzer.CrashAnalysisResult
+import com.movtery.zalithlauncher.crashanalyzer.CrashAnalyzer
+import com.movtery.zalithlauncher.crashanalyzer.CrashInputLoader
+import com.movtery.zalithlauncher.crashanalyzer.ExitInfo
 import com.movtery.zalithlauncher.path.PathManager
 import com.movtery.zalithlauncher.ui.base.BaseAppCompatActivity
 import com.movtery.zalithlauncher.ui.screens.main.ErrorScreen
+import com.movtery.zalithlauncher.ui.screens.main.crashlogs.CrashAnalysisSection
 import com.movtery.zalithlauncher.ui.screens.main.crashlogs.ShareLinkOperation
 import com.movtery.zalithlauncher.ui.theme.ZalithLauncherTheme
 import com.movtery.zalithlauncher.ui.theme.backgroundColor
@@ -47,6 +54,8 @@ import com.movtery.zalithlauncher.utils.network.openLink
 import com.movtery.zalithlauncher.utils.string.throwableToString
 import com.movtery.zalithlauncher.viewmodel.LogsUploadViewModel
 import dagger.hilt.android.AndroidEntryPoint
+import kotlinx.coroutines.Dispatchers
+import kotlinx.coroutines.withContext
 import kotlinx.parcelize.Parcelize
 import java.io.File
 
@@ -61,13 +70,14 @@ fun showExitMessage(
     context: Context,
     code: Int,
     isSignal: Boolean,
-    logPath: String
+    logPath: String,
+    gameDir: String? = null
 ) {
     val intent = Intent(context, ErrorActivity::class.java).apply {
         addFlags(Intent.FLAG_ACTIVITY_CLEAR_TASK)
         addFlags(Intent.FLAG_ACTIVITY_NEW_TASK)
         putExtra(BUNDLE_EXIT_TYPE, EXIT_JVM)
-        putExtra(BUNDLE_JVM_CRASH, JvmCrash(code, isSignal, logPath))
+        putExtra(BUNDLE_JVM_CRASH, JvmCrash(code, isSignal, logPath, gameDir))
     }
     context.startActivity(intent)
 }
@@ -76,7 +86,9 @@ fun showExitMessage(
 private data class JvmCrash(
     val code: Int,
     val isSignal: Boolean,
-    val logPath: String
+    val logPath: String,
+    /** Direktori kerja game, tempat crash-reports/ dan hs_err_pid*.log berada */
+    val gameDir: String? = null
 ): Parcelable
 
 @AndroidEntryPoint
@@ -108,7 +120,11 @@ class ErrorActivity : BaseAppCompatActivity() {
                     logFile = File(jvmCrash.logPath).also { file ->
                         //检查日志文件是否适合上传
                         viewModel.check(file)
-                    }
+                    },
+                    analysisSource = AnalysisSource(
+                        gameDir = jvmCrash.gameDir?.let(::File),
+                        exit = ExitInfo(jvmCrash.code, jvmCrash.isSignal)
+                    )
                 )
             }
             else -> {
@@ -119,7 +135,8 @@ class ErrorActivity : BaseAppCompatActivity() {
                     message = message,
                     messageBody = messageBody,
                     crashType = CrashType.LAUNCHER_CRASH,
-                    logFile = PathManager.FILE_CRASH_REPORT
+                    logFile = PathManager.FILE_CRASH_REPORT,
+                    analysisSource = null
                 )
             }
         }
@@ -129,6 +146,17 @@ class ErrorActivity : BaseAppCompatActivity() {
         val logExists = logFile.exists() && logFile.isFile
 
         setContent {
+            //仅游戏崩溃需要分析；分析在后台线程进行，期间 result 为 null
+            val analysis by produceState<CrashAnalysisResult?>(null, logFile) {
+                val source = errorMessage.analysisSource ?: return@produceState
+                value = withContext(Dispatchers.IO) {
+                    runCatching {
+                        val input = CrashInputLoader.load(logFile, source.gameDir)
+                        CrashAnalyzer.analyze(input.logText, input.crashReportText, source.exit)
+                    }.getOrElse { CrashAnalysisResult(findings = emptyList()) }
+                }
+            }
+
             ZalithLauncherTheme {
                 ShareLinkOperation(
                     operation = viewModel.operation,
@@ -176,6 +204,9 @@ class ErrorActivity : BaseAppCompatActivity() {
                             text = errorMessage.messageBody,
                             style = MaterialTheme.typography.bodyMedium
                         )
+                        if (errorMessage.analysisSource != null) {
+                            CrashAnalysisSection(result = analysis)
+                        }
                     }
                 }
             }
@@ -186,7 +217,14 @@ class ErrorActivity : BaseAppCompatActivity() {
         val message: String,
         val messageBody: String,
         val crashType: CrashType,
-        val logFile: File
+        val logFile: File,
+        /** null bila tidak perlu dianalisis (crash launcher) */
+        val analysisSource: AnalysisSource?
+    )
+
+    private class AnalysisSource(
+        val gameDir: File?,
+        val exit: ExitInfo
     )
 }
 
