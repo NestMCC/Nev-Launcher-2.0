@@ -55,13 +55,13 @@ Fitur yang direncanakan tidak otomatis tersedia pada versi saat ini. Periksa kod
 
 ## Unduhan
 
-Kunjungi halaman [GitHub Releases](https://github.com/ridssatrian-lgtm/Nev-Launcher-2.0/releases).
+Kunjungi halaman [GitHub Releases](https://github.com/NestMCC/NevLauncher/releases).
 
 Jika belum ada rilis APK yang dipublikasikan, berarti belum ada paket rilis yang dapat dipastikan tersedia melalui halaman tersebut. Jangan menganggap build berhasil atau aman diuji sebelum proses build dan pengujiannya benar-benar selesai.
 
 ## Pelaporan masalah
 
-Laporkan bug melalui [GitHub Issues](https://github.com/ridssatrian-lgtm/Nev-Launcher-2.0/issues). Jika memungkinkan, sertakan:
+Laporkan bug melalui [GitHub Issues](https://github.com/NestMCC/NevLauncher/issues). Jika memungkinkan, sertakan:
 
 - Versi NEV Launcher atau commit yang digunakan.
 - Model perangkat dan versi Android.
@@ -109,4 +109,4 @@ NEV Launcher adalah proyek komunitas yang tidak resmi. Minecraft, nama, logo, da
 
 ---
 
-Dikelola di [repositori NEV Launcher 2.0](https://github.com/ridssatrian-lgtm/Nev-Launcher-2.0).
+Dikelola di [repositori NEV Launcher 2.0](https://github.com/NestMCC/NevLauncher).

@@ -104,7 +104,7 @@ object ServerHubManager {
 
     /** Sumber daftar server. Edit servers.json di repo untuk menambah/mengubah server. */
     const val REMOTE_URL =
-        "https://raw.githubusercontent.com/ridssatrian-lgtm/nev-launcher-2.0/main/servers.json"
+        "https://raw.githubusercontent.com/NestMCC/NevLauncher/main/servers.json"
 
     private const val KEY_CACHE = "servers_json_v3"
     private const val PING_COOLDOWN_MS = 20_000L
