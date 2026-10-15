@@ -10,6 +10,7 @@ import androidx.compose.animation.fadeOut
 import androidx.compose.foundation.BorderStroke
 import androidx.compose.foundation.Image
 import androidx.compose.foundation.background
+import androidx.compose.foundation.clickable
 import androidx.compose.foundation.horizontalScroll
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -31,9 +32,12 @@ import androidx.compose.foundation.lazy.grid.items
 import androidx.compose.foundation.rememberScrollState
 import androidx.compose.foundation.shape.CircleShape
 import androidx.compose.foundation.shape.RoundedCornerShape
+import androidx.compose.foundation.text.BasicTextField
 import androidx.compose.foundation.verticalScroll
 import androidx.compose.material3.AlertDialog
 import androidx.compose.material3.Button
+import androidx.compose.material3.DropdownMenu
+import androidx.compose.material3.DropdownMenuItem
 import androidx.compose.material3.ExperimentalMaterial3Api
 import androidx.compose.material3.FilterChip
 import androidx.compose.material3.Icon
@@ -59,6 +63,7 @@ import androidx.compose.ui.draw.clip
 import androidx.compose.ui.graphics.Brush
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.FilterQuality
+import androidx.compose.ui.graphics.SolidColor
 import androidx.compose.ui.graphics.asImageBitmap
 import androidx.compose.ui.layout.ContentScale
 import androidx.compose.ui.platform.LocalContext
@@ -102,7 +107,7 @@ private data class ServerEntry(
 )
 
 /**
- * Nev Server Hub: Jelajah server, Server Saya, detail server, dan filter kategori.
+ * Nev Server Hub: Jelajah server, Favorit, detail server, pencarian, dan filter (lokasi, online, game).
  * @param onPlayServer luncurkan game langsung terhubung ke alamat server
  */
 @Composable
@@ -130,11 +135,14 @@ private fun ServerHubContent(
 ) {
     val context = LocalContext.current
 
+    //Tampilan: 0 = Jelajah (semua server), 1 = Favorit
     var tab by rememberSaveable { mutableIntStateOf(0) }
+    //kata kunci pencarian nama/alamat server
+    var query by rememberSaveable { mutableStateOf("") }
     var category by rememberSaveable { mutableStateOf<String?>(null) }
-    //filter asal (hanya di Jelajah): null = Semua, "indonesia", "luar"
+    //filter lokasi (hanya di Jelajah): null = Semua, "indonesia", "luar"
     var origin by rememberSaveable { mutableStateOf<String?>(null) }
-    //filter jumlah pemain online minimal (kelipatan 50)
+    //filter jumlah pemain online minimal (10+, lalu kelipatan 50)
     var minPlayers by rememberSaveable { mutableStateOf<Int?>(null) }
     var detailAddress by remember { mutableStateOf<String?>(null) }
     var showAdd by remember { mutableStateOf(false) }
@@ -152,28 +160,30 @@ private fun ServerHubContent(
 
     val savedAddresses = remember(savedCards) { savedCards.map { it.record.cardId }.toSet() }
 
-    //Tab: 0 = Jelajah (semua), 1 = Server Saya, 2 = Server Indonesia, 3 = Server Luar
-    val baseServers = remember(servers, tab) {
-        when (tab) {
-            2 -> servers.filter { it.isIndonesia }
-            3 -> servers.filter { !it.isIndonesia }
-            else -> servers
-        }
-    }
+    //Semua server untuk Jelajah; lokasi/pemain/mode disaring lewat dropdown
+    val baseServers = servers
     val maxOnline = remember(baseServers, pings) {
         baseServers.maxOfOrNull { (pings[it.address] as? HubPing.Online)?.online ?: 0 } ?: 0
     }
-    //batas pemain yang punya server cocok: 50+, 100+, ... (kelipatan 50, sampai 500+)
-    val playerSteps = remember(maxOnline) { (50..500 step 50).filter { it <= maxOnline } }
+    //batas pemain yang punya server cocok: 10+, 50+, 100+, ... (kelipatan 50, sampai 500+)
+    //server yang pemainnya sedikit tetap tampil selama filter "Semua"
+    val playerSteps = remember(maxOnline) {
+        (listOf(10) + (50..500 step 50)).filter { it <= maxOnline }
+    }
+    val search = query.trim()
 
-    val discoverEntries = remember(baseServers, savedAddresses, category, origin, minPlayers, tab, pings) {
+    val discoverEntries = remember(baseServers, savedAddresses, category, origin, minPlayers, search, pings) {
         baseServers
+            .filter { server ->
+                search.isEmpty() ||
+                    server.name.contains(search, ignoreCase = true) ||
+                    server.address.contains(search, ignoreCase = true)
+            }
             .filter { server ->
                 category == null || server.categories.any { it.equals(category, ignoreCase = true) }
             }
             .filter { server ->
-                tab != 0 || origin == null ||
-                    (origin == ORIGIN_INDONESIA) == server.isIndonesia
+                origin == null || (origin == ORIGIN_INDONESIA) == server.isIndonesia
             }
             .filter { server ->
                 val min = minPlayers
@@ -202,8 +212,12 @@ private fun ServerHubContent(
     val categories = remember(baseServers) {
         baseServers.flatMap { it.categories }.distinctBy { it.lowercase() }.sorted()
     }
-    val savedEntries = remember(savedCards) {
-        savedCards.map { card ->
+    val savedEntries = remember(savedCards, search) {
+        savedCards.filter { card ->
+            search.isEmpty() ||
+                card.record.name.contains(search, ignoreCase = true) ||
+                card.record.cardId.contains(search, ignoreCase = true)
+        }.map { card ->
             ServerEntry(
                 name = card.record.name,
                 address = card.record.cardId,
@@ -283,76 +297,55 @@ private fun ServerHubContent(
 
         Spacer(Modifier.height(8.dp))
 
-        //Tab: Jelajah | Server Saya | Server Indonesia | Server Luar
+        //Satu baris filter: Cari | lokasi | online | game | favorit
         Row(
-            modifier = Modifier
-                .fillMaxWidth()
-                .horizontalScroll(rememberScrollState()),
+            modifier = Modifier.fillMaxWidth(),
+            verticalAlignment = Alignment.CenterVertically,
             horizontalArrangement = Arrangement.spacedBy(8.dp)
         ) {
-            val switchTab = { index: Int ->
-                tab = index
-                category = null
-                minPlayers = null
+            HubSearchField(
+                modifier = Modifier.weight(1f),
+                value = query,
+                onValueChange = { query = it }
+            )
+
+            //lokasi, online, dan game hanya berlaku untuk Jelajah
+            if (tab != 1) {
+                HubDropdown(
+                    title = "lokasi",
+                    selectedLabel = when (origin) {
+                        ORIGIN_INDONESIA -> "Indonesia"
+                        ORIGIN_OUTSIDE -> "Luar"
+                        else -> null
+                    },
+                    options = listOf<Pair<String, String?>>(
+                        "Semua" to null,
+                        "Indonesia" to ORIGIN_INDONESIA,
+                        "Luar" to ORIGIN_OUTSIDE
+                    ),
+                    onSelect = { origin = it }
+                )
+                HubDropdown(
+                    title = "online",
+                    selectedLabel = minPlayers?.let { "$it+" },
+                    options = listOf<Pair<String, Int?>>("Semua" to null) +
+                        playerSteps.map { "$it+" to it },
+                    onSelect = { minPlayers = it }
+                )
+                HubDropdown(
+                    title = "game",
+                    selectedLabel = category,
+                    options = listOf<Pair<String, String?>>("Semua mode" to null) +
+                        categories.map { it to it },
+                    onSelect = { category = it }
+                )
             }
-            HubChip(selected = tab == 0, label = "Jelajah", onClick = { switchTab(0) })
+
             HubChip(
                 selected = tab == 1,
-                label = "Server Saya (${savedCards.size})",
-                onClick = { switchTab(1) }
+                label = "Favorit (${savedCards.size})",
+                onClick = { tab = if (tab == 1) 0 else 1 }
             )
-            HubChip(selected = tab == 2, label = "Server Indonesia", onClick = { switchTab(2) })
-            HubChip(selected = tab == 3, label = "Server Luar", onClick = { switchTab(3) })
-        }
-
-        //Filter asal + jumlah pemain (Jelajah, Server Indonesia, Server Luar)
-        if (tab != 1) {
-            Spacer(Modifier.height(8.dp))
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                if (tab == 0) {
-                    HubChip(selected = origin == null, label = "Semua", onClick = { origin = null })
-                    HubChip(
-                        selected = origin == ORIGIN_INDONESIA,
-                        label = "Indonesia",
-                        onClick = { origin = if (origin == ORIGIN_INDONESIA) null else ORIGIN_INDONESIA }
-                    )
-                    HubChip(
-                        selected = origin == ORIGIN_OUTSIDE,
-                        label = "Luar",
-                        onClick = { origin = if (origin == ORIGIN_OUTSIDE) null else ORIGIN_OUTSIDE }
-                    )
-                }
-                playerSteps.forEach { step ->
-                    HubChip(
-                        selected = minPlayers == step,
-                        label = "$step+",
-                        onClick = { minPlayers = if (minPlayers == step) null else step }
-                    )
-                }
-            }
-
-            //Kategori mode
-            Spacer(Modifier.height(8.dp))
-            Row(
-                modifier = Modifier
-                    .fillMaxWidth()
-                    .horizontalScroll(rememberScrollState()),
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
-            ) {
-                HubChip(selected = category == null, label = "Semua mode", onClick = { category = null })
-                categories.forEach { name ->
-                    HubChip(
-                        selected = category == name,
-                        label = name,
-                        onClick = { category = if (category == name) null else name }
-                    )
-                }
-            }
         }
 
         LazyVerticalGrid(
@@ -376,7 +369,7 @@ private fun ServerHubContent(
                         text = if (tab != 1) {
                             if (loading) "Memuat daftar server…" else "Belum ada server yang cocok dengan filter ini."
                         } else {
-                            "Belum ada server tersimpan. Tambahkan lewat tombol di atas, atau simpan dari Jelajah."
+                            "Belum ada server favorit. Tambahkan lewat tombol di atas, atau simpan dari Jelajah."
                         }
                     )
                 }
@@ -410,7 +403,7 @@ private fun ServerHubContent(
                     val added = ServerCardManager.addCard(detail.name, detail.address, icon)
                     Toast.makeText(
                         context,
-                        if (added) "Disimpan ke Server Saya" else "Server sudah ada di Server Saya",
+                        if (added) "Disimpan ke Favorit" else "Server sudah ada di Favorit",
                         Toast.LENGTH_SHORT
                     ).show()
                 }
@@ -462,6 +455,93 @@ private fun HubChip(selected: Boolean, label: String, onClick: () -> Unit) {
         onClick = onClick,
         label = { Text(label, maxLines = 1) }
     )
+}
+
+/** Kolom pencarian server (nama atau alamat) */
+@Composable
+private fun HubSearchField(
+    modifier: Modifier,
+    value: String,
+    onValueChange: (String) -> Unit
+) {
+    val primary = MaterialTheme.colorScheme.primary
+    Surface(
+        modifier = modifier.height(40.dp),
+        shape = RoundedCornerShape(20.dp),
+        color = primary.copy(alpha = 0.12f),
+        border = BorderStroke(1.dp, primary.copy(alpha = 0.35f))
+    ) {
+        Row(
+            modifier = Modifier.padding(horizontal = 14.dp),
+            verticalAlignment = Alignment.CenterVertically,
+            horizontalArrangement = Arrangement.spacedBy(8.dp)
+        ) {
+            Box(
+                modifier = Modifier.weight(1f),
+                contentAlignment = Alignment.CenterStart
+            ) {
+                if (value.isEmpty()) {
+                    Text(
+                        text = "Cari server…",
+                        style = MaterialTheme.typography.bodyMedium,
+                        color = MaterialTheme.colorScheme.onSurfaceVariant,
+                        maxLines = 1
+                    )
+                }
+                BasicTextField(
+                    modifier = Modifier.fillMaxWidth(),
+                    value = value,
+                    onValueChange = onValueChange,
+                    singleLine = true,
+                    textStyle = MaterialTheme.typography.bodyMedium.copy(
+                        color = MaterialTheme.colorScheme.onSurface
+                    ),
+                    cursorBrush = SolidColor(primary)
+                )
+            }
+            if (value.isNotEmpty()) {
+                Text(
+                    modifier = Modifier.clickable { onValueChange("") },
+                    text = "✕",
+                    style = MaterialTheme.typography.bodyMedium,
+                    color = MaterialTheme.colorScheme.onSurfaceVariant
+                )
+            }
+        }
+    }
+}
+
+/** Dropdown filter: menampilkan [title] saat belum ada pilihan, atau pilihan yang aktif */
+@OptIn(ExperimentalMaterial3Api::class)
+@Composable
+private fun <T> HubDropdown(
+    title: String,
+    selectedLabel: String?,
+    options: List<Pair<String, T?>>,
+    onSelect: (T?) -> Unit
+) {
+    var expanded by remember { mutableStateOf(false) }
+    Box {
+        FilterChip(
+            selected = selectedLabel != null,
+            onClick = { expanded = true },
+            label = { Text("${selectedLabel ?: title} ▾", maxLines = 1) }
+        )
+        DropdownMenu(
+            expanded = expanded,
+            onDismissRequest = { expanded = false }
+        ) {
+            options.forEach { (label, value) ->
+                DropdownMenuItem(
+                    text = { Text(label) },
+                    onClick = {
+                        onSelect(value)
+                        expanded = false
+                    }
+                )
+            }
+        }
+    }
 }
 
 @Composable
