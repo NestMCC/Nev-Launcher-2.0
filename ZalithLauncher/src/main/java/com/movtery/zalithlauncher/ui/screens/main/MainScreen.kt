@@ -29,6 +29,7 @@ import androidx.compose.ui.text.buildAnnotatedString
 import androidx.compose.ui.text.SpanStyle
 import androidx.compose.foundation.Image
 import androidx.activity.compose.LocalOnBackPressedDispatcherOwner
+import androidx.annotation.DrawableRes
 import androidx.compose.animation.AnimatedVisibility
 import androidx.compose.animation.Crossfade
 import androidx.compose.animation.fadeIn
@@ -40,6 +41,7 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -75,11 +77,14 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.coerceIn
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -937,7 +942,24 @@ private fun NevBrandTitle() {
 }
 
 /**
- * Nev Launcher: sidebar kiri berisi menu (Beranda, File, Multiplayer, Unduh, Pengaturan)
+ * Entri menu pada sidebar Nev Launcher
+ */
+private data class NevRailEntry(
+    val selected: Boolean,
+    @DrawableRes val iconRes: Int,
+    val label: String,
+    val onClick: () -> Unit
+)
+
+/**
+ * Nev Launcher: sidebar kiri berisi menu (Beranda, Server, File, Multiplayer, Unduh, Pengaturan)
+ *
+ * Responsif terhadap ukuran layar:
+ * - Tinggi item dihitung dari ruang yang tersedia, sehingga semua menu selalu muat tanpa terpotong.
+ * - Layar pendek (HP landscape): item dipadatkan dan label disembunyikan (hanya ikon).
+ * - Layar tinggi (tablet): tinggi item dibatasi dan menu Pengaturan dipatok di dasar sidebar.
+ * - Layar sempit: lebar sidebar dikecilkan agar konten tidak terdesak.
+ * - Jika ruang benar-benar tidak cukup, sidebar tetap bisa di-scroll sebagai cadangan.
  */
 @Composable
 private fun NevSideRail(
@@ -954,60 +976,109 @@ private fun NevSideRail(
     toSettingsScreen: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier
-            .width(76.dp)
-            .fillMaxHeight()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 6.dp, vertical = 4.dp),
-        verticalArrangement = Arrangement.spacedBy(6.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        NevRailItem(
+    val mainEntries = listOf(
+        NevRailEntry(
             selected = inLauncherScreen,
-            painter = painterResource(R.drawable.ic_home_filled),
-            text = "Beranda",
+            iconRes = R.drawable.ic_home_filled,
+            label = "Beranda",
             onClick = { if (!inLauncherScreen) toMainScreen() }
-        )
-        NevRailItem(
+        ),
+        NevRailEntry(
             selected = inServerScreen,
-            painter = painterResource(R.drawable.ic_dns_outlined),
-            text = "Server",
+            iconRes = R.drawable.ic_dns_outlined,
+            label = "Server",
             onClick = { if (!inServerScreen) toServerScreen() }
-        )
-        NevRailItem(
+        ),
+        NevRailEntry(
             selected = false,
-            painter = painterResource(R.drawable.ic_folder_filled),
-            text = "File",
+            iconRes = R.drawable.ic_folder_filled,
+            label = "File",
             onClick = openFileManager
-        )
-        NevRailItem(
+        ),
+        NevRailEntry(
             selected = inMultiplayerScreen,
-            painter = painterResource(R.drawable.ic_group_filled),
-            text = stringResource(R.string.terracotta),
+            iconRes = R.drawable.ic_group_filled,
+            label = stringResource(R.string.terracotta),
             onClick = { if (!inMultiplayerScreen) toMultiplayerScreen() }
-        )
-        NevRailItem(
+        ),
+        NevRailEntry(
             selected = inDownloadScreen,
-            painter = painterResource(R.drawable.ic_download_2_filled),
-            text = stringResource(R.string.generic_download),
+            iconRes = R.drawable.ic_download_2_filled,
+            label = stringResource(R.string.generic_download),
             onClick = { if (!inDownloadScreen) toDownloadScreen() }
         )
-        NevRailItem(
-            selected = inSettingsScreen,
-            painter = painterResource(R.drawable.ic_settings_filled),
-            text = stringResource(R.string.generic_setting),
-            onClick = { if (!inSettingsScreen) toSettingsScreen() }
-        )
+    )
+    val settingsEntry = NevRailEntry(
+        selected = inSettingsScreen,
+        iconRes = R.drawable.ic_settings_filled,
+        label = stringResource(R.string.generic_setting),
+        onClick = { if (!inSettingsScreen) toSettingsScreen() }
+    )
+
+    val screenWidthDp = LocalConfiguration.current.screenWidthDp
+    val railWidth = if (screenWidthDp < 600) 64.dp else 76.dp
+
+    BoxWithConstraints(
+        modifier = modifier
+            .width(railWidth)
+            .fillMaxHeight()
+    ) {
+        val verticalPadding = 4.dp
+        val gap = 3.dp
+        val minItemHeight = 32.dp
+        val maxItemHeight = 60.dp
+        val labelMinHeight = 52.dp
+
+        //  jumlah celah = jumlah item (termasuk celah ekstra di sekitar spacer pada mode tetap)
+        val totalItems = mainEntries.size + 1
+        //  dikurangi 1.dp sebagai toleransi pembulatan piksel
+        val spaceForItems = maxHeight - verticalPadding * 2 - gap * totalItems - 1.dp
+        val fitHeight = spaceForItems / totalItems
+        val needScroll = fitHeight < minItemHeight
+        val itemHeight = fitHeight.coerceIn(minItemHeight, maxItemHeight)
+        val showLabel = itemHeight >= labelMinHeight
+        val iconSize = if (showLabel) 22.dp else 20.dp
+
+        val contentModifier = Modifier
+            .fillMaxSize()
+            .then(if (needScroll) Modifier.verticalScroll(rememberScrollState()) else Modifier)
+            .padding(horizontal = 6.dp, vertical = verticalPadding)
+
+        Column(
+            modifier = contentModifier,
+            verticalArrangement = Arrangement.spacedBy(gap),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            mainEntries.forEach { entry ->
+                NevRailItem(
+                    entry = entry,
+                    itemHeight = itemHeight,
+                    showLabel = showLabel,
+                    iconSize = iconSize
+                )
+            }
+
+            //  Pengaturan selalu dipatok di dasar sidebar agar mudah terlihat
+            if (!needScroll) {
+                Spacer(modifier = Modifier.weight(1f))
+            }
+
+            NevRailItem(
+                entry = settingsEntry,
+                itemHeight = itemHeight,
+                showLabel = showLabel,
+                iconSize = iconSize
+            )
+        }
     }
 }
 
 @Composable
 private fun NevRailItem(
-    selected: Boolean,
-    painter: Painter,
-    text: String,
-    onClick: () -> Unit
+    entry: NevRailEntry,
+    itemHeight: Dp,
+    showLabel: Boolean,
+    iconSize: Dp
 ) {
     val selectedBrush = Brush.horizontalGradient(
         colors = listOf(
@@ -1015,29 +1086,32 @@ private fun NevRailItem(
             MaterialTheme.colorScheme.primaryContainer
         )
     )
-    val tint = if (selected) Color.White else LocalContentColor.current
+    val tint = if (entry.selected) Color.White else LocalContentColor.current
     Column(
         modifier = Modifier
             .fillMaxWidth()
+            .height(itemHeight)
             .clip(MaterialTheme.shapes.large)
-            .then(if (selected) Modifier.background(selectedBrush) else Modifier)
-            .clickable(onClick = onClick)
-            .padding(vertical = 8.dp),
+            .then(if (entry.selected) Modifier.background(selectedBrush) else Modifier)
+            .clickable(onClick = entry.onClick),
         horizontalAlignment = Alignment.CenterHorizontally,
-        verticalArrangement = Arrangement.spacedBy(2.dp)
+        verticalArrangement = Arrangement.Center
     ) {
         Icon(
-            modifier = Modifier.size(22.dp),
-            painter = painter,
-            contentDescription = text,
+            modifier = Modifier.size(iconSize),
+            painter = painterResource(entry.iconRes),
+            contentDescription = entry.label,
             tint = tint
         )
-        Text(
-            text = text,
-            style = MaterialTheme.typography.labelSmall,
-            color = tint,
-            maxLines = 1,
-            overflow = TextOverflow.Ellipsis
-        )
+        if (showLabel) {
+            Spacer(modifier = Modifier.height(2.dp))
+            Text(
+                text = entry.label,
+                style = MaterialTheme.typography.labelSmall,
+                color = tint,
+                maxLines = 1,
+                overflow = TextOverflow.Ellipsis
+            )
+        }
     }
 }
