@@ -582,6 +582,21 @@ object AllSettings : SettingsRegistry() {
     val enableTerracottaNodes = boolSetting("enableTerracottaNodes", false)
 
     /**
+     * Nev Launcher: perekaman layar - rekam suara game
+     */
+    val recordGameAudio = boolSetting("recordGameAudio", true)
+
+    /**
+     * Nev Launcher: perekaman layar - rekam mikrofon
+     */
+    val recordMic = boolSetting("recordMic", false)
+
+    /**
+     * Nev Launcher: perekaman layar - redam suara dari luar pada mikrofon
+     */
+    val recordNoiseSuppress = boolSetting("recordNoiseSuppress", true)
+
+    /**
      * 陶瓦联机：自定义 EasyTier 服务器节点
      */
     val terracottaNodes = stringSetting("terracottaNodes", "")

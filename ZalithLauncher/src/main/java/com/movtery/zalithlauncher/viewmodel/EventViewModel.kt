@@ -65,6 +65,8 @@ class EventViewModel : ViewModel() {
             data object OnBack : Game
             /** [com.movtery.zalithlauncher.game.launch.handler.AbstractHandler.onResume] */
             data object OnResume: Game
+            /** Nev Launcher: mulai/hentikan perekaman layar */
+            data object ToggleScreenRecord : Game
         }
         sealed interface Terracotta : Event {
             /** 申请 VPN 权限 */

@@ -19,12 +19,15 @@
 package com.movtery.zalithlauncher.ui.activities
 
 import android.annotation.SuppressLint
+import android.Manifest
 import android.content.Context
 import android.content.Intent
 import android.content.pm.ActivityInfo
+import android.content.pm.PackageManager
 import android.content.res.Configuration
 import android.graphics.SurfaceTexture
 import android.hardware.display.DisplayManager
+import android.media.projection.MediaProjectionManager
 import android.os.Build
 import android.os.Bundle
 import android.os.SystemClock
@@ -42,6 +45,7 @@ import android.view.WindowManager
 import android.widget.Toast
 import androidx.activity.OnBackPressedCallback
 import androidx.activity.compose.setContent
+import androidx.activity.result.contract.ActivityResultContracts
 import androidx.activity.viewModels
 import androidx.annotation.Keep
 import androidx.compose.foundation.background
@@ -63,6 +67,7 @@ import androidx.compose.ui.platform.LocalDensity
 import androidx.compose.ui.unit.IntOffset
 import androidx.compose.ui.unit.IntSize
 import androidx.compose.ui.viewinterop.AndroidView
+import androidx.core.content.ContextCompat
 import androidx.core.graphics.drawable.toDrawable
 import androidx.lifecycle.Lifecycle
 import androidx.lifecycle.ViewModel
@@ -97,6 +102,8 @@ import com.movtery.zalithlauncher.game.plugin.PluginLoader
 import com.movtery.zalithlauncher.game.renderer.Renderers
 import com.movtery.zalithlauncher.game.sdl.SdlBridge
 import com.movtery.zalithlauncher.game.version.installed.Version
+import com.movtery.zalithlauncher.game.record.ScreenRecordService
+import com.movtery.zalithlauncher.game.record.ScreenRecordState
 import com.movtery.zalithlauncher.setting.AllSettings
 import com.movtery.zalithlauncher.setting.enums.ResolutionRule
 import com.movtery.zalithlauncher.terracotta.TerracottaVPNService
@@ -355,6 +362,54 @@ class VMActivity : BaseAppCompatActivity(), SurfaceTextureListener, SurfaceHolde
 
     private val vmViewModel: VMViewModel by viewModels()
 
+    //region Nev Launcher: perekaman layar
+
+    private val projectionLauncher = registerForActivityResult(ActivityResultContracts.StartActivityForResult()) { result ->
+        val data = result.data
+        if (result.resultCode == RESULT_OK && data != null) {
+            ScreenRecordService.start(
+                context = this,
+                resultCode = result.resultCode,
+                data = data,
+                gameAudio = AllSettings.recordGameAudio.getValue(),
+                mic = AllSettings.recordMic.getValue(),
+                noiseSuppress = AllSettings.recordNoiseSuppress.getValue()
+            )
+        } else {
+            Toast.makeText(this, R.string.record_cancelled, Toast.LENGTH_SHORT).show()
+        }
+    }
+
+    private val recordAudioPermissionLauncher = registerForActivityResult(ActivityResultContracts.RequestPermission()) { granted ->
+        if (!granted) Toast.makeText(this, R.string.record_audio_denied, Toast.LENGTH_LONG).show()
+        //tetap lanjut merekam; tanpa izin, perekam hanya mengambil video
+        requestScreenCapture()
+    }
+
+    private fun requestScreenCapture() {
+        val manager = getSystemService(Context.MEDIA_PROJECTION_SERVICE) as MediaProjectionManager
+        projectionLauncher.launch(manager.createScreenCaptureIntent())
+    }
+
+    /**
+     * Mulai atau hentikan perekaman layar.
+     */
+    private fun toggleScreenRecording() {
+        if (ScreenRecordState.recording.value) {
+            ScreenRecordService.stop(this)
+            return
+        }
+        val needAudio = AllSettings.recordGameAudio.getValue() || AllSettings.recordMic.getValue()
+        val hasPermission = ContextCompat.checkSelfPermission(this, Manifest.permission.RECORD_AUDIO) == PackageManager.PERMISSION_GRANTED
+        if (needAudio && !hasPermission) {
+            recordAudioPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO)
+        } else {
+            requestScreenCapture()
+        }
+    }
+
+    //endregion
+
     /** View used to locate the layout hosting SDL's text input bridge. */
     private var gameSurfaceView: View? = null
 
@@ -451,6 +506,9 @@ class VMActivity : BaseAppCompatActivity(), SurfaceTextureListener, SurfaceHolde
                     }
                     is EventViewModel.Event.Game.SwitchIme -> {
                         vmViewModel.textInputMode = event.mode ?: vmViewModel.textInputMode.switch()
+                    }
+                    is EventViewModel.Event.Game.ToggleScreenRecord -> {
+                        toggleScreenRecording()
                     }
                     is EventViewModel.Event.Game.KeyHandle -> {
                         vmViewModel.keyHandle = event.handle

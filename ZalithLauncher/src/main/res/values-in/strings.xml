@@ -1517,4 +1517,20 @@
     <string name="crash_cause_storage_permission_fix">Periksa izin penyimpanan launcher, dan pastikan folder game bisa ditulis (bukan di lokasi read-only).</string>
     <string name="crash_cause_world_data_error_title">Data dunia rusak atau tidak terbaca</string>
     <string name="crash_cause_world_data_error_fix">Pulihkan cadangan dunia, atau hapus dunia atau datapack yang rusak.</string>
+
+    <!-- Nev Launcher: perekaman layar -->
+    <string name="record_notification_channel">Perekaman layar</string>
+    <string name="record_notification_title">Sedang merekam layar</string>
+    <string name="record_notification_text">Ketuk Berhenti untuk menyelesaikan dan menyimpan video.</string>
+    <string name="record_stop">Berhenti</string>
+    <string name="record_started">Perekaman dimulai</string>
+    <string name="record_saved">Rekaman disimpan: %1$s</string>
+    <string name="record_failed">Perekaman gagal: %1$s</string>
+    <string name="record_cancelled">Perekaman layar dibatalkan</string>
+    <string name="record_audio_denied">Izin mikrofon ditolak, merekam tanpa suara</string>
+    <string name="record_menu_start">Mulai Rekam Layar</string>
+    <string name="record_menu_stop">Berhenti Rekam Layar</string>
+    <string name="record_option_game_audio">Rekam suara game</string>
+    <string name="record_option_mic">Rekam mikrofon</string>
+    <string name="record_option_noise_suppress">Redam suara dari luar pada mikrofon</string>
 </resources>

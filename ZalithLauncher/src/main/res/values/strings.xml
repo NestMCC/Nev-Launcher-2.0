@@ -1630,4 +1630,20 @@
     <string name="crash_cause_storage_permission_fix">Check the launcher\'s storage permission, and make sure the game folder is writable (not on a read-only location).</string>
     <string name="crash_cause_world_data_error_title">World data is corrupted or unreadable</string>
     <string name="crash_cause_world_data_error_fix">Restore a backup of the world, or remove the broken world or datapack.</string>
+
+    <!-- Nev Launcher: screen recording -->
+    <string name="record_notification_channel">Screen recording</string>
+    <string name="record_notification_title">Recording the screen</string>
+    <string name="record_notification_text">Tap Stop to finish and save the video.</string>
+    <string name="record_stop">Stop</string>
+    <string name="record_started">Recording started</string>
+    <string name="record_saved">Recording saved: %1$s</string>
+    <string name="record_failed">Recording failed: %1$s</string>
+    <string name="record_cancelled">Screen recording was cancelled</string>
+    <string name="record_audio_denied">Microphone permission denied, recording without audio</string>
+    <string name="record_menu_start">Start Screen Recording</string>
+    <string name="record_menu_stop">Stop Screen Recording</string>
+    <string name="record_option_game_audio">Record game audio</string>
+    <string name="record_option_mic">Record microphone</string>
+    <string name="record_option_noise_suppress">Mute surrounding noise on the mic</string>
 </resources>

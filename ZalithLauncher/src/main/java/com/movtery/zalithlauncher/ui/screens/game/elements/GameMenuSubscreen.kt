@@ -67,6 +67,7 @@ import androidx.compose.ui.text.style.TextOverflow
 import androidx.compose.ui.unit.dp
 import com.movtery.zalithlauncher.R
 import com.movtery.zalithlauncher.game.sdl.SdlBridge
+import com.movtery.zalithlauncher.game.record.ScreenRecordState
 import com.movtery.zalithlauncher.setting.AllSettings
 import com.movtery.zalithlauncher.setting.enums.FpsDisplayMode
 import com.movtery.zalithlauncher.setting.enums.GamepadInputMode
@@ -133,6 +134,7 @@ fun GameMenuSubscreen(
     onSwitchLog: () -> Unit,
     enableTerracotta: Boolean,
     onOpenTerracottaMenu: () -> Unit,
+    onToggleScreenRecord: () -> Unit,
     onRefreshWindowSize: () -> Unit,
     onInputMethod: () -> Unit,
     onSendKeycode: () -> Unit,
@@ -190,7 +192,12 @@ fun GameMenuSubscreen(
                         onForceClose = onForceClose,
                         onSwitchLog = onSwitchLog,
                         enableTerracotta = enableTerracotta,
-                        onOpenTerracottaMenu = onOpenTerracottaMenu
+                        onOpenTerracottaMenu = onOpenTerracottaMenu,
+                        onToggleScreenRecord = {
+                            onToggleScreenRecord()
+                            //tutup menu agar layar game terlihat/tidak menutupi rekaman
+                            closeScreen()
+                        }
                     )
                     1 -> ControlInputPage(
                         modifier = Modifier.fillMaxSize(),
@@ -292,6 +299,7 @@ private fun GameActionPage(
     onSwitchLog: () -> Unit,
     enableTerracotta: Boolean,
     onOpenTerracottaMenu: () -> Unit,
+    onToggleScreenRecord: () -> Unit,
     modifier: Modifier = Modifier,
     color: Color = cardColor(false),
     contentColor: Color = onCardColor(),
@@ -322,6 +330,52 @@ private fun GameActionPage(
                 color = color,
                 contentColor = contentColor,
             )
+        }
+
+        //Nev Launcher: perekaman layar
+        item {
+            val recording by ScreenRecordState.recording.collectAsState()
+            MenuTextButton(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(
+                    if (recording) R.string.record_menu_stop else R.string.record_menu_start
+                ),
+                onClick = onToggleScreenRecord,
+                color = color,
+                contentColor = contentColor,
+            )
+        }
+        item {
+            MenuSwitchButton(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(R.string.record_option_game_audio),
+                switch = AllSettings.recordGameAudio.state,
+                onSwitch = { AllSettings.recordGameAudio.save(it) },
+                color = color,
+                contentColor = contentColor,
+            )
+        }
+        item {
+            MenuSwitchButton(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(R.string.record_option_mic),
+                switch = AllSettings.recordMic.state,
+                onSwitch = { AllSettings.recordMic.save(it) },
+                color = color,
+                contentColor = contentColor,
+            )
+        }
+        if (AllSettings.recordMic.state) {
+            item {
+                MenuSwitchButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = stringResource(R.string.record_option_noise_suppress),
+                    switch = AllSettings.recordNoiseSuppress.state,
+                    onSwitch = { AllSettings.recordNoiseSuppress.save(it) },
+                    color = color,
+                    contentColor = contentColor,
+                )
+            }
         }
 
         //如果开启多人联机，则展示这个按钮

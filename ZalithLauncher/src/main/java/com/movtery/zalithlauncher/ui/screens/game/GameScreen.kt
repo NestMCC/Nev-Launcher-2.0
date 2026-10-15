@@ -769,6 +769,9 @@ fun GameScreen(
             onSwitchLog = { onLogStateChange(logState.next()) },
             enableTerracotta = AllSettings.enableTerracotta.state,
             onOpenTerracottaMenu = { terracottaViewModel.openMenu() },
+            onToggleScreenRecord = {
+                eventViewModel.sendEvent(EventViewModel.Event.Game.ToggleScreenRecord)
+            },
             onRefreshWindowSize = { eventViewModel.sendEvent(EventViewModel.Event.Game.RefreshSize) },
             onInputMethod = {
                 eventViewModel.sendEvent(EventViewModel.Event.Game.SwitchIme(null))
