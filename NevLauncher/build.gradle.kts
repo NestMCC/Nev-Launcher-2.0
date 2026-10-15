@@ -92,14 +92,12 @@ android {
             isMinifyEnabled = true
             isShrinkResources = true
             applicationIdSuffix = ".debug"
-            versionNameSuffix = "-fast"
             signingConfig = signingConfigs.getByName("debugBuild")
             matchingFallbacks += listOf("release")
         }
         debug {
             isMinifyEnabled = false
             applicationIdSuffix = ".debug"
-            versionNameSuffix = "-debug"
             signingConfig = signingConfigs.getByName("debugBuild")
         }
     }
