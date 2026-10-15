@@ -56,7 +56,7 @@ jobs:
       - name: Build APK for ${{ matrix.arch }}
         run: |
           chmod +x gradlew
-          ./gradlew ZalithLauncher:assemble${{ inputs.variant }} -Darch=${{ matrix.arch }}
+          ./gradlew NevLauncher:assemble${{ inputs.variant }} -Darch=${{ matrix.arch }}
 
       - name: Delete previous debug APK artifacts
         env:
@@ -84,7 +84,7 @@ jobs:
         with:
           name: debug apk (${{ matrix.arch }})
           path: |
-            ZalithLauncher/build/outputs/apk/debug/*.apk
-            ZalithLauncher/build/outputs/apk/fast/*.apk
+            NevLauncher/build/outputs/apk/debug/*.apk
+            NevLauncher/build/outputs/apk/fast/*.apk
           if-no-files-found: error
           retention-days: 90

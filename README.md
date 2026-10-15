@@ -91,7 +91,7 @@ Berkas [THIRD_PARTY_LICENSES.md](./THIRD_PARTY_LICENSES.md) mencatat proyek hulu
 
 ### Catatan identitas teknis
 
-Pada konfigurasi yang diperiksa, modul Android masih menggunakan namespace dan application ID dasar `com.movtery.zalithlauncher`, serta nama proyek Gradle `ZalithLauncher`. Ini merupakan temuan yang perlu ditangani sebagai pekerjaan branding/teknis terpisah. Jangan mengganti application ID secara serampangan karena dapat memengaruhi data aplikasi, autentikasi, tautan, dan kompatibilitas. Apa pun nama aplikasi yang ditampilkan, pertahankan atribusi dan pemberitahuan lisensi proyek hulu.
+Pada konfigurasi yang diperiksa, modul Android masih menggunakan namespace dan application ID dasar `com.movtery.zalithlauncher` (nama proyek/modul Gradle sudah `NevLauncher`). Ini merupakan temuan yang perlu ditangani sebagai pekerjaan branding/teknis terpisah. Jangan mengganti application ID secara serampangan karena dapat memengaruhi data aplikasi, autentikasi, tautan, dan kompatibilitas. Apa pun nama aplikasi yang ditampilkan, pertahankan atribusi dan pemberitahuan lisensi proyek hulu.
 
 ## Kredit dan proyek hulu
 
