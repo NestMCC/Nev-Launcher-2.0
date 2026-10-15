@@ -204,7 +204,7 @@ androidComponents {
                 }
 
                 (output.getFilter(ABI)?.identifier ?: "all").let { abi ->
-                    val baseName = "$launcherApkName-${if (variant.buildType == "release") launcherVersionName else "Debug-$launcherVersionName"}"
+                    val baseName = launcherApkName
                     output.outputFileName = if (abi == "all") "$baseName.apk" else "$baseName-$abi.apk"
                 }
             }
