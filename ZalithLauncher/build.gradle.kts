@@ -203,7 +203,8 @@ androidComponents {
                 }
 
                 (output.getFilter(ABI)?.identifier ?: "all").let { abi ->
-                    val baseName = "$launcherName-${if (variant.buildType == "release") launcherVersionName else "Debug-$launcherVersionName"}"
+                    // Nev Launcher: nama APK tetap "Nev Launcher.apk" (tanpa nomor versi)
+                    val baseName = launcherAPPName
                     output.outputFileName = if (abi == "all") "$baseName.apk" else "$baseName-$abi.apk"
                 }
             }
