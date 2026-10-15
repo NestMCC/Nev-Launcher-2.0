@@ -512,6 +512,11 @@ object AllSettings : SettingsRegistry() {
     val showMenuBall = boolSetting("showMenuBall", true)
 
     /**
+     * 录屏：录制游戏声音（Android 10 及以上）
+     */
+    val recordGameAudio = boolSetting("recordGameAudio", true)
+
+    /**
      * 录屏：同时录制麦克风声音
      */
     val recordMicrophone = boolSetting("recordMicrophone", false)

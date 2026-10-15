@@ -35,6 +35,7 @@
         android:roundIcon="@mipmap/ic_launcher_round"
         android:theme="@style/AppTheme.ZalithLauncher"
         android:appCategory="game"
+        android:allowAudioPlaybackCapture="true"
         android:supportsRtl="true"
         android:isGame="true"
         android:allowBackup="true"

@@ -22,6 +22,7 @@ import android.Manifest
 import android.app.Activity
 import android.content.pm.PackageManager
 import android.media.projection.MediaProjectionManager
+import android.os.Build
 import android.os.SystemClock
 import android.widget.Toast
 import androidx.activity.compose.rememberLauncherForActivityResult
@@ -487,17 +488,19 @@ private fun GameRecordPage(
     contentColor: Color = onCardColor(),
 ) {
     val context = LocalContext.current
+    val gameAudioSupported = Build.VERSION.SDK_INT >= Build.VERSION_CODES.Q
     val recordState by ScreenRecordState.state.collectAsState()
     val recording = recordState.recording
+    val paused = recordState.paused
 
-    //录制时长，每秒刷新
-    var elapsedSeconds by remember { mutableLongStateOf(0L) }
-    LaunchedEffect(recordState.startedAt, recording) {
-        while (recording) {
-            elapsedSeconds = (SystemClock.elapsedRealtime() - recordState.startedAt) / 1000
+    //录制时长（不含暂停），每半秒刷新
+    var elapsedMs by remember { mutableLongStateOf(0L) }
+    LaunchedEffect(recordState) {
+        elapsedMs = recordState.elapsedMs(SystemClock.elapsedRealtime())
+        while (recording && !paused) {
             kotlinx.coroutines.delay(500)
+            elapsedMs = recordState.elapsedMs(SystemClock.elapsedRealtime())
         }
-        elapsedSeconds = 0L
     }
 
     val captureLauncher = rememberLauncherForActivityResult(
@@ -509,7 +512,8 @@ private fun GameRecordPage(
                 context = context,
                 resultCode = result.resultCode,
                 data = data,
-                recordAudio = AllSettings.recordMicrophone.state,
+                recordMic = AllSettings.recordMicrophone.state,
+                recordGameAudio = AllSettings.recordGameAudio.state && gameAudioSupported,
                 bitrateMbps = AllSettings.recordBitrateMbps.state,
                 highFps = AllSettings.recordHighFps.state
             )
@@ -525,15 +529,17 @@ private fun GameRecordPage(
         captureLauncher.launch(manager.createScreenCaptureIntent())
     }
 
-    //麦克风权限无论是否授予都继续录制：被拒绝时服务会自动退回仅录制画面
+    //麦克风权限无论是否授予都继续录制：被拒绝时服务会自动退回仅录制画面（游戏声音同样需要该权限）
     val micPermissionLauncher = rememberLauncherForActivityResult(
         ActivityResultContracts.RequestPermission()
     ) { requestCapture() }
 
     fun startRecording() {
-        val needMic = AllSettings.recordMicrophone.state &&
+        val needAudio = AllSettings.recordMicrophone.state ||
+                (AllSettings.recordGameAudio.state && gameAudioSupported)
+        val needPermission = needAudio &&
                 ContextCompat.checkSelfPermission(context, Manifest.permission.RECORD_AUDIO) != PackageManager.PERMISSION_GRANTED
-        if (needMic) micPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO) else requestCapture()
+        if (needPermission) micPermissionLauncher.launch(Manifest.permission.RECORD_AUDIO) else requestCapture()
     }
 
     val listState = rememberLazyListState()
@@ -549,25 +555,60 @@ private fun GameRecordPage(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 4.dp, vertical = 2.dp),
-                text = if (recording) {
-                    stringResource(R.string.record_status_recording, formatElapsed(elapsedSeconds))
-                } else {
-                    stringResource(R.string.record_status_idle)
+                text = when {
+                    paused -> stringResource(R.string.record_status_paused, formatElapsed(elapsedMs / 1000))
+                    recording -> stringResource(R.string.record_status_recording, formatElapsed(elapsedMs / 1000))
+                    else -> stringResource(R.string.record_status_idle)
                 },
                 style = MaterialTheme.typography.bodyMedium,
                 color = if (recording) MaterialTheme.colorScheme.primary else contentColor
             )
         }
-        //开始 / 停止
+        if (!recording) {
+            //开始
+            item {
+                MenuTextButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = stringResource(R.string.record_start),
+                    onClick = { startRecording() },
+                    color = color,
+                    contentColor = contentColor,
+                )
+            }
+        } else {
+            //暂停 / 继续
+            item {
+                MenuTextButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = stringResource(if (paused) R.string.record_resume else R.string.record_pause),
+                    onClick = {
+                        if (paused) ScreenRecordService.resume(context) else ScreenRecordService.pause(context)
+                    },
+                    color = color,
+                    contentColor = contentColor,
+                )
+            }
+            //停止并保存
+            item {
+                MenuTextButton(
+                    modifier = Modifier.fillMaxWidth(),
+                    text = stringResource(R.string.record_stop),
+                    onClick = { ScreenRecordService.stop(context) },
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.3f),
+                    contentColor = contentColor,
+                )
+            }
+        }
+        //游戏声音
         item {
-            MenuTextButton(
+            MenuSwitchButton(
                 modifier = Modifier.fillMaxWidth(),
-                text = stringResource(if (recording) R.string.record_stop else R.string.record_start),
-                onClick = {
-                    if (recording) ScreenRecordService.stop(context) else startRecording()
-                },
-                color = if (recording) MaterialTheme.colorScheme.primary.copy(alpha = 0.3f) else color,
+                text = stringResource(R.string.record_option_game_audio),
+                switch = AllSettings.recordGameAudio.state && gameAudioSupported,
+                onSwitch = { AllSettings.recordGameAudio.save(it) },
+                color = color,
                 contentColor = contentColor,
+                enabled = !recording && gameAudioSupported
             )
         }
         //麦克风
@@ -614,7 +655,9 @@ private fun GameRecordPage(
                 modifier = Modifier
                     .fillMaxWidth()
                     .padding(horizontal = 4.dp),
-                text = stringResource(R.string.record_option_microphone_summary),
+                text = stringResource(
+                    if (gameAudioSupported) R.string.record_option_audio_summary else R.string.record_option_audio_summary_legacy
+                ),
                 style = MaterialTheme.typography.labelSmall,
                 color = contentColor.copy(alpha = 0.7f)
             )

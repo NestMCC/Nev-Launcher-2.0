@@ -1561,7 +1561,12 @@
     <string name="record_status_idle">Not recording. Your video will be saved to Movies/NEV Launcher.</string>
     <string name="record_status_recording">Recording… %1$s</string>
     <string name="record_option_microphone">Record microphone</string>
-    <string name="record_option_microphone_summary">Game sound is not captured, only the microphone.</string>
+    <string name="record_pause">Pause</string>
+    <string name="record_resume">Resume</string>
+    <string name="record_status_paused">Paused · %1$s</string>
+    <string name="record_option_game_audio">Record game sound</string>
+    <string name="record_option_audio_summary">Game sound and microphone are mixed into the video. Audio recording needs the microphone permission.</string>
+    <string name="record_option_audio_summary_legacy">Recording game sound needs Android 10 or newer. Only the microphone can be recorded on this device.</string>
     <string name="record_option_60fps">60 FPS</string>
     <string name="record_option_bitrate">Video bitrate</string>
     <string name="record_option_locked_hint">Settings can only be changed while not recording.</string>
@@ -1571,6 +1576,9 @@
     <string name="record_toast_permission_denied">Screen capture permission was not granted</string>
     <string name="notification_record_service_name">Screen Recording Service</string>
     <string name="notification_record_title">Recording the game screen</string>
+    <string name="notification_record_paused">Recording paused</string>
+    <string name="notification_record_pause">Pause</string>
+    <string name="notification_record_resume">Resume</string>
     <string name="notification_record_stop">Stop</string>
     <string name="control_editor_style_presets">Style presets</string>
     <string name="control_editor_style_presets_hint">Tap a preset to add it to your styles</string>
