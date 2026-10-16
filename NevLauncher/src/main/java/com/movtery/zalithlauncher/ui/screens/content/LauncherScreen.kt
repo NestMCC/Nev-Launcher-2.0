@@ -190,8 +190,9 @@ fun LauncherScreen(
                 }
             }
 
-            // Nev Launcher: di layar pendek, panel kanan tidak dipakai lagi (akun pindah ke banner)
-            val isActionMenuTaller = maxHeight >= 600.dp
+            // Nev Launcher: di layar pendek atau sempit, panel kanan tidak dipakai lagi (akun pindah ke banner)
+            // sehingga konten Beranda mendapat seluruh lebar yang tersedia
+            val isActionMenuTaller = maxHeight >= 600.dp && maxWidth >= 700.dp
 
             // 内容区域
             Row(modifier = Modifier.fillMaxSize()) {

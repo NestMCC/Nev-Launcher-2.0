@@ -40,6 +40,7 @@ import androidx.compose.animation.slideOutVertically
 import androidx.compose.foundation.clickable
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
+import androidx.compose.foundation.layout.BoxWithConstraints
 import androidx.compose.foundation.layout.Column
 import androidx.compose.foundation.layout.PaddingValues
 import androidx.compose.foundation.layout.Row
@@ -51,6 +52,7 @@ import androidx.compose.foundation.layout.height
 import androidx.compose.foundation.layout.padding
 import androidx.compose.foundation.layout.size
 import androidx.compose.foundation.layout.width
+import androidx.compose.foundation.layout.widthIn
 import androidx.compose.foundation.lazy.LazyColumn
 import androidx.compose.foundation.lazy.items
 import androidx.compose.material3.CardDefaults
@@ -75,11 +77,14 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
 import androidx.compose.ui.text.TextStyle
+import androidx.compose.ui.unit.Dp
 import androidx.compose.ui.unit.LayoutDirection
+import androidx.compose.ui.unit.TextUnit
 import androidx.compose.ui.unit.dp
 import androidx.constraintlayout.compose.ConstraintLayout
 import androidx.lifecycle.compose.collectAsStateWithLifecycle
@@ -182,6 +187,9 @@ fun MainScreen(
     val glowPrimary = MaterialTheme.colorScheme.primary
     val glowSecondary = MaterialTheme.colorScheme.secondary
 
+    // Nev Launcher: bilah atas dipadatkan di layar yang sangat pendek agar ruang konten tidak habis
+    val topBarHeight = if (LocalConfiguration.current.screenHeightDp < 360) 32.dp else 40.dp
+
     Surface(
         modifier = Modifier.fillMaxSize(),
         color = backgroundColor,
@@ -215,7 +223,7 @@ fun MainScreen(
             TopBar(
                 modifier = Modifier
                     .fillMaxWidth()
-                    .height(40.dp),
+                    .height(topBarHeight),
                 mainScreenKey = mainScreenKey,
                 inLauncherScreen = inLauncherScreen,
                 taskRunning = tasks.isEmpty(),
@@ -315,6 +323,8 @@ fun MainScreen(
                     isExpanded = isTaskMenuExpanded,
                     modifier = Modifier
                         .fillMaxHeight()
+                        // lebar minimum agar teks tugas tetap terbaca di layar sempit
+                        .widthIn(min = 240.dp)
                         .fillMaxWidth(0.3f)
                         .align(Alignment.CenterStart)
                         .padding(all = 6.dp)
@@ -898,6 +908,7 @@ private fun TaskItem(
  */
 @Composable
 private fun NevBrandTitle() {
+    val shortScreen = LocalConfiguration.current.screenHeightDp < 360
     Row(
         verticalAlignment = Alignment.CenterVertically,
         horizontalArrangement = Arrangement.spacedBy(8.dp)
@@ -905,7 +916,7 @@ private fun NevBrandTitle() {
         Image(
             painter = painterResource(R.drawable.img_launcher),
             contentDescription = null,
-            modifier = Modifier.size(30.dp)
+            modifier = Modifier.size(if (shortScreen) 24.dp else 30.dp)
         )
         Column(verticalArrangement = Arrangement.Center) {
             Text(
@@ -939,6 +950,57 @@ private fun NevBrandTitle() {
 /**
  * Nev Launcher: sidebar kiri berisi menu (Beranda, File, Multiplayer, Unduh, Pengaturan)
  */
+/**
+ * Ukuran item sidebar yang menyesuaikan tinggi/lebar layar.
+ */
+private data class NevRailMetrics(
+    val railWidth: Dp,
+    val iconSize: Dp,
+    val itemVerticalPadding: Dp,
+    val itemGap: Dp,
+    val labelSize: TextUnit,
+    val labelLineHeight: TextUnit,
+    val spread: Boolean
+)
+
+private const val NevRailItemCount = 6
+
+private fun nevRailMetrics(screenWidth: Dp, availableHeight: Dp): NevRailMetrics {
+    // Tinggi yang dibutuhkan 6 item dalam ukuran nyaman (ikon 22dp + label + padding)
+    val comfortableNeeded = 56.dp * NevRailItemCount + 6.dp * (NevRailItemCount - 1) + 8.dp
+    return when {
+        // Layar pendek (HP landscape): rapatkan agar semua menu muat tanpa digulir
+        availableHeight < comfortableNeeded -> NevRailMetrics(
+            railWidth = 72.dp,
+            iconSize = 20.dp,
+            itemVerticalPadding = 4.dp,
+            itemGap = 2.dp,
+            labelSize = 10.sp,
+            labelLineHeight = 12.sp,
+            spread = true
+        )
+        // Layar lebar & tinggi (tablet): sedikit lebih besar
+        screenWidth >= 960.dp && availableHeight >= 520.dp -> NevRailMetrics(
+            railWidth = 88.dp,
+            iconSize = 26.dp,
+            itemVerticalPadding = 10.dp,
+            itemGap = 8.dp,
+            labelSize = 12.sp,
+            labelLineHeight = 16.sp,
+            spread = false
+        )
+        else -> NevRailMetrics(
+            railWidth = 76.dp,
+            iconSize = 22.dp,
+            itemVerticalPadding = 8.dp,
+            itemGap = 6.dp,
+            labelSize = 11.sp,
+            labelLineHeight = 16.sp,
+            spread = false
+        )
+    }
+}
+
 @Composable
 private fun NevSideRail(
     inLauncherScreen: Boolean,
@@ -954,51 +1016,64 @@ private fun NevSideRail(
     toSettingsScreen: () -> Unit,
     modifier: Modifier = Modifier
 ) {
-    Column(
-        modifier = modifier
-            .width(76.dp)
-            .fillMaxHeight()
-            .verticalScroll(rememberScrollState())
-            .padding(horizontal = 6.dp, vertical = 4.dp),
-        verticalArrangement = Arrangement.spacedBy(6.dp),
-        horizontalAlignment = Alignment.CenterHorizontally
-    ) {
-        NevRailItem(
-            selected = inLauncherScreen,
-            painter = painterResource(R.drawable.ic_home_filled),
-            text = "Beranda",
-            onClick = { if (!inLauncherScreen) toMainScreen() }
-        )
-        NevRailItem(
-            selected = inServerScreen,
-            painter = painterResource(R.drawable.ic_dns_outlined),
-            text = "Server",
-            onClick = { if (!inServerScreen) toServerScreen() }
-        )
-        NevRailItem(
-            selected = false,
-            painter = painterResource(R.drawable.ic_folder_filled),
-            text = "File",
-            onClick = openFileManager
-        )
-        NevRailItem(
-            selected = inMultiplayerScreen,
-            painter = painterResource(R.drawable.ic_group_filled),
-            text = stringResource(R.string.terracotta),
-            onClick = { if (!inMultiplayerScreen) toMultiplayerScreen() }
-        )
-        NevRailItem(
-            selected = inDownloadScreen,
-            painter = painterResource(R.drawable.ic_download_2_filled),
-            text = stringResource(R.string.generic_download),
-            onClick = { if (!inDownloadScreen) toDownloadScreen() }
-        )
-        NevRailItem(
-            selected = inSettingsScreen,
-            painter = painterResource(R.drawable.ic_settings_filled),
-            text = stringResource(R.string.generic_setting),
-            onClick = { if (!inSettingsScreen) toSettingsScreen() }
-        )
+    BoxWithConstraints(modifier = modifier.fillMaxHeight()) {
+        // maxWidth = lebar jendela (rail adalah anak pertama Row), maxHeight = tinggi area di bawah bilah atas
+        val metrics = nevRailMetrics(screenWidth = maxWidth, availableHeight = maxHeight)
+
+        Column(
+            modifier = Modifier
+                .width(metrics.railWidth)
+                .fillMaxHeight()
+                // Cadangan untuk layar yang sangat pendek: tetap bisa digulir, tidak ada menu yang hilang
+                .verticalScroll(rememberScrollState())
+                .padding(horizontal = 4.dp, vertical = 4.dp),
+            verticalArrangement = if (metrics.spread) Arrangement.SpaceEvenly
+            else Arrangement.spacedBy(metrics.itemGap),
+            horizontalAlignment = Alignment.CenterHorizontally
+        ) {
+            NevRailItem(
+                selected = inLauncherScreen,
+                painter = painterResource(R.drawable.ic_home_filled),
+                text = "Beranda",
+                metrics = metrics,
+                onClick = { if (!inLauncherScreen) toMainScreen() }
+            )
+            NevRailItem(
+                selected = inServerScreen,
+                painter = painterResource(R.drawable.ic_dns_outlined),
+                text = "Server",
+                metrics = metrics,
+                onClick = { if (!inServerScreen) toServerScreen() }
+            )
+            NevRailItem(
+                selected = false,
+                painter = painterResource(R.drawable.ic_folder_filled),
+                text = "File",
+                metrics = metrics,
+                onClick = openFileManager
+            )
+            NevRailItem(
+                selected = inMultiplayerScreen,
+                painter = painterResource(R.drawable.ic_group_filled),
+                text = stringResource(R.string.terracotta),
+                metrics = metrics,
+                onClick = { if (!inMultiplayerScreen) toMultiplayerScreen() }
+            )
+            NevRailItem(
+                selected = inDownloadScreen,
+                painter = painterResource(R.drawable.ic_download_2_filled),
+                text = stringResource(R.string.generic_download),
+                metrics = metrics,
+                onClick = { if (!inDownloadScreen) toDownloadScreen() }
+            )
+            NevRailItem(
+                selected = inSettingsScreen,
+                painter = painterResource(R.drawable.ic_settings_filled),
+                text = stringResource(R.string.generic_setting),
+                metrics = metrics,
+                onClick = { if (!inSettingsScreen) toSettingsScreen() }
+            )
+        }
     }
 }
 
@@ -1007,6 +1082,7 @@ private fun NevRailItem(
     selected: Boolean,
     painter: Painter,
     text: String,
+    metrics: NevRailMetrics,
     onClick: () -> Unit
 ) {
     val selectedBrush = Brush.horizontalGradient(
@@ -1022,21 +1098,25 @@ private fun NevRailItem(
             .clip(MaterialTheme.shapes.large)
             .then(if (selected) Modifier.background(selectedBrush) else Modifier)
             .clickable(onClick = onClick)
-            .padding(vertical = 8.dp),
+            .padding(vertical = metrics.itemVerticalPadding),
         horizontalAlignment = Alignment.CenterHorizontally,
         verticalArrangement = Arrangement.spacedBy(2.dp)
     ) {
         Icon(
-            modifier = Modifier.size(22.dp),
+            modifier = Modifier.size(metrics.iconSize),
             painter = painter,
             contentDescription = text,
             tint = tint
         )
         Text(
             text = text,
-            style = MaterialTheme.typography.labelSmall,
+            style = MaterialTheme.typography.labelSmall.copy(
+                fontSize = metrics.labelSize,
+                lineHeight = metrics.labelLineHeight
+            ),
             color = tint,
             maxLines = 1,
+            softWrap = false,
             overflow = TextOverflow.Ellipsis
         )
     }

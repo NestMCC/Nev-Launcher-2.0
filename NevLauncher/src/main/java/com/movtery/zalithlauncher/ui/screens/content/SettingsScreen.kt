@@ -64,6 +64,7 @@ import com.movtery.zalithlauncher.ui.screens.NormalNavKey
 import com.movtery.zalithlauncher.ui.screens.TitledNavKey
 import com.movtery.zalithlauncher.ui.screens.content.elements.CategoryIcon
 import com.movtery.zalithlauncher.ui.screens.content.elements.CategoryItem
+import com.movtery.zalithlauncher.ui.screens.content.elements.NevCategoryTabs
 import com.movtery.zalithlauncher.ui.screens.content.settings.AboutInfoScreen
 import com.movtery.zalithlauncher.ui.screens.content.settings.ControlManageScreen
 import com.movtery.zalithlauncher.ui.screens.content.settings.ControlSettingsScreen
@@ -142,49 +143,13 @@ private fun TabMenu(
         isHorizontal = false
     )
 
-    val scrollState = rememberScrollState()
-    Row(
-        modifier = modifier
-            .offset { IntOffset(x = 0, y = yOffset.roundToPx()) }
-            .horizontalScroll(scrollState)
-            .padding(horizontal = 12.dp, vertical = 6.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = Arrangement.spacedBy(8.dp)
-    ) {
-        settingItems.forEach { item ->
-            if (item.division) {
-                VerticalDivider(
-                    modifier = Modifier
-                        .height(24.dp)
-                        .alpha(0.4f),
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
-
-            val selected = settingsScreenKey == item.key
-            val bg = if (selected) MaterialTheme.colorScheme.primary else MaterialTheme.colorScheme.surfaceBright
-            val fg = if (selected) MaterialTheme.colorScheme.onPrimary else MaterialTheme.colorScheme.onSurface
-            Row(
-                modifier = Modifier
-                    .clip(RoundedCornerShape(50))
-                    .background(bg)
-                    .clickable { navigateTo(item.key) }
-                    .padding(horizontal = 14.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(6.dp)
-            ) {
-                CompositionLocalProvider(LocalContentColor provides fg) {
-                    item.icon()
-                    Text(
-                        text = stringResource(item.textRes),
-                        maxLines = 1,
-                        color = fg,
-                        style = MaterialTheme.typography.labelLarge
-                    )
-                }
-            }
-        }
-    }
+    // Nev Launcher: semua tab selalu terlihat (membungkus ke baris berikutnya bila tidak muat)
+    NevCategoryTabs(
+        modifier = modifier.offset { IntOffset(x = 0, y = yOffset.roundToPx()) },
+        items = settingItems,
+        isSelected = { item -> settingsScreenKey == item.key },
+        onClick = { item -> navigateTo(item.key) }
+    )
 }
 
 @Composable

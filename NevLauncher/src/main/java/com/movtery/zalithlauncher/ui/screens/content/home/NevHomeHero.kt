@@ -19,6 +19,10 @@
 package com.movtery.zalithlauncher.ui.screens.content.home
 
 import androidx.compose.foundation.layout.widthIn
+import androidx.compose.foundation.layout.heightIn
+import androidx.compose.foundation.layout.BoxWithConstraints
+import androidx.compose.foundation.layout.ExperimentalLayoutApi
+import androidx.compose.foundation.layout.FlowRow
 import android.net.Uri
 import androidx.compose.runtime.getValue
 import androidx.compose.runtime.mutableStateOf
@@ -74,7 +78,11 @@ import com.movtery.zalithlauncher.ui.components.nevCardBorder
 
 /**
  * Nev Launcher: banner sambutan di layar utama (merah-gelap, logo N, tombol Main Sekarang)
+ *
+ * Adaptif: tinggi mengikuti isi (minimum menyesuaikan tinggi layar), logo hanya tampil bila lebar cukup,
+ * dan kontrol (Main Sekarang, versi, akun) membungkus ke baris berikutnya di layar sempit.
  */
+@OptIn(ExperimentalLayoutApi::class)
 @Composable
 fun NevHeroBanner(
     onPlay: () -> Unit,
@@ -93,10 +101,13 @@ fun NevHeroBanner(
     val bannerVersion = NevBannerStore.version.intValue
     val hasMedia = remember(bannerVersion) { NevBannerStore.exists(context) }
 
-    Box(
+    // Tinggi minimum banner menyesuaikan tinggi layar; tinggi sebenarnya mengikuti isi (bisa tumbuh saat kontrol membungkus)
+    val shortScreen = androidx.compose.ui.platform.LocalConfiguration.current.screenHeightDp < 360
+
+    BoxWithConstraints(
         modifier = modifier
             .fillMaxWidth()
-            .height(152.dp)
+            .heightIn(min = if (shortScreen) 112.dp else 152.dp)
             .clip(shape)
             .then(
                 if (hasMedia) {
@@ -118,14 +129,22 @@ fun NevHeroBanner(
                 }
             )
     ) {
-        if (!hasMedia) {
+        // Tingkat ukuran berdasarkan lebar banner
+        val narrow = maxWidth < 440.dp
+        val showLogo = !hasMedia && maxWidth >= 520.dp
+        val logoSize = if (maxWidth >= 720.dp && !shortScreen) 84.dp else 64.dp
+        val textStart = if (narrow) 14.dp else 22.dp
+        // ruang di kanan: logo (bila tampil) atau tombol edit banner
+        val textEnd = if (showLogo) logoSize + 32.dp else 52.dp
+
+        if (showLogo) {
             Image(
                 painter = painterResource(R.drawable.img_launcher),
                 contentDescription = null,
                 modifier = Modifier
                     .align(Alignment.CenterEnd)
                     .padding(end = 16.dp)
-                    .size(84.dp)
+                    .size(logoSize)
                     .alpha(0.92f)
             )
         }
@@ -173,7 +192,12 @@ fun NevHeroBanner(
         Column(
             modifier = Modifier
                 .align(Alignment.CenterStart)
-                .padding(start = 22.dp, end = 110.dp),
+                .padding(
+                    start = textStart,
+                    end = textEnd,
+                    top = if (shortScreen) 10.dp else 14.dp,
+                    bottom = if (shortScreen) 10.dp else 14.dp
+                ),
             verticalArrangement = Arrangement.spacedBy(2.dp)
         ) {
             Text(
@@ -186,21 +210,29 @@ fun NevHeroBanner(
                     withStyle(SpanStyle(color = primary)) { append("NEV ") }
                     withStyle(SpanStyle(color = gold)) { append(BuildKeys.LAUNCHER_NAME.removePrefix("Nev ").uppercase()) }
                 },
-                style = MaterialTheme.typography.headlineSmall.copy(fontWeight = FontWeight.ExtraBold)
-            )
-            Text(
-                text = "Launcher Minecraft Java untuk pengalaman bermain yang maksimal.",
-                style = MaterialTheme.typography.bodySmall,
-                color = Color.White.copy(alpha = 0.85f),
+                style = (if (shortScreen || narrow) MaterialTheme.typography.titleLarge
+                else MaterialTheme.typography.headlineSmall).copy(fontWeight = FontWeight.ExtraBold),
                 maxLines = 1
             )
-            Spacer(modifier = Modifier.height(6.dp))
-            Row(
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = Arrangement.spacedBy(8.dp)
+            // Deskripsi disembunyikan di layar sangat pendek agar tombol tetap terlihat; di layar sempit boleh 2 baris
+            if (!shortScreen) {
+                Text(
+                    text = "Launcher Minecraft Java untuk pengalaman bermain yang maksimal.",
+                    style = MaterialTheme.typography.bodySmall,
+                    color = Color.White.copy(alpha = 0.85f),
+                    maxLines = if (narrow) 2 else 1,
+                    overflow = androidx.compose.ui.text.style.TextOverflow.Ellipsis
+                )
+            }
+            Spacer(modifier = Modifier.height(if (shortScreen) 2.dp else 6.dp))
+            // FlowRow: semua kontrol tetap tampil, otomatis turun ke baris berikutnya bila lebar tidak cukup
+            FlowRow(
+                horizontalArrangement = Arrangement.spacedBy(8.dp),
+                verticalArrangement = Arrangement.spacedBy(6.dp)
             ) {
                 // Tombol Main Sekarang = tombol luncurkan (menggantikan tombol Luncurkan di panel kanan)
                 ScalingActionButton(
+                    modifier = Modifier.align(Alignment.CenterVertically),
                     onClick = onPlay,
                     shape = RoundedCornerShape(percent = 50),
                     colors = ButtonDefaults.buttonColors(
@@ -235,8 +267,8 @@ fun NevHeroBanner(
                 // Pemilih versi (dipindah dari menu Luncurkan)
                 Box(
                     modifier = Modifier
-                        .weight(1f, fill = false)
-                        .widthIn(max = 200.dp)
+                        .align(Alignment.CenterVertically)
+                        .widthIn(max = if (narrow) 170.dp else 210.dp)
                         .clip(MaterialTheme.shapes.large)
                         .background(Color.Black.copy(alpha = 0.28f))
                 ) {
@@ -244,7 +276,11 @@ fun NevHeroBanner(
                 }
 
                 // Menu akun (Tambahkan Akun / akun aktif) di samping pemilih versi
-                Box(modifier = Modifier.widthIn(max = 170.dp)) {
+                Box(
+                    modifier = Modifier
+                        .align(Alignment.CenterVertically)
+                        .widthIn(max = if (narrow) 140.dp else 170.dp)
+                ) {
                     accountChip()
                 }
             }

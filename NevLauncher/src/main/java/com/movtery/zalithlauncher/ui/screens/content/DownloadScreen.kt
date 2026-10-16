@@ -72,6 +72,7 @@ import com.movtery.zalithlauncher.ui.screens.content.download.DownloadShadersScr
 import com.movtery.zalithlauncher.ui.screens.content.download.assets.search.SearchIdScreen
 import com.movtery.zalithlauncher.ui.screens.content.elements.CategoryIcon
 import com.movtery.zalithlauncher.ui.screens.content.elements.CategoryItem
+import com.movtery.zalithlauncher.ui.screens.content.elements.NevCategoryTabs
 import com.movtery.zalithlauncher.ui.screens.navigateOnce
 import com.movtery.zalithlauncher.ui.screens.onBack
 import com.movtery.zalithlauncher.ui.screens.rememberTransitionSpec
@@ -185,52 +186,13 @@ private fun TabMenu(
         isHorizontal = false
     )
 
-    val scrollState = rememberScrollState()
-    androidx.compose.foundation.layout.Row(
-        modifier = modifier
-            .offset { IntOffset(x = 0, y = yOffset.roundToPx()) }
-            .horizontalScroll(scrollState)
-            .padding(horizontal = 12.dp, vertical = 6.dp),
-        verticalAlignment = Alignment.CenterVertically,
-        horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(8.dp)
-    ) {
-        downloadsList.forEach { item ->
-            if (item.division) {
-                androidx.compose.material3.VerticalDivider(
-                    modifier = Modifier
-                        .height(24.dp)
-                        .alpha(0.4f),
-                    color = MaterialTheme.colorScheme.onSurface
-                )
-            }
-
-            val selected = backScreenViewModel.downloadScreen.currentKey == item.key
-            val scheme = MaterialTheme.colorScheme
-            val bg = if (selected) scheme.primary else scheme.surfaceBright
-            val fg = if (selected) scheme.onPrimary else scheme.onSurface
-            androidx.compose.foundation.layout.Row(
-                modifier = Modifier
-                    .clip(androidx.compose.foundation.shape.RoundedCornerShape(50))
-                    .background(bg)
-                    .clickable { backStack.navigateOnce(item.key) }
-                    .padding(horizontal = 14.dp, vertical = 8.dp),
-                verticalAlignment = Alignment.CenterVertically,
-                horizontalArrangement = androidx.compose.foundation.layout.Arrangement.spacedBy(6.dp)
-            ) {
-                androidx.compose.runtime.CompositionLocalProvider(
-                    androidx.compose.material3.LocalContentColor provides fg
-                ) {
-                    item.icon()
-                    Text(
-                        text = stringResource(item.textRes),
-                        maxLines = 1,
-                        color = fg,
-                        style = MaterialTheme.typography.labelLarge
-                    )
-                }
-            }
-        }
-    }
+    // Nev Launcher: semua tab selalu terlihat (membungkus ke baris berikutnya bila tidak muat)
+    NevCategoryTabs(
+        modifier = modifier.offset { IntOffset(x = 0, y = yOffset.roundToPx()) },
+        items = downloadsList,
+        isSelected = { item -> backScreenViewModel.downloadScreen.currentKey == item.key },
+        onClick = { item -> backStack.navigateOnce(item.key) }
+    )
 }
 
 @Composable
