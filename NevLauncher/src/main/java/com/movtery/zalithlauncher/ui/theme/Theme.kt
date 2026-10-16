@@ -702,7 +702,7 @@ fun ZalithLauncherTheme(
             val autoScale = compactAutoScale(shortSideDp)
             val scale = (autoScale * uiScaleSetting / 100f).coerceIn(MIN_UI_SCALE, MAX_UI_SCALE)
             //teks hanya sedikit dikecilkan dibanding elemen lain supaya tetap mudah dibaca
-            val fontFactor = 1f + (1f - scale) * 0.4f
+            val fontFactor = 1f + (1f - scale) * 0.45f
             Density(
                 density = baseDensity.density * scale,
                 fontScale = baseDensity.fontScale * fontFactor
@@ -725,7 +725,7 @@ fun ZalithLauncherTheme(
     }
 }
 
-private const val MIN_UI_SCALE = 0.62f
+private const val MIN_UI_SCALE = 0.5f
 private const val MAX_UI_SCALE = 1.1f
 
 /**
@@ -733,10 +733,10 @@ private const val MAX_UI_SCALE = 1.1f
  * pengecilan lebih besar agar konten muat lega, layar besar (tablet) hanya sedikit.
  */
 private fun compactAutoScale(shortSideDp: Int): Float = when {
-    shortSideDp < 360 -> 0.80f
-    shortSideDp < 420 -> 0.84f
-    shortSideDp < 520 -> 0.88f
-    shortSideDp < 640 -> 0.92f
-    shortSideDp < 800 -> 0.95f
-    else -> 0.98f
+    shortSideDp < 360 -> 0.66f
+    shortSideDp < 420 -> 0.70f
+    shortSideDp < 520 -> 0.76f
+    shortSideDp < 640 -> 0.82f
+    shortSideDp < 800 -> 0.88f
+    else -> 0.92f
 }

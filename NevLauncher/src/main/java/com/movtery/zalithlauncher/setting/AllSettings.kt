@@ -400,7 +400,7 @@ object AllSettings : SettingsRegistry() {
      * Skala tampilan launcher (persen). 100 = ukuran otomatis yang sudah dipadatkan
      * sesuai ukuran layar; turunkan agar tampilan lebih lega, naikkan agar lebih besar.
      */
-    val launcherUiScale = intSetting("launcherUiScale", 100, 70..110)
+    val launcherUiScale = intSetting("launcherUiScale", 100, 60..110)
 
     /**
      * 持续型节日彩蛋效果
