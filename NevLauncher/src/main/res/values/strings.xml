@@ -1082,6 +1082,8 @@
     <string name="settings_launcher_language">Language</string>
     <string name="settings_launcher_full_screen_title">Fullscreen Mode</string>
     <string name="settings_launcher_full_screen_summary">Make the launcher pages fullscreen, ignoring safe areas like notches and punch-holes</string>
+    <string name="settings_launcher_ui_scale_title">Interface Scale</string>
+    <string name="settings_launcher_ui_scale_summary">Make the launcher interface smaller for a roomier look, or larger for easier reading. The default value is the automatic size for your screen</string>
     <string name="settings_launcher_animate_speed_title">Animation Speed</string>
     <string name="settings_launcher_animate_speed_summary">Adjust the playback speed multiplier for launcher animations</string>
     <string name="settings_launcher_animate_extent_title">Animation Intensity</string>

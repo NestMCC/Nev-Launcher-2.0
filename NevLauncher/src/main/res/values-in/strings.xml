@@ -505,6 +505,8 @@
     <string name="settings_control_mouse_control_mode_slide">Kontrol Geser</string>
     <string name="settings_control_mouse_control_mode_click">Kontrol Sentuh</string>
     <string name="settings_launcher_full_screen_title">Mode Layar Penuh</string>
+    <string name="settings_launcher_ui_scale_title">Skala Tampilan</string>
+    <string name="settings_launcher_ui_scale_summary">Perkecil tampilan agar terlihat lebih luas, atau perbesar agar lebih mudah dibaca. Nilai bawaan adalah ukuran otomatis sesuai layar Anda</string>
     <string name="minecraft_download_downloading_game_files">Mengunduh file\n(%1$d/%2$d, %3$s/%4$s)</string>
     <string name="minecraft_download_failed">Terjadi kesalahan saat mengunduh Minecraft</string>
     <string name="generic_reset">Reset</string>

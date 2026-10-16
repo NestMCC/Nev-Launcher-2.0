@@ -37,7 +37,10 @@ import androidx.compose.runtime.mutableStateOf
 import androidx.compose.runtime.remember
 import androidx.compose.runtime.setValue
 import androidx.compose.ui.graphics.Color
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalContext
+import androidx.compose.ui.platform.LocalDensity
+import androidx.compose.ui.unit.Density
 import com.materialkolor.PaletteStyle
 import com.materialkolor.dynamicColorScheme
 import com.movtery.zalithlauncher.setting.AllSettings
@@ -617,6 +620,7 @@ fun ZalithLauncherTheme(
     dynamicColor: Boolean = true,
     backgroundViewModel: BackgroundViewModel? = null,
     festivals: List<Festival> = emptyList(),
+    compactUi: Boolean = false,
     content: @Composable () -> Unit
 ) {
     val colorTheme = AllSettings.launcherColorTheme.state
@@ -684,7 +688,30 @@ fun ZalithLauncherTheme(
         }
     }
 
+    //Tampilan lebih ringkas: skala kerapatan (density) disesuaikan dengan ukuran layar,
+    //sehingga semua elemen (ikon, kartu, jarak, teks) mengecil secara proporsional
+    //dan ruang kosong terasa lebih luas tanpa menghilangkan satu pun fitur.
+    val baseDensity = LocalDensity.current
+    val configuration = LocalConfiguration.current
+    val uiScaleSetting = AllSettings.launcherUiScale.state
+    val shortSideDp = minOf(configuration.screenWidthDp, configuration.screenHeightDp)
+    val density = remember(compactUi, baseDensity, shortSideDp, uiScaleSetting) {
+        if (!compactUi) {
+            baseDensity
+        } else {
+            val autoScale = compactAutoScale(shortSideDp)
+            val scale = (autoScale * uiScaleSetting / 100f).coerceIn(MIN_UI_SCALE, MAX_UI_SCALE)
+            //teks hanya sedikit dikecilkan dibanding elemen lain supaya tetap mudah dibaca
+            val fontFactor = 1f + (1f - scale) * 0.4f
+            Density(
+                density = baseDensity.density * scale,
+                fontScale = baseDensity.fontScale * fontFactor
+            )
+        }
+    }
+
     CompositionLocalProvider(
+        LocalDensity provides density,
         LocalBackgroundViewModel provides backgroundViewModel,
         LocalFestivals provides festivals
     ) {
@@ -696,4 +723,20 @@ fun ZalithLauncherTheme(
             content = content
         )
     }
+}
+
+private const val MIN_UI_SCALE = 0.62f
+private const val MAX_UI_SCALE = 1.1f
+
+/**
+ * Skala otomatis berdasarkan sisi terpendek layar (dp): layar kecil mendapat
+ * pengecilan lebih besar agar konten muat lega, layar besar (tablet) hanya sedikit.
+ */
+private fun compactAutoScale(shortSideDp: Int): Float = when {
+    shortSideDp < 360 -> 0.80f
+    shortSideDp < 420 -> 0.84f
+    shortSideDp < 520 -> 0.88f
+    shortSideDp < 640 -> 0.92f
+    shortSideDp < 800 -> 0.95f
+    else -> 0.98f
 }

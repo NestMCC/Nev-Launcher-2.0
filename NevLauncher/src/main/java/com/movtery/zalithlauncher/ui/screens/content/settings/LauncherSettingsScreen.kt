@@ -218,6 +218,24 @@ fun LauncherSettingsScreen(
                         }
                     )
 
+                    //Skala tampilan: nilai baru diterapkan saat slider dilepas agar tidak bergeser saat digeser
+                    var uiScaleDraft by remember { mutableStateOf(AllSettings.launcherUiScale.state) }
+                    IntSliderSettingsCard(
+                        modifier = Modifier.fillMaxWidth(),
+                        position = CardPosition.Middle,
+                        value = uiScaleDraft,
+                        title = stringResource(R.string.settings_launcher_ui_scale_title),
+                        summary = stringResource(R.string.settings_launcher_ui_scale_summary),
+                        valueRange = AllSettings.launcherUiScale.floatRange,
+                        suffix = "%",
+                        fineTuningControl = true,
+                        onValueChange = { uiScaleDraft = it },
+                        onValueChangeFinished = {
+                            AllSettings.launcherUiScale.updateState(uiScaleDraft)
+                            AllSettings.launcherUiScale.save(uiScaleDraft)
+                        }
+                    )
+
                     SwitchSettingsCard(
                         modifier = Modifier.fillMaxWidth(),
                         position = CardPosition.Middle,

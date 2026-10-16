@@ -308,7 +308,8 @@ class MainActivity : BaseAppCompatActivity() {
         setContent {
             ZalithLauncherTheme(
                 backgroundViewModel = backgroundViewModel,
-                festivals = festivals
+                festivals = festivals,
+                compactUi = true
             ) {
                 ObserveFullScreenSetting(AllSettings.launcherFullScreen.state)
 
