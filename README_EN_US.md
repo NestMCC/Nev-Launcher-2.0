@@ -1,22 +1,21 @@
-# Zalith Launcher 2
-![Downloads](https://img.shields.io/github/downloads/ZalithLauncher/ZalithLauncher2/total)
-[![Sponsor](https://img.shields.io/badge/sponsor-30363D?logo=GitHub-Sponsors)](https://afdian.com/a/MovTery)
+# NEV Launcher
+[![License: GPL-3.0](https://img.shields.io/badge/License-GPL--3.0-blue.svg)](LICENSE)
+![Platform: Android](https://img.shields.io/badge/Platform-Android-3DDC84?logo=android&logoColor=white)
+![UI: Jetpack Compose](https://img.shields.io/badge/UI-Jetpack%20Compose-4285F4?logo=jetpackcompose&logoColor=white)
 
-[简体中文](README.md) | [繁體中文](README_ZH_TW.md)
-
+[Bahasa Indonesia](README.md) | [繁體中文](README_ZH_TW.md)
 
 > [!IMPORTANT]
-> This project is **completely separate** from [ZalithLauncher](https://github.com/ZalithLauncher/ZalithLauncher).  
+> **NEV Launcher is an unofficial modified version.** It is not affiliated with, endorsed by, or sponsored by Zalith Launcher, PojavLauncher, Mojang Studios, or Microsoft. Minecraft is a trademark of its respective owner.
 
-**Zalith Launcher 2** is a newly designed launcher for **Android devices** tailored for [Minecraft: Java Edition](https://www.minecraft.net/). The project uses [PojavLauncher](https://github.com/PojavLauncherTeam/PojavLauncher/tree/v3_openjdk/app_pojavlauncher/src/main/jni) as its core launching engine and features a modern UI built with **Jetpack Compose** and **Material Design 3**.  
-We are currently building our official website [zalithlauncher.cn](https://zalithlauncher.cn)  
-Additionally, we are aware that a third-party website has been set up using the name “Zalith Launcher”, appearing to be official. Please note: **this site was not created by us**. It exploits the name to display ads for profit. We **do not participate in, endorse, or trust** such content.  
-Please stay vigilant and **protect your personal privacy**!
+**NEV Launcher** is a community launcher for **Android devices** that runs [Minecraft: Java Edition](https://www.minecraft.net/). It is a modified fork of [Zalith Launcher 2](https://github.com/ZalithLauncher/ZalithLauncher2), which uses [PojavLauncher](https://github.com/PojavLauncherTeam/PojavLauncher/tree/v3_openjdk/app_pojavlauncher/src/main/jni) as its core launching engine. The UI is built with **Jetpack Compose** and **Material Design 3**.  
+The project focuses on the mobile experience, UI development, and gradual feature improvements. It is still under development.
 
-## 🌐 Language and Translation Support
+## 📥 Downloads and Issues
 
-We are using the Weblate platform to translate Zalith Launcher 2. You're welcome to join our [Weblate project](https://hosted.weblate.org/projects/zalithlauncher2) and contribute to the translations!  
-Thank you to every language contributor for helping make Zalith Launcher 2 more multilingual and global!
+* Downloads: [GitHub Releases](https://github.com/NestMCC/NevLauncher/releases)
+* Bug reports: [GitHub Issues](https://github.com/NestMCC/NevLauncher/issues). Please include the launcher version or commit, your device model and Android version, the Minecraft version and renderer, steps to reproduce, and relevant logs.
+* Never post passwords, access tokens, authentication codes, or personal data in public issues.
 
 ## 📦 Build Instructions (For Developers)
 
@@ -33,7 +32,7 @@ Thank you to every language contributor for helping make Zalith Launcher 2 more 
 ### Build Steps
 
 ```bash
-git clone git@github.com:ZalithLauncher/ZalithLauncher2.git
+git clone https://github.com/NestMCC/NevLauncher.git
 # Open the project in Android Studio and build
 ```
 
@@ -43,12 +42,20 @@ This project is licensed under the **[GPL-3.0 license](LICENSE)**.
 
 ### Additional Terms (Pursuant to Section 7 of the GPLv3 License)
 
+These terms come from the upstream Zalith Launcher 2 project and apply to this modified version:
+
 1. When distributing a modified version of this program, you must reasonably modify the program's name or version number to distinguish it from the original version. (According to [GPLv3, 7(c)](https://github.com/ZalithLauncher/ZalithLauncher2/blob/969827b/LICENSE#L372-L374))
     - Modified versions **must not include the original program name "ZalithLauncher" or its abbreviation "ZL" in their name, nor use any name that is similar enough to cause confusion with the official name**.
     - All modified versions **must clearly indicate that they are “Unofficial Modified Versions” on the program’s startup screen or main interface**.
     - The application name of the program can be modified in [gradle.properties](./NevLauncher/gradle.properties).
 
 2. You must not remove the copyright notices displayed by the program. (According to [GPLv3, 7(b)](https://github.com/ZalithLauncher/ZalithLauncher2/blob/969827b/LICENSE#L368-L370))
+
+### Credits
+
+* [Zalith Launcher 2](https://github.com/ZalithLauncher/ZalithLauncher2) by MovTery and contributors, the upstream project this launcher is based on.
+* [PojavLauncher](https://github.com/PojavLauncherTeam/PojavLauncher), the launching engine used by the upstream project.
+* The maintainers of the open source libraries listed below. See also [THIRD_PARTY_LICENSES.md](THIRD_PARTY_LICENSES.md) for the ongoing license audit.
 
 ## Open Source Libraries and Licenses
 
