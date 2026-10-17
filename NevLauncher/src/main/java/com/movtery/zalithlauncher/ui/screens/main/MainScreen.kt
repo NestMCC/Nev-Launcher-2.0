@@ -75,6 +75,7 @@ import androidx.compose.ui.draw.drawBehind
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.painter.Painter
+import androidx.compose.ui.platform.LocalConfiguration
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -932,6 +933,20 @@ private fun NevBrandTitle() {
                 maxLines = 1,
                 softWrap = false
             )
+            // Wajib dari syarat GPLv3 7(c) proyek asli: tandai versi modifikasi tidak resmi di antarmuka utama.
+            // Disembunyikan hanya di layar yang sangat pendek agar bilah atas tidak sesak.
+            if (LocalConfiguration.current.screenHeightDp >= 360) {
+                Text(
+                    text = stringResource(R.string.nev_unofficial_modified).uppercase(),
+                    style = MaterialTheme.typography.labelSmall.copy(
+                        fontSize = 7.sp,
+                        letterSpacing = 1.sp
+                    ),
+                    color = MaterialTheme.colorScheme.primary.copy(alpha = 0.85f),
+                    maxLines = 1,
+                    softWrap = false
+                )
+            }
         }
     }
 }
