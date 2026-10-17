@@ -823,6 +823,16 @@
     <string name="game_menu_option_controls_opacity">Opasitas Layout Kontrol</string>
     <string name="account_microsoft_exit_by_user">Anda meninggalkan halaman web, jadi proses login Microsoft telah dibatalkan untuk Anda.</string>
     <string name="cape_name_none">Tidak Ada</string>
+    <string name="account_local_cape">Cape</string>
+    <string name="account_local_cape_current">Cape: %s</string>
+    <string name="account_local_cape_install">Instal Cape</string>
+    <string name="account_local_cape_installed">Cape Terinstal (%d)</string>
+    <string name="account_local_cape_empty">Belum ada cape terinstal. Pakai \"Instal Cape\" untuk menambah file PNG.</string>
+    <string name="account_local_cape_invalid">Gambar cape tidak valid. Pakai PNG dengan proporsi cape, misalnya 64x32.</string>
+    <string name="account_local_cape_install_success">Cape terinstal: %s</string>
+    <string name="account_local_cape_install_failed">Gagal menginstal cape</string>
+    <string name="account_local_cape_applied">Cape diganti ke: %s</string>
+    <string name="account_local_cape_applied_none">Cape dilepas</string>
     <string name="file_invalid_leading_or_trailing_space">Tidak dapat dimulai atau diakhiri dengan spasi!</string>
     <string name="versions_overview_mod_folder">Folder Mod</string>
     <string name="manage_delete_all">Hapus Semua</string>

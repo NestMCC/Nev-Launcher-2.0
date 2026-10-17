@@ -129,6 +129,8 @@ import com.movtery.zalithlauncher.game.account.isLocalAccount
 import com.movtery.zalithlauncher.game.account.isMicrosoftAccount
 import com.movtery.zalithlauncher.game.account.isSkinChangeAllowed
 import com.movtery.zalithlauncher.game.account.wardrobe.EmptyCape
+import com.movtery.zalithlauncher.game.account.wardrobe.LocalCape
+import com.movtery.zalithlauncher.game.account.wardrobe.NoLocalCape
 import com.movtery.zalithlauncher.game.account.wardrobe.SkinModelType
 import com.movtery.zalithlauncher.game.account.wardrobe.capeLocalRes
 import com.movtery.zalithlauncher.game.account.yggdrasil.PlayerProfile
@@ -1313,10 +1315,13 @@ fun ChangeSkinDialog(
     onResetSkin: () -> Unit,
     onApplySkin: (File, SkinModelType) -> Unit,
     onApplyCape: (PlayerProfile.Cape) -> Unit,
-    onFetchCapes: () -> Unit
+    onFetchCapes: () -> Unit,
+    //Nev Launcher: cape lokal untuk akun offline (null = tanpa cape)
+    onApplyLocalCape: (LocalCape?) -> Unit = {}
 ) {
     val context = LocalContext.current
     val playerSkin = remember { PlayerSkin(context) }
+    val localCapeState = rememberLocalCapeUiState(account)
 
     DisposableEffect(Unit) {
         onDispose {
@@ -1465,6 +1470,28 @@ fun ChangeSkinDialog(
                                 }
                             }
 
+                            // Nev Launcher: pratinjau cape lokal akun offline
+                            LaunchedEffect(
+                                pageFinished,
+                                skinState,
+                                localCapeState.selected,
+                                localCapeState.changed
+                            ) {
+                                if (!pageFinished || !account.isLocalAccount()) return@LaunchedEffect
+                                val cape = localCapeState.selected
+                                if (cape == null || cape == NoLocalCape) {
+                                    playerSkin.loadCape(EmptyCape)
+                                } else {
+                                    runCatching {
+                                        cape.file.inputStream().use { stream ->
+                                            playerSkin.loadCape(stream)
+                                        }
+                                    }.onFailure {
+                                        playerSkin.loadCape(EmptyCape)
+                                    }
+                                }
+                            }
+
                             // 独立加载披风：列表就绪前若本地有缓存披风则优先显示，列表加载完或切换时更新
                             LaunchedEffect(pageFinished, currentCapeToLoad, availableCapes) {
                                 if (!pageFinished) return@LaunchedEffect
@@ -1593,6 +1620,11 @@ fun ChangeSkinDialog(
                                 )
                             }
 
+                            //Nev Launcher: akun offline bisa memilih, menginstal, dan melihat daftar cape
+                            if (account.isLocalAccount()) {
+                                LocalCapeSection(state = localCapeState)
+                            }
+
                             //离线账号重置皮肤
                             if (account.isLocalAccount() && account.hasSkinFile && skinState != ChangeSkin.ResetSkin) {
                                 InfoLayoutTextItem(
@@ -1626,7 +1658,7 @@ fun ChangeSkinDialog(
 
                         Button(
                             modifier = Modifier.weight(1f),
-                            enabled = skinState != ChangeSkin.None || capeState != ChangeCape.None,
+                            enabled = skinState != ChangeSkin.None || capeState != ChangeCape.None || localCapeState.changed,
                             onClick = {
                                 when (skinState) {
                                     is ChangeSkin.ChangeSkinData -> {
@@ -1642,6 +1674,10 @@ fun ChangeSkinDialog(
 
                                 if (capeState is ChangeCape.ChangeCapeData) {
                                     onApplyCape(capeState.cape)
+                                }
+
+                                if (localCapeState.changed) {
+                                    onApplyLocalCape(localCapeState.pending)
                                 }
 
                                 onDismissRequest()
@@ -1812,7 +1848,7 @@ private fun getCapeAvatar(
     return null
 }
 
-private fun getCapeAvatar(
+internal fun getCapeAvatar(
     cape: Bitmap,
     size: Dp,
     density: Density

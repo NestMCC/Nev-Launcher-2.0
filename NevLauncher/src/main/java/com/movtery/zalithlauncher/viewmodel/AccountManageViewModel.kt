@@ -41,6 +41,9 @@ import com.movtery.zalithlauncher.game.account.microsoft.MINECRAFT_SERVICES_URL
 import com.movtery.zalithlauncher.game.account.microsoftLogin
 import com.movtery.zalithlauncher.game.account.refreshMicrosoft
 import com.movtery.zalithlauncher.game.account.wardrobe.EmptyCape
+import com.movtery.zalithlauncher.game.account.wardrobe.LocalCape
+import com.movtery.zalithlauncher.game.account.wardrobe.LocalCapeLibrary
+import com.movtery.zalithlauncher.game.account.wardrobe.NoLocalCape
 import com.movtery.zalithlauncher.game.account.wardrobe.SkinModelType
 import com.movtery.zalithlauncher.game.account.wardrobe.capeLocalRes
 import com.movtery.zalithlauncher.game.account.wardrobe.getLocalUUIDWithSkinModel
@@ -140,6 +143,12 @@ sealed interface AccountManageIntent {
     data class ApplyMicrosoftCape(
         val account: Account,
         val cape: PlayerProfile.Cape
+    ) : AccountManageIntent
+
+    /** Nev Launcher: pakai cape dari pustaka cape lokal untuk akun offline (null = tanpa cape) */
+    data class ApplyLocalCape(
+        val account: Account,
+        val cape: LocalCape?
     ) : AccountManageIntent
 
     /** 创建新的离线账号 */
@@ -354,6 +363,7 @@ class AccountManageViewModel @AssistedInject constructor(
             is AccountManageIntent.UploadMicrosoftSkin -> uploadMicrosoftSkin(intent)
             is AccountManageIntent.FetchMicrosoftCapes -> fetchMicrosoftCapes(intent.account)
             is AccountManageIntent.ApplyMicrosoftCape -> applyMicrosoftCape(intent)
+            is AccountManageIntent.ApplyLocalCape -> applyLocalCape(intent.account, intent.cape)
             is AccountManageIntent.CreateLocalAccount -> createLocalAccount(
                 intent.userName,
                 intent.userUUID
@@ -551,6 +561,32 @@ class AccountManageViewModel @AssistedInject constructor(
                             )
                         }
                     }
+                }
+            )
+        )
+    }
+
+    /** Nev Launcher: pakai cape lokal untuk akun offline */
+    private fun applyLocalCape(account: Account, cape: LocalCape?) {
+        TaskSystem.submitTask(
+            Task.runTask(
+                dispatcher = Dispatchers.IO,
+                task = {
+                    LocalCapeLibrary.apply(account, cape)
+                    AccountsManager.refreshWardrobe()
+                    val toast = if (cape == null || cape == NoLocalCape) {
+                        androidText(R.string.account_local_cape_applied_none)
+                    } else {
+                        androidText(R.string.account_local_cape_applied, cape.name)
+                    }
+                    emitToast(toast)
+                },
+                onError = { th ->
+                    AccountsManager.refreshWardrobe()
+                    emitError(
+                        androidText(R.string.generic_error),
+                        androidText(th.getMessageOrToString())
+                    )
                 }
             )
         )

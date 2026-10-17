@@ -580,6 +580,16 @@
     <string name="account_other_login_role_not_found">No role matching the current account was found. Please check on the server you are using to see if this role exists!</string>
     <!--  Cape localization  -->
     <string name="cape_name_none">No Cape</string>
+    <string name="account_local_cape">Cape</string>
+    <string name="account_local_cape_current">Cape: %s</string>
+    <string name="account_local_cape_install">Install Cape</string>
+    <string name="account_local_cape_installed">Installed Capes (%d)</string>
+    <string name="account_local_cape_empty">No capes installed yet. Use \"Install Cape\" to add a PNG file.</string>
+    <string name="account_local_cape_invalid">Invalid cape image. Use a PNG with cape proportions, for example 64x32.</string>
+    <string name="account_local_cape_install_success">Cape installed: %s</string>
+    <string name="account_local_cape_install_failed">Failed to install the cape</string>
+    <string name="account_local_cape_applied">Cape changed to: %s</string>
+    <string name="account_local_cape_applied_none">Cape removed</string>
     <string name="cape_name_migrator">Migrator</string>
     <string name="cape_name_mapmaker">MapMaker</string>
     <string name="cape_name_moderator">Moderator</string>
