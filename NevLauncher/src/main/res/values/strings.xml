@@ -426,6 +426,17 @@
     <string name="game_menu_option_fps_display_mode_chart">Chart</string>
     <string name="game_menu_option_switch_memory">Memory Display</string>
     <string name="game_menu_option_menu_ball_opacity">Menu Overlay Opacity</string>
+    <string name="game_menu_option_hud_scale">Overlay Size</string>
+    <string name="game_menu_option_switch_coordinates">Coordinates (X, Y, Z)</string>
+    <string name="game_menu_option_switch_compass">Compass Direction</string>
+    <string name="game_hud_compass_n">N</string>
+    <string name="game_hud_compass_ne">NE</string>
+    <string name="game_hud_compass_e">E</string>
+    <string name="game_hud_compass_se">SE</string>
+    <string name="game_hud_compass_s">S</string>
+    <string name="game_hud_compass_sw">SW</string>
+    <string name="game_hud_compass_w">W</string>
+    <string name="game_hud_compass_nw">NW</string>
     <string name="game_menu_option_send_keycode">Send Keycode</string>
     <string name="game_menu_option_replacement_control">Replace Control Layout</string>
     <string name="game_menu_option_hotbar_rule">Hotbar Positioning Rule</string>

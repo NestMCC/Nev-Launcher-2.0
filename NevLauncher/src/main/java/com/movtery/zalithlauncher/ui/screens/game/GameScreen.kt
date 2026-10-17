@@ -108,6 +108,7 @@ import com.movtery.zalithlauncher.ui.control.hotbarPercentage
 import com.movtery.zalithlauncher.ui.control.input.TextInputMode
 import com.movtery.zalithlauncher.ui.control.mouse.SwitchableMouseLayout
 import com.movtery.zalithlauncher.ui.screens.game.elements.DraggableGameBall
+import com.movtery.zalithlauncher.ui.screens.game.elements.PlayerPose
 import com.movtery.zalithlauncher.ui.screens.game.elements.ForceCloseOperation
 import com.movtery.zalithlauncher.ui.screens.game.elements.GameMenuSubscreen
 import com.movtery.zalithlauncher.ui.screens.game.elements.GamepadModePromptDialog
@@ -166,6 +167,14 @@ private class GameViewModel(
     var moveOnlyPointers = mutableSetOf<PointerId>()
     /** 鼠标触摸指针处理层占用指针列表 */
     var occupiedPointers = mutableSetOf<PointerId>()
+
+    /** Posisi dan arah pandang pemain, `null` selama belum ada sumber data */
+    var playerPose by mutableStateOf<PlayerPose?>(null)
+        private set
+    /** Perbarui posisi dan arah pandang pemain */
+    fun updatePlayerPose(pose: PlayerPose?) {
+        playerPose = pose
+    }
 
     /** 游戏内帧率状态 */
     var gameFps by mutableIntStateOf(0)
@@ -852,6 +861,10 @@ fun GameScreen(
                     fpsMax = viewModel.fpsMax,
                     fpsMin = viewModel.fpsMin,
                     showMemory = AllSettings.showMemory.state,
+                    scale = AllSettings.hudScale.state / 100f,
+                    showCoordinates = AllSettings.showCoordinates.state,
+                    showCompass = AllSettings.showCompass.state,
+                    playerPose = viewModel.playerPose,
                     opened = viewModel.gameMenuState == MenuState.SHOW,
                     alpha = AllSettings.menuBallOpacity.state / 100f,
                     onClick = {

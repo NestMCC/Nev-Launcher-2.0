@@ -507,6 +507,21 @@ object AllSettings : SettingsRegistry() {
     val showMemory = boolSetting("showMemory", false)
 
     /**
+     * 悬浮窗信息的整体大小（百分比）
+     */
+    val hudScale = intSetting("hudScale", 100, 60..200)
+
+    /**
+     * 在游戏菜单悬浮窗上显示坐标（X、Y、Z）
+     */
+    val showCoordinates = boolSetting("showCoordinates", false)
+
+    /**
+     * 在游戏菜单悬浮窗上显示朝向（arah mata angin）
+     */
+    val showCompass = boolSetting("showCompass", false)
+
+    /**
      * 在游戏画面上展示菜单悬浮窗
      */
     val showMenuBall = boolSetting("showMenuBall", true)

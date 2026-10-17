@@ -493,6 +493,49 @@ private fun GameDisplayPage(
                 enabled = AllSettings.showMenuBall.state
             )
         }
+        //koordinat X, Y, Z
+        item {
+            MenuSwitchButton(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(R.string.game_menu_option_switch_coordinates),
+                switch = AllSettings.showCoordinates.state,
+                onSwitch = { AllSettings.showCoordinates.save(it) },
+                color = color,
+                contentColor = contentColor,
+                enabled = AllSettings.showMenuBall.state
+            )
+        }
+        //arah mata angin
+        item {
+            MenuSwitchButton(
+                modifier = Modifier.fillMaxWidth(),
+                text = stringResource(R.string.game_menu_option_switch_compass),
+                switch = AllSettings.showCompass.state,
+                onSwitch = { AllSettings.showCompass.save(it) },
+                color = color,
+                contentColor = contentColor,
+                enabled = AllSettings.showMenuBall.state
+            )
+        }
+        //ukuran overlay (besar / kecil)
+        item {
+            MenuSliderLayout(
+                modifier = Modifier.fillMaxWidth(),
+                title = stringResource(R.string.game_menu_option_hud_scale),
+                value = AllSettings.hudScale.state,
+                valueRange = AllSettings.hudScale.floatRange,
+                onValueChange = { value ->
+                    AllSettings.hudScale.updateState(value)
+                },
+                onValueChangeFinished = { value ->
+                    AllSettings.hudScale.save(value)
+                },
+                suffix = "%",
+                color = color,
+                contentColor = contentColor,
+                enabled = AllSettings.showMenuBall.state
+            )
+        }
         //请求最高刷新率
         item {
             MenuSwitchButton(
