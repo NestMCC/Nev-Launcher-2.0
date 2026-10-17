@@ -492,6 +492,11 @@ object AllSettings : SettingsRegistry() {
     val launcherTaskMenuExpanded = boolSetting("launcherTaskMenuExpanded", true)
 
     /**
+     * Ukuran tampilan (GUI) launcher dalam persen
+     */
+    val launcherGuiScale = intSetting("launcherGuiScale", 100, 70..150)
+
+    /**
      * 在游戏菜单悬浮窗上显示帧率
      */
     val showFPS = boolSetting("showFPS", true)

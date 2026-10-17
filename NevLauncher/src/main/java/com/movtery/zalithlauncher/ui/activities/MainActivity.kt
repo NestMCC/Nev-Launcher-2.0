@@ -75,7 +75,7 @@ import com.movtery.zalithlauncher.ui.screens.main.MainScreen
 import com.movtery.zalithlauncher.ui.screens.main.crashlogs.LogShareMenu
 import com.movtery.zalithlauncher.ui.screens.main.crashlogs.LogShareMenuOperation
 import com.movtery.zalithlauncher.ui.screens.main.crashlogs.ShareLinkOperation
-import com.movtery.zalithlauncher.ui.theme.ZalithLauncherTheme
+import com.movtery.zalithlauncher.ui.theme.ScaledLauncherTheme
 import com.movtery.zalithlauncher.ui.theme.festivals.FestivalEffects
 import com.movtery.zalithlauncher.ui.theme.festivals.FestivalTapObserver
 import com.movtery.zalithlauncher.ui.theme.showThemed
@@ -306,7 +306,7 @@ class MainActivity : BaseAppCompatActivity() {
         )
 
         setContent {
-            ZalithLauncherTheme(
+            ScaledLauncherTheme(
                 backgroundViewModel = backgroundViewModel,
                 festivals = festivals
             ) {

@@ -114,6 +114,7 @@ import com.movtery.zalithlauncher.ui.screens.content.settings.layouts.SettingsCa
 import com.movtery.zalithlauncher.ui.screens.content.settings.layouts.SettingsCardColumn
 import com.movtery.zalithlauncher.ui.screens.content.settings.layouts.SwitchSettingsCard
 import com.movtery.zalithlauncher.ui.theme.ColorThemeType
+import com.movtery.zalithlauncher.ui.theme.LauncherGuiScale
 import com.movtery.zalithlauncher.ui.theme.cardColor
 import com.movtery.zalithlauncher.ui.theme.onCardColor
 import com.movtery.zalithlauncher.utils.animation.TransitionAnimationType
@@ -228,10 +229,26 @@ fun LauncherSettingsScreen(
 
                     SwitchSettingsCard(
                         modifier = Modifier.fillMaxWidth(),
-                        position = CardPosition.Bottom,
+                        position = CardPosition.Middle,
                         unit = AllSettings.launcherFullScreen,
                         title = stringResource(R.string.settings_launcher_full_screen_title),
                         summary = stringResource(R.string.settings_launcher_full_screen_summary)
+                    )
+
+                    //Ukuran tampilan (GUI) launcher: diterapkan saat slider dilepas
+                    IntSliderSettingsCard(
+                        modifier = Modifier.fillMaxWidth(),
+                        position = CardPosition.Bottom,
+                        value = AllSettings.launcherGuiScale.state,
+                        title = stringResource(R.string.settings_launcher_gui_scale_title),
+                        summary = stringResource(R.string.settings_launcher_gui_scale_summary),
+                        valueRange = AllSettings.launcherGuiScale.floatRange,
+                        suffix = "%",
+                        onValueChange = { AllSettings.launcherGuiScale.updateState(it) },
+                        onValueChangeFinished = {
+                            LauncherGuiScale.commit(AllSettings.launcherGuiScale.state)
+                        },
+                        fineTuningControl = true
                     )
                 }
             }

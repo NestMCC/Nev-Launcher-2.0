@@ -982,6 +982,8 @@
     <string name="sort_by_last_played">Urutkan berdasarkan terakhir dimainkan</string>
     <string name="game_menu_option_menu_ball_opacity">Transparansi Overlay Menu</string>
     <string name="game_menu_option_hud_scale">Ukuran Overlay</string>
+    <string name="settings_launcher_gui_scale_title">Ukuran Tampilan Launcher</string>
+    <string name="settings_launcher_gui_scale_summary">Perbesar atau perkecil seluruh tampilan launcher. Diterapkan saat slider dilepas</string>
     <string name="game_menu_option_switch_coordinates">Koordinat (X, Y, Z)</string>
     <string name="game_menu_option_switch_compass">Arah Mata Angin</string>
     <string name="game_hud_compass_n">U</string>
