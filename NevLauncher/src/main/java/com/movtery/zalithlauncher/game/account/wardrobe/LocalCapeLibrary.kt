@@ -114,7 +114,7 @@ object LocalCapeLibrary {
     /**
      * Pakai [cape] untuk [account]. Jika null atau [NoLocalCape], cape akun dihapus.
      */
-    suspend fun apply(account: Account, cape: LocalCape?) = withContext(Dispatchers.IO) {
+    suspend fun applyTo(account: Account, cape: LocalCape?) = withContext(Dispatchers.IO) {
         val target = account.getCapeFile()
         if (cape == null || cape == NoLocalCape || !cape.file.exists()) {
             FileUtils.deleteQuietly(target)

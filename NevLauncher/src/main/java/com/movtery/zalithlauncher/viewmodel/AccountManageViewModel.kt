@@ -572,7 +572,7 @@ class AccountManageViewModel @AssistedInject constructor(
             Task.runTask(
                 dispatcher = Dispatchers.IO,
                 task = {
-                    LocalCapeLibrary.apply(account, cape)
+                    LocalCapeLibrary.applyTo(account, cape)
                     AccountsManager.refreshWardrobe()
                     val toast = if (cape == null || cape == NoLocalCape) {
                         androidText(R.string.account_local_cape_applied_none)

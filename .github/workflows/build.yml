@@ -56,7 +56,11 @@ jobs:
       - name: Build APK for ${{ matrix.arch }}
         run: |
           chmod +x gradlew
-          ./gradlew NevLauncher:assemble${{ inputs.variant }} -Darch=${{ matrix.arch }}
+          set -o pipefail
+          ./gradlew NevLauncher:assemble${{ inputs.variant }} -Darch=${{ matrix.arch }} 2>&1 | tee /tmp/build.log || {
+            echo "::error::$(grep -E '^e: |What went wrong|Execution failed|Unresolved|error:' -A2 /tmp/build.log | head -40 | awk '{printf "%s%%0A", substr($0,1,220)}')"
+            exit 1
+          }
 
       - name: Delete previous debug APK artifacts
         env:
