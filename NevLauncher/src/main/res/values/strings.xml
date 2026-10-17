@@ -427,6 +427,7 @@
     <string name="game_menu_option_switch_memory">Memory Display</string>
     <string name="game_menu_option_menu_ball_opacity">Menu Overlay Opacity</string>
     <string name="game_menu_option_hud_scale">Overlay Size</string>
+    <string name="game_menu_option_menu_scale">Game Menu Size</string>
     <string name="game_menu_option_switch_coordinates">Coordinates (X, Y, Z)</string>
     <string name="game_menu_option_switch_compass">Compass Direction</string>
     <string name="game_hud_compass_n">N</string>

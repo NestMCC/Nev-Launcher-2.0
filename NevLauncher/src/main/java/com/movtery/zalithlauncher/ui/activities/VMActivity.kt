@@ -123,6 +123,7 @@ import com.movtery.zalithlauncher.utils.getDisplayFriendlyRes
 import com.movtery.zalithlauncher.utils.getParcelableSafely
 import com.movtery.zalithlauncher.utils.rememberGameRenderSize
 import com.movtery.zalithlauncher.viewmodel.ErrorViewModel
+import com.movtery.zalithlauncher.ui.control.gamepad.isGamepadKeyEvent
 import com.movtery.zalithlauncher.viewmodel.EventViewModel
 import com.movtery.zalithlauncher.viewmodel.GamepadViewModel
 import kotlinx.coroutines.Dispatchers
@@ -768,6 +769,13 @@ class VMActivity : BaseAppCompatActivity(), SurfaceTextureListener, SurfaceHolde
                     return false
                 }
             }
+        }
+        //Pintasan keyboard fisik: F10 membuka Menu Game (tombol F10 tidak dipakai Minecraft)
+        if (event.keyCode == KeyEvent.KEYCODE_F10 && !event.isGamepadKeyEvent()) {
+            if (isPressed && event.repeatCount == 0) {
+                eventViewModel.sendEvent(EventViewModel.Event.Game.ToggleMenu)
+            }
+            return true
         }
         withHandler {
             if (shouldIgnoreKeyEvent(event)) {

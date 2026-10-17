@@ -67,6 +67,8 @@ class EventViewModel : ViewModel() {
             data object OnResume: Game
             /** Nev Launcher: mulai/hentikan perekaman layar */
             data object ToggleScreenRecord : Game
+            /** Nev Launcher: buka/tutup Menu Game lewat keyboard (F10) */
+            data object ToggleMenu : Game
         }
         sealed interface Terracotta : Event {
             /** 申请 VPN 权限 */

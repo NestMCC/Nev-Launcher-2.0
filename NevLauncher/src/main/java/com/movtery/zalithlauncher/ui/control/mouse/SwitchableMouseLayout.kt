@@ -55,7 +55,8 @@ typealias CursorMode = Int
  * @param enableMouseClick          是否开启虚拟鼠标点击操作（仅适用于滑动控制）
  * @param longPressTimeoutMillis    长按触发检测时长
  * @param requestPointerCapture     是否使用鼠标抓取方案
- * @param hideMouseInClickMode      是否在鼠标为点击控制模式时，隐藏鼠标指针
+ * @param suspendPointerCapture     sementara melepas tangkapan mouse (mis. saat menu game terbuka)
+ * @param hideMouseInClickMode     是否在鼠标为点击控制模式时，隐藏鼠标指针
  * @param gamepadViewModel          更新手柄状态的ViewModel
  * @param onTouch                   触摸到鼠标层
  * @param onMouse                   实体鼠标交互事件
@@ -86,6 +87,7 @@ fun SwitchableMouseLayout(
     enableMouseClick: Boolean = AllSettings.enableMouseClick.state,
     longPressTimeoutMillis: Long = AllSettings.mouseLongPressDelay.state.toLong(),
     requestPointerCapture: Boolean = !AllSettings.physicalMouseMode.state,
+    suspendPointerCapture: Boolean = false,
     hideMouseInClickMode: Boolean = AllSettings.hideMouse.state,
     gamepadViewModel: GamepadViewModel? = null,
     onTouch: () -> Unit = {},
@@ -172,7 +174,10 @@ fun SwitchableMouseLayout(
     }
 
     val textInputActive = rememberTextInputActive()
-    val capturePointer = isCaptured || (requestPointerCapture1 && !textInputActive)
+    //Saat menu game terbuka, mouse fisik dilepas dari mode tangkap supaya bisa
+    //menggerakkan kursor dan mengklik menu; kamera game juga tidak ikut berputar
+    val capturePointer = !suspendPointerCapture &&
+            (isCaptured || (requestPointerCapture1 && !textInputActive))
 
     fun updatePointerPos(pos: Offset) {
         lastVirtualMousePos.value = pos

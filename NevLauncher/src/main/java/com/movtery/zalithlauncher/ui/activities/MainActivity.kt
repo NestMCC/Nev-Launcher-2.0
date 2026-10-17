@@ -774,6 +774,13 @@ class MainActivity : BaseAppCompatActivity() {
             eventViewModel.sendEvent(EventViewModel.Event.Key.OnKeyDown(event))
             return true
         }
+        //Keyboard fisik: Esc = kembali (sama seperti tombol Back)
+        if (event.keyCode == KeyEvent.KEYCODE_ESCAPE) {
+            if (event.action == KeyEvent.ACTION_UP) {
+                onBackPressedDispatcher.onBackPressed()
+            }
+            return true
+        }
         return super.dispatchKeyEvent(event)
     }
 }

@@ -144,6 +144,7 @@ fun GameMenuSubscreen(
 ) {
     val selected = controlMenuTabIndex.coerceIn(0, menuCategories.lastIndex)
 
+    ProvideGameMenuScale {
     CenterMenuSubscreen(
         state = state,
         closeScreen = closeScreen,
@@ -229,6 +230,7 @@ fun GameMenuSubscreen(
                 }
             }
         }
+    }
     }
 }
 
@@ -534,6 +536,24 @@ private fun GameDisplayPage(
                 color = color,
                 contentColor = contentColor,
                 enabled = AllSettings.showMenuBall.state
+            )
+        }
+        //ukuran panel Menu Game (diterapkan saat slider dilepas)
+        item {
+            MenuSliderLayout(
+                modifier = Modifier.fillMaxWidth(),
+                title = stringResource(R.string.game_menu_option_menu_scale),
+                value = AllSettings.gameMenuScale.state,
+                valueRange = AllSettings.gameMenuScale.floatRange,
+                onValueChange = { value ->
+                    AllSettings.gameMenuScale.updateState(value)
+                },
+                onValueChangeFinished = { value ->
+                    GameMenuScale.commit(value)
+                },
+                suffix = "%",
+                color = color,
+                contentColor = contentColor,
             )
         }
         //请求最高刷新率

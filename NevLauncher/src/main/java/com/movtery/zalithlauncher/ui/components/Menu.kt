@@ -31,6 +31,7 @@ import androidx.compose.animation.slideInHorizontally
 import androidx.compose.animation.slideOutHorizontally
 import androidx.compose.foundation.background
 import androidx.compose.foundation.clickable
+import androidx.compose.foundation.focusGroup
 import androidx.compose.foundation.interaction.MutableInteractionSource
 import androidx.compose.foundation.layout.Arrangement
 import androidx.compose.foundation.layout.Box
@@ -71,9 +72,17 @@ import androidx.compose.ui.Modifier
 import androidx.compose.ui.draw.alpha
 import androidx.compose.ui.draw.clip
 import androidx.compose.ui.draw.rotate
+import androidx.compose.ui.focus.FocusRequester
+import androidx.compose.ui.focus.focusProperties
+import androidx.compose.ui.focus.focusRequester
 import androidx.compose.ui.graphics.Color
 import androidx.compose.ui.graphics.Shape
 import androidx.compose.ui.graphics.graphicsLayer
+import androidx.compose.ui.input.key.Key
+import androidx.compose.ui.input.key.KeyEventType
+import androidx.compose.ui.input.key.key
+import androidx.compose.ui.input.key.onPreviewKeyEvent
+import androidx.compose.ui.input.key.type
 import androidx.compose.ui.platform.LocalLayoutDirection
 import androidx.compose.ui.res.painterResource
 import androidx.compose.ui.res.stringResource
@@ -342,12 +351,40 @@ fun CenterMenuSubscreen(
                 enter = fadeIn() + scaleIn(initialScale = 0.92f),
                 exit = fadeOut() + scaleOut(targetScale = 0.92f)
             ) {
+                //Keyboard: saat menu tampil, fokus dipindah ke dalam panel supaya
+                //panah / Tab / Enter langsung bekerja; Esc atau F10 menutup menu
+                val panelFocus = remember { FocusRequester() }
+                LaunchedEffect(Unit) {
+                    runCatching { panelFocus.requestFocus() }
+                }
                 BackgroundCard(
                     shape = shape,
                     influencedByBackground = false,
                     //拦截面板内的点击，避免穿透到遮罩层导致菜单被关闭
                     modifier = Modifier
                         .fillMaxSize()
+                        .focusRequester(panelFocus)
+                        .focusGroup()
+                        .onPreviewKeyEvent { keyEvent ->
+                            when (keyEvent.key) {
+                                //Esc menutup saat tombol dilepas
+                                Key.Escape -> {
+                                    if (keyEvent.type == KeyEventType.KeyUp) closeScreen()
+                                    true
+                                }
+                                //F10 menutup saat ditekan (KeyUp dari F10 yang membuka menu
+                                //bisa tiba setelah menu tampil, sehingga tidak dipakai)
+                                Key.F10 -> {
+                                    if (keyEvent.type == KeyEventType.KeyDown &&
+                                        keyEvent.nativeKeyEvent.repeatCount == 0
+                                    ) closeScreen()
+                                    true
+                                }
+                                else -> false
+                            }
+                        }
+                        //panel itu sendiri tidak perlu fokus; fokus hanya untuk isinya
+                        .focusProperties { canFocus = false }
                         .clickable(
                             indication = null,
                             interactionSource = remember { MutableInteractionSource() },

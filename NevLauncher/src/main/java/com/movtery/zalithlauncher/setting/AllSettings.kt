@@ -514,7 +514,12 @@ object AllSettings : SettingsRegistry() {
     /**
      * 悬浮窗信息的整体大小（百分比）
      */
-    val hudScale = intSetting("hudScale", 100, 60..200)
+    val hudScale = intSetting("hudScale", 100, 30..200)
+
+    /**
+     * Ukuran panel Menu Game (persen)
+     */
+    val gameMenuScale = intSetting("gameMenuScale", 85, 50..120)
 
     /**
      * 在游戏菜单悬浮窗上显示坐标（X、Y、Z）

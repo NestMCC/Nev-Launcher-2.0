@@ -710,7 +710,8 @@ fun GameScreen(
                     },
                     onMouseMoved = { viewModel.switchControlLayer(HideLayerWhen.WhenMouse) },
                     onTouch = { viewModel.switchControlLayer(HideLayerWhen.None) },
-                    gamepadViewModel = gamepadViewModel.takeIf { AllSettings.gamepadControl.state }
+                    gamepadViewModel = gamepadViewModel.takeIf { AllSettings.gamepadControl.state },
+                    suspendPointerCapture = viewModel.gameMenuState == MenuState.SHOW
                 )
             }
 
@@ -905,6 +906,10 @@ fun GameScreen(
                     is EventViewModel.Event.Game.OnResume -> {
                         viewModel.clearState()
                     }
+                    is EventViewModel.Event.Game.ToggleMenu -> {
+                        //Pintasan keyboard (F10): buka/tutup Menu Game
+                        if (!viewModel.isEditingLayout) viewModel.switchMenu()
+                    }
                     else -> { /*忽略*/ }
                 }
             }
@@ -1030,7 +1035,8 @@ private fun MouseControlLayout(
     onReleasePointer: (PointerId) -> Unit,
     onMouseMoved: () -> Unit,
     onTouch: () -> Unit,
-    gamepadViewModel: GamepadViewModel?
+    gamepadViewModel: GamepadViewModel?,
+    suspendPointerCapture: Boolean = false
 ) {
     Box(
         modifier = modifier
@@ -1056,6 +1062,7 @@ private fun MouseControlLayout(
             modifier = Modifier.fillMaxSize(),
             screenSize = screenSize,
             cursorMode = cursorMode,
+            suspendPointerCapture = suspendPointerCapture,
             onTouch = onTouch,
             onMouse = onMouseMoved,
             gamepadViewModel = gamepadViewModel,
